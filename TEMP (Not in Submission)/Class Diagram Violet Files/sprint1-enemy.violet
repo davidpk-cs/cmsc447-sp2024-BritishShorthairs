@@ -5,16 +5,16 @@
    <object class="com.horstmann.violet.ClassNode" id="ClassNode0">
     <void property="attributes">
      <void property="text">
-      <string>Health
-
+      <string>Health: int
+Speed: int
 </string>
      </void>
     </void>
     <void property="methods">
      <void property="text">
-      <string>Spawn
-Move
-Destruct</string>
+      <string>Spawn(pos_x, pos_y)
+Move(target)
+Destruct()</string>
      </void>
     </void>
     <void property="name">
@@ -83,12 +83,12 @@ Destruct</string>
    <object class="com.horstmann.violet.ClassNode" id="ClassNode2">
     <void property="attributes">
      <void property="text">
-      <string>Attack Power</string>
+      <string>Attack Power: int</string>
      </void>
     </void>
     <void property="methods">
      <void property="text">
-      <string>Laser Blast</string>
+      <string>Laser Blast(target)</string>
      </void>
     </void>
     <void property="name">
@@ -122,13 +122,13 @@ Destruct</string>
    <object class="com.horstmann.violet.ClassNode" id="ClassNode3">
     <void property="attributes">
      <void property="text">
-      <string>Weight
+      <string>Weight: int
 </string>
      </void>
     </void>
     <void property="methods">
      <void property="text">
-      <string>Collide</string>
+      <string>Collide(target)</string>
      </void>
     </void>
     <void property="name">
@@ -162,13 +162,13 @@ Destruct</string>
    <object class="com.horstmann.violet.ClassNode" id="ClassNode4">
     <void property="attributes">
      <void property="text">
-      <string>Spawn Rate
-UFO Level</string>
+      <string>Spawn Rate: float
+UFO Level: UFO Object</string>
      </void>
     </void>
     <void property="methods">
      <void property="text">
-      <string>Spawn UFO</string>
+      <string>Spawn UFO()</string>
      </void>
     </void>
     <void property="name">
@@ -202,12 +202,12 @@ UFO Level</string>
    <object class="com.horstmann.violet.ClassNode" id="ClassNode5">
     <void property="attributes">
      <void property="text">
-      <string>Bounty</string>
+      <string>BountyValue: int</string>
      </void>
     </void>
     <void property="methods">
      <void property="text">
-      <string>Long Range Attack</string>
+      <string>LongRangeAttack(target)</string>
      </void>
     </void>
     <void property="name">

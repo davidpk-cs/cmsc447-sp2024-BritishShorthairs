@@ -5,8 +5,8 @@
    <object class="com.horstmann.violet.ClassNode" id="ClassNode0">
     <void property="attributes">
      <void property="text">
-      <string>Health
-Position</string>
+      <string>Health: int
+Position: (int, int)</string>
      </void>
     </void>
     <void property="name">
@@ -40,7 +40,7 @@ Position</string>
    <object class="com.horstmann.violet.ClassNode" id="ClassNode1">
     <void property="methods">
      <void property="text">
-      <string>Initiate Game Over Upon Destruction</string>
+      <string>InitiateGameOverUponDestruction()</string>
      </void>
     </void>
     <void property="name">
@@ -74,13 +74,13 @@ Position</string>
    <object class="com.horstmann.violet.ClassNode" id="ClassNode2">
     <void property="attributes">
      <void property="text">
-      <string>Cost
-Rate of Fire</string>
+      <string>Cost: int
+Rate of Fire: float</string>
      </void>
     </void>
     <void property="methods">
      <void property="text">
-      <string>Deploy</string>
+      <string>Deploy()</string>
      </void>
     </void>
     <void property="name">
@@ -143,13 +143,13 @@ Rate of Fire</string>
    <object class="com.horstmann.violet.ClassNode" id="ClassNode4">
     <void property="attributes">
      <void property="text">
-      <string>Speed</string>
+      <string>Speed: int</string>
      </void>
     </void>
     <void property="methods">
      <void property="text">
-      <string>Move
-Follow</string>
+      <string>Move()
+Follow(EnemyTarget)</string>
      </void>
     </void>
     <void property="name">
@@ -183,7 +183,7 @@ Follow</string>
    <object class="com.horstmann.violet.ClassNode" id="ClassNode5">
     <void property="attributes">
      <void property="text">
-      <string>Area of Effect Size</string>
+      <string>Area of Effect Size: int</string>
      </void>
     </void>
     <void property="name">
@@ -246,7 +246,7 @@ Follow</string>
    <object class="com.horstmann.violet.ClassNode" id="ClassNode7">
     <void property="attributes">
      <void property="text">
-      <string>Pierce Power</string>
+      <string>Pierce Power: int</string>
      </void>
     </void>
     <void property="name">
@@ -280,14 +280,15 @@ Follow</string>
    <object class="com.horstmann.violet.ClassNode" id="ClassNode8">
     <void property="attributes">
      <void property="text">
-      <string>Area of Effect Size (0 if no AOE)
-Pierce Power (0 if no Pierce)
-Speed</string>
+      <string>Area of Effect Size: int (0 if no AOE)
+Pierce Power: int (0 if no Pierce)
+Speed: int</string>
      </void>
     </void>
     <void property="methods">
      <void property="text">
-      <string>Detonate</string>
+      <string>Detonate()
+CheckIfContact()</string>
      </void>
     </void>
     <void property="name">
