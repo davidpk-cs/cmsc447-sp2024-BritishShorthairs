@@ -8,5 +8,4 @@ vary however (pierce power, speed, Area of Effect, etc.).
 Enemy Diagram: Presents enemies. There are 2 kinds of enemies. Celestial bodies like asteroids go and crash into our towers and home base and do a lot of damage, but are destroyed on contact. The other towers actually persist and 
 continue to attack (or spawn other towers) until destroyed.
 
-Economy Diagram: Lays out the crafting system. It shows how raw materials can be crafted into intermediate materials
-which can be crafted into full fledged towers. 
+Economy Diagram: Lays out the crafting system. It shows how towers can be crafted out of resources. That are acquired from destroying enemies.
