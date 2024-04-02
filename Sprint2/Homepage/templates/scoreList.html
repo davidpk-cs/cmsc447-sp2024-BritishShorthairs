@@ -1,0 +1,85 @@
+<!--
+Author: Shianne Marbley
+File: scoreList.html
+Description: Where the inputted data is stored in a table format
+
+
+NOTE: everthing is in red because I am trying to see what colors don't mesh with the background
+but I am not sure atm.
+-->
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset ="utf-8">
+        <style>
+            .highscores{
+                color:rgb(76, 142, 209);
+                text-decoration: underline;
+                text-align: center;
+                font-family:'Times New Roman', Times, serif;
+                font-size: 30px;
+            }
+            table{ 
+                text-align: center;
+                border-collapse: collapse;
+                width: 100%; 
+                font-family:'Times New Roman', Times, serif;
+                font-size: 18px;
+
+            }
+            td, tr{
+                /* creates the line between each entry*/
+                border-bottom: 5px solid #ed9f51;
+                border-left: 5px solid #ed9f51;
+                border-right: 5px solid #ed9f51;
+                padding: 8px;
+                text-align: left;
+            }
+            th{
+                color: red;
+                border-top: 5px solid #ed9f51;
+                border-left: 5px solid #ed9f51;
+            }
+
+            body{
+                background-image: url("{{ url_for('static', filename='img/HighScores.png') }}");
+                background-color: rgb(210, 231, 246);
+                background-repeat: no-repeat;
+                background-size: cover;
+                background-position: top center;
+            }
+            .delete{
+                border-right: 1px solid #ed9f51;
+                
+            }
+
+        </style>
+
+    </head>
+    <body>
+        <!--Uses a forloop so that user inputed data goes to
+        the correct  places-->
+        <h1 class="highscores"> High Scores List</h1>
+        <table>
+            <tr>
+                
+                <th><strong>Username</strong></th>
+                <th><strong>Points</strong></th>
+                <th><strong>Delete</strong></th>
+            </tr>
+            {%for d in data%}
+            <tr>
+
+                <td style="color: red;">{{d[1]}}</td>
+                <td style="color: red;">{{d[2]}}</td> 
+
+                <td><form action="{{url_for('delete')}}" method="POST"><input type="hidden" name="id" value="{{ d[0] }}"><input type="submit" value="Delete" 
+                    style="background-color:rgb(219, 223, 222); border-radius:5px; border-width:thin; font-size:15px; color:red;"></form> </td> 
+            </tr>
+            {%endfor%}
+        </table>
+        <br>
+        <button class="btn" type="button" onclick="window.location.href='/';"
+        style="background-color:rgb(219, 223, 222); border-radius:5px; border-width:thin; font-size:15px;">Back Home</button>
+    </body>
+</html>
