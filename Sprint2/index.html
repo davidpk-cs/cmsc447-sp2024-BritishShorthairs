@@ -35,6 +35,10 @@ canvas {
 <script>
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
+
+// matt
+const item_coords = [];
+
 canvas.width = window.innerWidth * .99;
 canvas.height = window.innerHeight * .89;
 
@@ -55,9 +59,47 @@ const drawBoard = () => {
 };
 
 const drawRect = (x, y) => {
-  ctx.fillStyle = "blue";
-  ctx.fillRect(x * pixel_size, y * pixel_size, 
+  console.log('Clicked pos rect: ', x, y); // check console on web 
+
+  // make an arbitrary rect for new item
+  r_x = x + curr_box.x - 1; 
+  b_y = y + curr_box.y - 1;
+  // console.log("Curr box: ", x, y, r_x, y, x, b_y, r_x, b_y);
+
+  // Check if any object conflicts with where we clicked for new 
+  conflict = false;
+
+  item_coords.forEach(stored_item => {    
+    r_x2 = stored_item.x + stored_item.width - 1; 
+    b_y2 = stored_item.y + stored_item.height - 1;
+
+    // console.log("existing box: ", stored_item.x, stored_item.y, r_x2, stored_item.y, stored_item.x, b_y2, r_x2, b_y2);
+
+    // conflict when curr_box inhibits an exisiting box
+    if (!(x > r_x2 || r_x < stored_item.x)) { 
+      if (!(y > b_y2 || b_y < stored_item.y)) {
+        conflict = true;
+      }
+    }
+  });
+
+  // only create a rect and store it if no conflict
+  if (!conflict) {
+    ctx.fillStyle = "blue";
+    ctx.fillRect(x * pixel_size, y * pixel_size, 
                pixel_size * curr_box.x, pixel_size * curr_box.y);
+  
+    // store rect here (top left corner, and its width and height)
+    const item = {
+          x: x,
+          y: y,
+          width: curr_box.x,
+          height: curr_box.y
+      };
+
+    // Push rectangle object to the array
+    item_coords.push(item);
+  }
 };
 
 const round_to_grid = (coord) => {
