@@ -61,6 +61,29 @@ const drawBoard = () => {
 const drawRect = (x, y) => {
   console.log('Clicked pos rect: ', x, y); // check console on web 
 
+  // Check if any object conflicts with where we clicked for new 
+  conflict = placement_conflict(x, y)
+
+  // only create a rect and store it if no conflict
+  if (!conflict) {
+    ctx.fillStyle = "blue";
+    ctx.fillRect(x * pixel_size, y * pixel_size, 
+               pixel_size * curr_box.x, pixel_size * curr_box.y);
+  
+    // store rect here (top left corner, and its width and height)
+    const item = {
+          x: x,
+          y: y,
+          width: curr_box.x,
+          height: curr_box.y
+      };
+
+    // Push rectangle object to the array
+    item_coords.push(item);
+  }
+};
+
+const placement_conflict = (x, y) => {
   // make an arbitrary rect for new item
   r_x = x + curr_box.x - 1; 
   b_y = y + curr_box.y - 1;
@@ -83,24 +106,8 @@ const drawRect = (x, y) => {
     }
   });
 
-  // only create a rect and store it if no conflict
-  if (!conflict) {
-    ctx.fillStyle = "blue";
-    ctx.fillRect(x * pixel_size, y * pixel_size, 
-               pixel_size * curr_box.x, pixel_size * curr_box.y);
-  
-    // store rect here (top left corner, and its width and height)
-    const item = {
-          x: x,
-          y: y,
-          width: curr_box.x,
-          height: curr_box.y
-      };
-
-    // Push rectangle object to the array
-    item_coords.push(item);
-  }
-};
+  return conflict;
+}
 
 const round_to_grid = (coord) => {
   return Math.floor(coord / pixel_size);
