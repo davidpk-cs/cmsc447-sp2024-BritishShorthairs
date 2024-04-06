@@ -1,0 +1,39 @@
+#homeBase{
+
+    border-radius:50%;
+    position:absolute;
+    width:100px;
+    height:100px;
+
+
+    background-color:gold;
+    border-color:black;
+    border-style:solid;
+}
+
+html, body{
+
+    height:100%;
+}
+
+
+#viewPort{
+
+    height: 80%;
+    width: 80%;
+    justify-self: center;
+
+    position:relative;
+
+    margin-top:10px;
+
+    border: solid 2px black;
+}
+
+#weaponField{
+    height:100%;
+    width:100%;
+    margin:0;
+    padding:0;
+    background-color:lightpink;
+}
