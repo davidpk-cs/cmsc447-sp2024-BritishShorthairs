@@ -2,7 +2,7 @@
 #view score and inputs username
 
 from flask import Flask
-from flask import render_template
+from flask import render_template,jsonify
 from flask import request, redirect,url_for
 import sqlite3
 
@@ -12,6 +12,9 @@ app = Flask(__name__)
 @app.route("/")
 def homeScreen():
     return render_template('homepage.html')
+@app.route("/newGame")
+def newGame():
+    return render_template('newGame.html')
 
 
 #atm it is just student inputted scores but hopefully we can link scores to usernames
@@ -67,7 +70,7 @@ def delete():
             conn.rollback()
 
         finally:
-            return redirect(url_for('scoreList')) 
+            return redirect(url_for('scoreList'))
         
 if __name__ == '__main__':
     app.run(debug=False)
