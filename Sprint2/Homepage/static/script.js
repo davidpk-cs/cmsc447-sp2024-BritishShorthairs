@@ -24,5 +24,19 @@ function getVars() {
         console.log("The score isn't 0. ");
         return;
     }
-    console.log('${username} is added with ${points}',)
+    console.log(`${username} is added with ${points}`);
+
+    /*var player_info = [username,points];
+
+    fetch('/scoreForm', 
+    {method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+        data: player_info,
+    })
+    });*/
 }
+
+
