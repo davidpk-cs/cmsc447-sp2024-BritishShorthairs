@@ -12,15 +12,20 @@ app = Flask(__name__)
 @app.route("/")
 def homeScreen():
     return render_template('homepage.html')
+
 @app.route("/newGame")
 def newGame():
     return render_template('newGame.html')
 
+@app.route('/startGame', methods=['POST'])
+def startGame():
+    return render_template('newGame.html')
+
 
 #atm it is just student inputted scores but hopefully we can link scores to usernames
-@app.route('/scoreForm',methods=['GET', 'POST'])
+@app.route('/scoreForm',methods=['POST','GET'])
 def scoreForm():
-    #this gets the data from the user input 
+       #this gets the data from the user input 
     if request.method == 'POST':
         Username = request.form['Username']
         Points = request.form['Points']
@@ -34,6 +39,17 @@ def scoreForm():
     else:
         #otherwise reload the form page
         return render_template("scoreForm.html")
+    ''' data = request.get_json()
+    info = data.get('data')
+
+    player_info = (info[0], int(info[1]))
+
+    connection = sqlite3.connect('database.db')
+    cursor = connection.cursor()
+    cursor.execute('INSERT OR IGNORE INTO highscores (username,points) VALUES (?, ?)', player_info)
+
+    connection.commit()
+    return jsonify("Successful Add")'''
 
 #route to see the table of highscores
 @app.route('/scoreList')
