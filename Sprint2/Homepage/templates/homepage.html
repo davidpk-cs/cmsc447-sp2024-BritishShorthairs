@@ -7,6 +7,7 @@ NOTES: must use static url method to reference photos
 <html>
     <head>
         <meta charset ="utf-8">
+        <script src="{{ url_for('static', filename='script.js') }}"></script>
         <style>
             body {
                 background-image: url("{{ url_for('static', filename='img/HomePage.png') }}");
@@ -67,7 +68,7 @@ NOTES: must use static url method to reference photos
             </div>
             <div class="btn">
                 <br>
-                <img class="new-game" src="{{ url_for('static', filename='img/newGame.png') }}">
+                <img class="new-game" src="{{ url_for('static', filename='img/newGame.png') }}" onclick="newGame()">
                 <br><br><br>
             </div>
         </p>
