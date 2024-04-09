@@ -21,35 +21,35 @@ def newGame():
 def startGame():
     return render_template('newGame.html')
 
+@app.route("/grid")
+def gridPage():
+    return render_template('grid.html')
+
 
 #atm it is just student inputted scores but hopefully we can link scores to usernames
-@app.route('/scoreForm',methods=['POST','GET'])
+@app.route('/scoreForm', methods=['GET', 'POST'])
 def scoreForm():
-       #this gets the data from the user input 
-    if request.method == 'POST':
-        Username = request.form['Username']
-        Points = request.form['Points']
-    #using submit button to insert the info into the datbase
-        with sqlite3.connect("database.db") as user:
-            cur = user.cursor()
-            cur.execute('INSERT INTO highscores (username,Points) VALUES (?,?)',(Username,Points))
-            user.commit()
-         #data is inputted so it should be on the datatable   
-        return redirect((url_for('scoreList'))) # CHANGE THIS TO HIGHSCORE TABLE NAME
-    else:
-        #otherwise reload the form page
-        return render_template("scoreForm.html")
-    ''' data = request.get_json()
-    info = data.get('data')
+     if request.method == 'POST':
+        #post request should be with data insertion
+        data = request.get_json()
+        info = data.get('data')
 
-    player_info = (info[0], int(info[1]))
+        username = info[0]
+        points = int(info[1])
 
-    connection = sqlite3.connect('database.db')
-    cursor = connection.cursor()
-    cursor.execute('INSERT OR IGNORE INTO highscores (username,points) VALUES (?, ?)', player_info)
+        if points != 0:
+            return jsonify({'error': 'Points must be 0 to submit.'}), 400
 
-    connection.commit()
-    return jsonify("Successful Add")'''
+        connection = sqlite3.connect('database.db')
+        cursor = connection.cursor()
+        cursor.execute('INSERT INTO highscores (username, points) VALUES (?, ?)', (username, points))
+        connection.commit()
+        connection.close()
+
+        return jsonify({'message': 'Data inserted successfully.'}), 200
+     else:
+        # render template as needed
+        return render_template('scoreForm.html')
 
 #route to see the table of highscores
 @app.route('/scoreList')

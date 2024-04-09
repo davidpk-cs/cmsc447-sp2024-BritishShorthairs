@@ -13,6 +13,7 @@ function deleteFxn() {
 }
 
 function getVars() {
+    event.preventDefault();
     //get the username and points from data inputed
     var newUser = document.getElementById("Username"); 
     var autoPoints = document.getElementById("Points"); 
@@ -25,18 +26,27 @@ function getVars() {
         return;
     }
     console.log(`${username} is added with ${points}`);
+    var player_info = [username,points];
 
-    /*var player_info = [username,points];
-
-    fetch('/scoreForm', 
-    {method: 'POST',
-    headers: {
-        'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-        data: player_info,
+    fetch('/scoreForm', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            data: player_info,
+        })
     })
-    });*/
+        .then(response => response.json())
+        .then(data => {
+            console.log(data); //log response to server
+            //redirect to scorelist 
+            window.location.href = '/scoreList'; 
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            //error handling
+        });
 }
 
 
