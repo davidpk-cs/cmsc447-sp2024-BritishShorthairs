@@ -33,7 +33,7 @@ Description: RN is a placeholder where user inputs username (score hopefully wil
     </head>
     <body>
         <h1 class="formPage">Highscores</h1>
-       <form class="forms" action="{{ url_for('scoreForm') }}" method="POST">
+       <form class="forms" action="{{ url_for('scoreForm') }}" method="POST" onsubmit="getVars(event)">
             <label>Enter Username:</label>
             <input type="text" name="Username" id="Username" placeholder="Username HERE!" value="{{ request.form['username']}}" required><br/><br/>
     
