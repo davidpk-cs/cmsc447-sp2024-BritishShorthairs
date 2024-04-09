@@ -1,9 +1,12 @@
 var enemies = [];
-var enemyIds = [];
+var enemyFragments = [];
+var enemyHP = [];
 
 var towers = [];
 
-var enemyCount = 12;
+var enemyCount = 3;
+var enemyWaves = 100;
+
 var enemySpeed = 10;
 
 var lasersActive = false;
@@ -12,14 +15,16 @@ const framesPerSecond = 60;
 
 const totalTimeInSeconds = 0.1; // Total time for one cycle
 const functionTimeInSeconds = totalTimeInSeconds / 2; // Equal time for each function
-
 const firstFunctionTimeInSeconds = functionTimeInSeconds; // Time for the first function
 const secondFunctionTimeInSeconds = functionTimeInSeconds; // Time for the second function
-
 const totalFrames = framesPerSecond * totalTimeInSeconds;
 const functionFrames = framesPerSecond * functionTimeInSeconds;
-
 var currentFunction = 0; // Keeps track of which function to run
+
+var canPlace = true;
+var activeTowerPlacement = false;
+
+var assetsPath = "../assets/"
 
 
 var currentFrame = 0;
@@ -29,32 +34,34 @@ function moveEnemies() {
 
     for (var i = 0; i < enemies.length; i++) {
         var target = document.getElementById("homeBase");
-
+    
         var targetStyles = window.getComputedStyle(target);
         var enemyStyles = window.getComputedStyle(enemies[i]);
-
+    
         // Assuming the top and left values are in percentages in CSS, calculate their pixel values relative to the parent container
         var targetTop = parseFloat(targetStyles.top);
         var targetLeft = parseFloat(targetStyles.left);
-
+    
         var enemyTop = parseFloat(enemyStyles.top);
         var enemyLeft = parseFloat(enemyStyles.left);
-
+    
         //console.log(targetTop, targetLeft, enemyTop, enemyLeft);
-
+    
         // Calculate 1/1000th of the distance
-        var changeX = (targetLeft - enemyLeft) / 200;
-        var changeY = (targetTop - enemyTop) / 200;
-
+        var changeX = (targetLeft - enemyLeft) / enemyFragments[i];
+        var changeY = (targetTop - enemyTop) / enemyFragments[i];
+    
         // Calculate new positions for enemy
         var newX = enemyLeft + changeX;
         var newY = enemyTop + changeY;
-
+    
         // Update the x and y positions of enemies[i] in pixels
         enemies[i].style.left = `${newX}px`;
         enemies[i].style.top = `${newY}px`;
-    }
 
+        if(enemyFragments[i] > 5){
+            enemyFragments[i] -= 1;
+    }   } 
 }
 
 function activateTowers() {
@@ -109,9 +116,8 @@ function activateTowers() {
 
                 draw.stroke();
 
-                enemies[j].parentNode.removeChild(enemies[j]);
-
-                enemies.splice(j, 1);
+                attackEnemy(j);
+                
                 break;
             }
             else{
@@ -122,7 +128,24 @@ function activateTowers() {
     }
 }
 
+function attackEnemy(j){
+
+    enemyHP[j] -= 1;
+
+    if(enemyHP[j] == 0){
+
+        enemies[j].parentNode.removeChild(enemies[j]);
+        enemies.splice(j, 1);
+        enemyFragments.splice(j, 1);
+        enemyHP.splice(j, 1);
+    }
+    
+}
+
 function runRound() {
+
+    coverScreenWithTransparentDiv();
+
     if (currentFrame < functionFrames) {
 
 
@@ -139,6 +162,12 @@ function runRound() {
         }
     } else if (currentFrame < 2 * functionFrames) {
         if (currentFunction === 1) {
+
+            if(enemyWaves){
+                sendEnemyWave();
+                enemyWaves--;
+            }
+
             moveEnemies();
         } else {
             //nothing over here, just keep existing canvas
@@ -157,18 +186,27 @@ function runRound() {
 
 function mainFunc(){
 
+    sendEnemyWave();
+
+    enemyWaves--;
+
+    runRound();
+}
+
+function sendEnemyWave(){
+
     for(var i = 0; i < enemyCount; i++){
     
-        var newRock = document.createElement("div");
+        var newRock = document.createElement("img"); // Change 'div' to 'img'
 
         newID = "enemy" + i.toString();
+        newRock.id = newID;
 
-        newRock.id= newID;
+        newRock.style.width = '60px';
+        newRock.style.height = '60px';
+        // The backgroundColor and borderRadius are not needed for an image, so those lines are removed.
 
-        newRock.style.width ='40px';
-        newRock.style.height = '40px';
-        newRock.style.backgroundColor = 'pink';
-        newRock.style.borderRadius = "50%";
+        newRock.src = assetsPath + 'enemies/tile007.png'; // Set the source to the PNG sprite
 
         newRock.style.position="absolute";
 
@@ -184,9 +222,10 @@ function mainFunc(){
         enemyHolder.appendChild(newRock);
 
         enemies.push(newRock);
+        enemyFragments.push(201);
+        enemyHP.push(1);
     }
 
-    runRound();
 }
 
 
@@ -201,14 +240,17 @@ function placeTower(){
         var x = event.clientX - viewPortPos.left;
         var y = event.clientY - viewPortPos.top;
 
-        var newTower = document.createElement("div");
+        var newTower = document.createElement("img");
+
+        newTower.src = assetsPath + "enemies/ufoBlue.png"; // Setting the source of the image
 
         newTower.style.position = "absolute";
-        
-        newTower.style.width ='60px';
+        newTower.style.width = '60px';
         newTower.style.height = '60px';
-        newTower.style.backgroundColor = 'black';
+
+        // For an <img>, backgroundColor and borderRadius will affect the container if it has any, but you can still apply borderRadius to make the image appear circular if it's not already.
         newTower.style.borderRadius = "50%";
+
 
         newTower.style.top = y.toString() + "px";
         newTower.style.left = x.toString() + "px";
@@ -229,4 +271,22 @@ function randomInt(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
+}
+
+
+function coverScreenWithTransparentDiv() {
+    // Create a new div element
+    const overlay = document.createElement('div');
+  
+    // Style the div to cover the entire screen and be fully transparent
+    overlay.style.position = 'fixed'; // Position fixed to cover the viewport
+    overlay.style.top = '0'; // Start from the top-left corner of the viewport
+    overlay.style.left = '0';
+    overlay.style.width = '100vw'; // Cover the full viewport width
+    overlay.style.height = '100vh'; // Cover the full viewport height
+    overlay.style.backgroundColor = 'rgba(0, 0, 0, 0)'; // Fully transparent background
+    overlay.style.zIndex = '1000'; // High z-index to ensure it covers other elements
+  
+    // Append the div to the body
+    document.body.appendChild(overlay);
+}
