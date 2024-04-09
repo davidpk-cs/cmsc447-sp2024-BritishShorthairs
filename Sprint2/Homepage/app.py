@@ -21,6 +21,10 @@ def newGame():
 def startGame():
     return render_template('newGame.html')
 
+@app.route("/grid")
+def gridPage():
+    return render_template('grid.html')
+
 
 #atm it is just student inputted scores but hopefully we can link scores to usernames
 @app.route('/scoreForm', methods=['GET', 'POST'])
