@@ -5,21 +5,27 @@ var enemyHP = [];
 var towers = [];
 
 var enemyCount = 3;
-var enemyWaves = 100;
+var enemyWaves = -1;
 
 var enemySpeed = 10;
 
 var lasersActive = false;
 
-const framesPerSecond = 60;
+var score = 0;
+
+var credits = 10;
+
+var lives = 100;
+
+const framesPerSecond = 60; //program tested on high refresh rate screens it works fine
 
 const totalTimeInSeconds = 0.1; // Total time for one cycle
 const functionTimeInSeconds = totalTimeInSeconds / 2; // Equal time for each function
 const firstFunctionTimeInSeconds = functionTimeInSeconds; // Time for the first function
-const secondFunctionTimeInSeconds = functionTimeInSeconds; // Time for the second function
+const secondFunctionTimeInSeconds = functionTimeInSeconds; // Time for second function!
 const totalFrames = framesPerSecond * totalTimeInSeconds;
 const functionFrames = framesPerSecond * functionTimeInSeconds;
-var currentFunction = 0; // Keeps track of which function to run
+var currentFunction = 0; //so we know what func to run
 
 var canPlace = true;
 var activeTowerPlacement = false;
@@ -38,7 +44,6 @@ function moveEnemies() {
         var targetStyles = window.getComputedStyle(target);
         var enemyStyles = window.getComputedStyle(enemies[i]);
     
-        // Assuming the top and left values are in percentages in CSS, calculate their pixel values relative to the parent container
         var targetTop = parseFloat(targetStyles.top);
         var targetLeft = parseFloat(targetStyles.left);
     
@@ -61,7 +66,26 @@ function moveEnemies() {
 
         if(enemyFragments[i] > 5){
             enemyFragments[i] -= 1;
-    }   } 
+        }
+        
+        var contactThreshold = 10; // pixels you need to be close enough to count as a touch
+        if (Math.abs(newX - targetLeft) <= contactThreshold && Math.abs(newY - targetTop) <= contactThreshold) {
+            lives--;
+
+            if(lives == 0){
+                document.getElementById("livesBoard").innerText = "Lives Remaining: 0";
+                return;
+            }
+            
+        }
+
+        if (enemyFragments[i] > 5) {
+            enemyFragments[i] -= 1;
+        }
+
+    }
+
+    document.getElementById("livesBoard").innerText = "Lives Remaining: " + lives.toString();
 }
 
 function activateTowers() {
@@ -79,7 +103,7 @@ function activateTowers() {
         var towerTop = parseInt(towerStyles.top);
         var towerLeft = parseInt(towerStyles.left);
 
-        // Set the drawing buffer size to match the displayed size
+        // Set the drawing buffer size to match the displayed size so we can draw on full canvas
 
         var towerRect = towers[i].getBoundingClientRect();
 
@@ -110,9 +134,11 @@ function activateTowers() {
                 draw = canvas.getContext("2d");
 
                 draw.beginPath();
-
+                
                 draw.moveTo(towerX, towerY);
                 draw.lineTo(enemyX, enemyY);
+
+                draw.strokeStyle = "red";
 
                 draw.stroke();
 
@@ -125,6 +151,8 @@ function activateTowers() {
             }
 
         }
+
+        document.getElementById("scoreBoard").innerText = "Score: " + score.toString();
     }
 }
 
@@ -138,6 +166,8 @@ function attackEnemy(j){
         enemies.splice(j, 1);
         enemyFragments.splice(j, 1);
         enemyHP.splice(j, 1);
+
+        score++;
     }
     
 }
@@ -165,6 +195,7 @@ function runRound() {
 
             if(enemyWaves){
                 sendEnemyWave();
+                enemyCount++;
                 enemyWaves--;
             }
 
@@ -172,6 +203,13 @@ function runRound() {
         } else {
             //nothing over here, just keep existing canvas
         }
+    }
+
+    if(lives == 0){
+
+        createEndingCover("Good Game! Total Score: " + score.toString());
+
+        return;
     }
     
     currentFrame++;
@@ -231,6 +269,14 @@ function sendEnemyWave(){
 
 function placeTower(){
 
+    if(credits == 0){
+        return;
+    }
+
+    credits--;
+
+    document.getElementById("creditBoard").innerText = "Credits Remaining: " + credits.toString();
+
     document.getElementById('viewPort').addEventListener('click', function(event) {
 
         //console.log("here");
@@ -248,7 +294,6 @@ function placeTower(){
         newTower.style.width = '60px';
         newTower.style.height = '60px';
 
-        // For an <img>, backgroundColor and borderRadius will affect the container if it has any, but you can still apply borderRadius to make the image appear circular if it's not already.
         newTower.style.borderRadius = "50%";
 
 
@@ -275,18 +320,65 @@ function randomInt(min, max) {
 
 
 function coverScreenWithTransparentDiv() {
-    // Create a new div element
+
+    //this is to make sure you can't do anything once you start the game
+   
     const overlay = document.createElement('div');
   
-    // Style the div to cover the entire screen and be fully transparent
-    overlay.style.position = 'fixed'; // Position fixed to cover the viewport
-    overlay.style.top = '0'; // Start from the top-left corner of the viewport
+    // Style the div to be fully transparent
+    overlay.style.position = 'fixed'; 
+    overlay.style.top = '0'; 
     overlay.style.left = '0';
     overlay.style.width = '100vw'; // Cover the full viewport width
     overlay.style.height = '100vh'; // Cover the full viewport height
-    overlay.style.backgroundColor = 'rgba(0, 0, 0, 0)'; // Fully transparent background
-    overlay.style.zIndex = '1000'; // High z-index to ensure it covers other elements
+    overlay.style.backgroundColor = 'rgba(0, 0, 0, 0)'; //  transparent background
+    overlay.style.zIndex = '1000'; 
   
-    // Append the div to the body
     document.body.appendChild(overlay);
 }
+
+
+function createEndingCover(message) {
+
+    // Check if overlay already exists and kill if needed
+    const existingOverlay = document.getElementById('customOverlay');
+    if (existingOverlay) {
+      existingOverlay.remove();
+    }
+  
+    // make the div
+    const overlay = document.createElement('div');
+    overlay.id = 'customOverlay';
+    overlay.style.position = 'fixed';
+    overlay.style.top = '0';
+    overlay.style.left = '0';
+    overlay.style.width = '100%';
+    overlay.style.height = '100%';
+    overlay.style.backgroundColor = 'rgba(255, 255, 255, 0.7)'; // a bit of transparent white
+    overlay.style.display = 'flex';
+    overlay.style.justifyContent = 'center';
+    overlay.style.alignItems = 'center';
+    overlay.style.zIndex = '1000'; // this is to cover everything
+  
+    // Create the header with the message
+    const header = document.createElement('h2');
+    header.textContent = message;
+    header.style.textAlign = 'center';
+  
+    // Create the reload button
+    const button = document.createElement('button');
+    button.textContent = "Restart Game";
+    button.onclick = function() {
+      window.location.reload();
+    };
+  
+    // add message to the div
+    overlay.appendChild(header);
+    overlay.appendChild(button);
+  
+    // deploy!!
+    document.body.appendChild(overlay);
+}
+  
+ 
+  
