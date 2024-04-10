@@ -12,7 +12,7 @@
 # How to run
 ## FOR SPACE DEFENDERS DEMO
 * Go to Code/src/Space Defenders Demo
-* Open main.html
+* Open main.html in a browser
 ## FOR HOMEPAGE
 * Go to Code/src/Homepage
 * run in terminal: pip install requirements.txt
