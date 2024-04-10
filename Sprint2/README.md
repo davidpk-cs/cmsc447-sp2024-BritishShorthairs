@@ -8,6 +8,7 @@
 * In the homepage folder, there is our homepage as well as the start of the Production side of the game.
 * In the Space Defender Demo folder, there is a demo of the Tower Defense side of the game.
 * Both of these are important aspects of the game, and need to be run seperately.
+* __Disclaimer:__ This current state of the game is meant to be run in fullscreen as it has not yet been tested in a crunched screen.
 
 # How to run
 ## FOR SPACE DEFENDERS DEMO
