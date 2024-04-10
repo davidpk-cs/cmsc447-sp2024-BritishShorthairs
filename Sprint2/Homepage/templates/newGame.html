@@ -4,19 +4,37 @@ File: newGame.html
 NOTES: must use static url method to reference photos
 -->
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset ="utf-8">
-        <style>
-            body{
-                background-color: rgb(106, 121, 132);
-            }
-        </style>
-    </head>
-    <body>
-        <h1><strong> This is a Template for a new game Page</strong></h1>
-        <button class="btn" type="button" onclick="window.location.href='/';"
-        style="background-color:rgb(219, 223, 222); border-radius:5px; border-width:thin; font-size:15px;">Back Home</button>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Space Defenders</title>
+    <script src="{{ url_for('static', filename='game.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='game.css') }}">
+</head>
+<body>
 
-    </body>
+    <div id = "topBar">
+
+        <button class="topBarItem" onclick="mainFunc()">Play Game</button>
+        <button class="topBarItem" onclick="placeTower()">Place Tower</button>
+
+        <p class="topBarItem" id="scoreBoard">Score: 100</p>
+
+    </div>
+
+    <div id = "viewPort">
+
+        <canvas id="weaponField"></canvas>
+    
+        <div id="homeBase" style="top:50%;
+        left:90%;">
+        
+    
+        </div>
+
+    </div>
+
+</body>
 </html>
