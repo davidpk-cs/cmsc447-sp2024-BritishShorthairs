@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask Signal</title>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <style>
+            .functionBox{
+                background-color:rgb(117, 132, 138);
+                margin:20px;
+                display:flex;
+                justify-content:space-evenly;
+                flex-wrap:wrap;
+                max-width:250px;
+                max-height:150px;
+            }
+            body{
+                /*background-color:rgb(201, 246, 231);*/
+                background-image: url("{{ url_for('static', filename='img/HighScores.png') }}");
+            }
+
+            footer{
+
+                background-color:rgb(117, 132, 138);
+            }
+
+            footer button{
+
+                margin:10px;
+                background-color:black;
+                color:white;
+            }
+
+            #searchBar{
+
+                display:flex;
+                justify-content:left;
+                flex-wrap:wrap;
+
+            }
+
+            tr th {
+                border: solid black 1px;
+            }
+
+            #topBar{
+
+                display:flex;
+                justify-content:left;
+                flex-wrap:wrap;
+            }
+
+            #refreshButton{
+
+                margin-left:25px;
+                background-color:rgb(117, 132, 138);
+                border-radius:15px;
+            }
+
+            #outerFunctionBox{
+                display:flex;
+                justify-content:space-evenly;
+                flex-wrap:wrap;
+            }
+
+            #fullContent{
+                display:flex;
+                justify-content: left;
+                flex-wrap:wrap;
+                margin:10px;
+            }
+
+            #scoreTable{
+                border: solid black 1px;
+                background-color:rgb(117, 132, 138);
+            }
+
+            .field{
+                margin-top:5px;
+                margin-bottom:5px;
+            }
+
+
+
+            .functionBox button{
+                border-radius: 25%;
+                background-color:rgb(117, 132, 138);
+                margin:10px;
+            }
+
+            #pageTitle{
+                text-align:center;
+                background-color:rgb(117, 132, 138);
+            }
+    </style>
+</head>
+<body>
+    <h1 id="pageTitle">HighScores</h1>
+
+    <h5 id="status" style="font-size:20px;color:rgb(247, 128, 49);">Status: No Operation Implemented Yet</h5>
+
+    <div id="topBar">
+        <div id="searchBar">
+
+            <input type="text" id="searchField">
+            <button onclick="search()" id="searchButton">Search</button>
+            <select id="searchType">
+
+                <!--<option>Search ID</option>-->
+                <option>Search Score</option>
+                <option>Search Name</option>
+            </select>
+        </div>
+
+        <button id="refreshButton" onclick="loadData()">&#x21BB; Update</button>
+
+    </div>
+    
+    <div id="fullContent">
+        
+    <table id="scoreTable">
+        <tr>
+            <th>Name</th>
+            <h>ID</th>
+            <th>Points</th>
+        </tr>
+    </table>
+
+    <div id="outerFunctionBox">
+
+    <div id = "deleteBox" class = "functionBox">
+        <div class = "field"><label for="deleteId">Username:</label>
+            <input type="text" id="deleteID"></div>
+
+        <button onclick="deleteEntry()" class = "fieldButton">Delete Player</button>
+
+    </div>
+
+    </div>
+
+    </div>
+
+    <footer>
+        <p>Hit Update to Clear Search Results or See Results of Operation</p>
+
+        <button onclick="reset()">Reset To Default Database</button>
+        <button class="btn" type="button" onclick="window.location.href='/';"
+        style="background-color:rgb(12, 12, 12); border-radius:2px; border-width:thin; font-size:15px; margin:10px;">Back Home</button>
+    </footer>
+
+
+</body>
+</html>
