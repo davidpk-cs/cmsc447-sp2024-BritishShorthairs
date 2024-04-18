@@ -31,6 +31,9 @@ canvas {
   <button onclick='change_button("2")'>Button 2</button>
   <button onclick='change_button("3")'>Button 3</button>
   <button onclick='redirect_page()'>Redirect</button>
+  <button onclick='drawBoard()'>Refresh</button>
+  <button onclick='load_line()'>Conveyer</button>
+
 </div>
 
 <script>
@@ -39,6 +42,13 @@ const ctx = canvas.getContext('2d');
 
 //-----------------------Globals-----------------------------------
 
+let bounds = ""
+var startX = 0;
+var startY = 0;
+var mouseX = 0;
+var mouseY = 0;
+var isDrawing = false;
+var existingLines = [];
 const item_coords = [];
 const pixel_size = 20; // Size of the grid cell
 
@@ -46,44 +56,71 @@ const pixel_size = 20; // Size of the grid cell
 canvas.width = Math.round(window.innerWidth * .99 / pixel_size) * pixel_size;
 canvas.height = Math.round(window.innerHeight * .89 / pixel_size) * pixel_size;
 
-box1 = {x: 2, y:2}
-box2 = {x: 5, y: 2}
-box3 = {x: 10, y: 10}
+box0 = {x: 0, y:0, color:"white"}
+box1 = {x: 2, y:2, color:"blue"}
+box2 = {x: 8, y: 2, color:"red"}
+box3 = {x: 6, y: 14, color:"green"}
 curr_box = box1
 
 //-----------------------Game funct-----------------------------------
 
 const drawBoard = () => {
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0,0, canvas.width, canvas.height);
   for (let x = 0; x <= canvas.width + pixel_size; x += pixel_size) {
     for (let y = 0; y <= canvas.height + pixel_size; y += pixel_size) {
       ctx.strokeStyle = "black";
       ctx.strokeRect(x, y, pixel_size, pixel_size);
     }
   }
+  item_coords.forEach(stored_item => {   
+    console.log(stored_item) 
+    drawRect(stored_item.x, stored_item.y, stored_item.width, stored_item.height, stored_item.color, false)
+  });
+  
+  ctx.strokeStyle = "black";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  
+  for (var i = 0; i < existingLines.length; ++i) {
+    var line = existingLines[i];
+    ctx.moveTo(line.startX,line.startY);
+    ctx.lineTo(line.endX,line.endY);
+  }
+  
+  ctx.stroke();
 };
 
-const drawRect = (x, y) => {
+const drawRect = (x, y, len, width, color, new_box=true) => {
+  ctx.fillStyle = color;
   console.log('Clicked pos rect: ', x, y); // check console on web 
 
   // Check if any object conflicts with where we clicked for new 
-  conflict = placement_conflict(x, y)
-
+  conflict = false;
+  if (new_box){
+    conflict = placement_conflict(x, y)
+  }
+    console.log(conflict)
   // only create a rect and store it if no conflict
   if (!conflict) {
-    ctx.fillStyle = "blue";
+    ctx.fillStyle = color;
     ctx.fillRect(x * pixel_size, y * pixel_size, 
-               pixel_size * curr_box.x, pixel_size * curr_box.y);
+               pixel_size * len, pixel_size * width);
   
     // store rect here (top left corner, and its width and height)
     const item = {
           x: x,
           y: y,
-          width: curr_box.x,
-          height: curr_box.y
+          width: len,
+          height: width,
+          color: color,
       };
 
     // Push rectangle object to the array
-    item_coords.push(item);
+    // Check if any object conflicts with where we clicked for new 
+    if (new_box){
+      item_coords.push(item);
+    }
   }
 };
 
@@ -115,7 +152,7 @@ const placement_conflict = (x, y) => {
     // conflict when curr_box inhibits an exisiting box
     if (!(x > r_x2 || r_x < stored_item.x)) { 
       if (!(y > b_y2 || b_y < stored_item.y)) {
-        conflict = true;
+        conflict = stored_item;
       }
     }
   });
@@ -135,13 +172,14 @@ const dump_obj = () => { // adapt this later to send objects somewhere else or r
 
 canvas.addEventListener('click', (event) => {
   const rect = canvas.getBoundingClientRect();
+  bounds = canvas.getBoundingClientRect();
   const x = event.clientX - rect.left;
   const y = event.clientY - rect.top;
 
   const gridX = round_to_grid(x);
   const gridY = round_to_grid(y);
 
-  drawRect(gridX, gridY);
+  drawRect(gridX, gridY, curr_box.x, curr_box.y, curr_box.color);
 });
 
 //-----------------------Starting grid-----------------------------------
@@ -155,6 +193,7 @@ const bottom_grid_boundary_y = round_to_grid(canvas.height) - 1;
 //-----------------------Other functs-----------------------------------
 
 function change_button(x) {
+  unload_line()
   console.log(x)
   if (x === "1") {
     curr_box = box1
@@ -169,6 +208,78 @@ function redirect_page() {
   console.log("Redirecting...")
   window.location.href='/';
 }
+
+function draw() {
+  drawBoard();
+  
+  if (isDrawing) {
+    ctx.strokeStyle = "darkred";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(startX,startY);
+    ctx.lineTo(mouseX,mouseY);
+    ctx.stroke();
+  }
+}
+
+function onmousedown(e) {
+  if (hasLoaded && e.button === 0) {
+    if (!isDrawing) {
+      startX = e.clientX - bounds.left;
+      startY = e.clientY - bounds.top;
+      
+      isDrawing = true;
+    }
+    
+    draw();
+  }
+}
+
+function onmouseup(e) {
+  if (hasLoaded && e.button === 0) {
+    if (isDrawing) {
+      existingLines.push({
+        startX: startX,
+        startY: startY,
+        endX: mouseX,
+        endY: mouseY
+      });
+      
+      isDrawing = false;
+    }
+    
+    draw();
+  }
+}
+
+function onmousemove(e) {
+  if (hasLoaded) {
+    mouseX = e.clientX - bounds.left;
+    mouseY = e.clientY - bounds.top;
+    
+    if (isDrawing) {
+      draw();
+    }
+  }
+}
+
+function load_line() {
+  curr_box = box0
+  canvas.onmousedown = onmousedown;
+  canvas.onmouseup = onmouseup;
+  canvas.onmousemove = onmousemove;
+  
+  hasLoaded = true; 
+}
+
+function unload_line() {
+  canvas.onmousedown = false;
+  canvas.onmouseup = false;
+  canvas.onmousemove = false;
+  
+  hasLoaded = true; 
+}
+
 
 </script>
 </body>
