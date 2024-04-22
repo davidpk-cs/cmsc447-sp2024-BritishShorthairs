@@ -47,6 +47,8 @@ var startX = 0;
 var startY = 0;
 var mouseX = 0;
 var mouseY = 0;
+var startObj = null;
+var endObj = null;
 var isDrawing = false;
 var existingLines = [];
 const item_coords = [];
@@ -65,16 +67,19 @@ curr_box = box1
 //-----------------------Game funct-----------------------------------
 
 const drawBoard = () => {
-  ctx.fillStyle = "#ffffff";
-  ctx.fillRect(0,0, canvas.width, canvas.height);
-  for (let x = 0; x <= canvas.width + pixel_size; x += pixel_size) {
+  // clear the canvas before a redraw
+  ctx.clearRect(0, 0,
+                canvas.width, canvas.height);
+  
+  for (let x = 0; x <= canvas.width + pixel_size; x += pixel_size) { // draw board
     for (let y = 0; y <= canvas.height + pixel_size; y += pixel_size) {
       ctx.strokeStyle = "black";
       ctx.strokeRect(x, y, pixel_size, pixel_size);
     }
   }
-  item_coords.forEach(stored_item => {   
-    console.log(stored_item) 
+
+  item_coords.forEach(stored_item => {    // redraw all items
+    //console.log(stored_item) 
     drawRect(stored_item.x, stored_item.y, stored_item.width, stored_item.height, stored_item.color, false)
   });
   
@@ -82,8 +87,9 @@ const drawBoard = () => {
   ctx.lineWidth = 2;
   ctx.beginPath();
   
-  for (var i = 0; i < existingLines.length; ++i) {
+  for (var i = 0; i < existingLines.length; ++i) { // redraw conveyors
     var line = existingLines[i];
+    console.log("STORED OBJECTS: ", line.obj_1, line.obj_2);
     ctx.moveTo(line.startX,line.startY);
     ctx.lineTo(line.endX,line.endY);
   }
@@ -93,14 +99,14 @@ const drawBoard = () => {
 
 const drawRect = (x, y, len, width, color, new_box=true) => {
   ctx.fillStyle = color;
-  console.log('Clicked pos rect: ', x, y); // check console on web 
+  //console.log('Clicked pos rect: ', x, y); // check console on web 
 
   // Check if any object conflicts with where we clicked for new 
   conflict = false;
   if (new_box){
     conflict = placement_conflict(x, y)
   }
-    console.log(conflict)
+  console.log(conflict)
   // only create a rect and store it if no conflict
   if (!conflict) {
     ctx.fillStyle = color;
@@ -114,6 +120,7 @@ const drawRect = (x, y, len, width, color, new_box=true) => {
           width: len,
           height: width,
           color: color,
+          connectors: 0,
       };
 
     // Push rectangle object to the array
@@ -222,15 +229,33 @@ function draw() {
   }
 }
 
+function click_in_box(x, y) { // draw line if origin is valid obj
+  let clicked = false;
+  item_coords.forEach(stored_item => { 
+    if ((x >= stored_item.x && x <= (stored_item.x + stored_item.width - 1)) && (y >= stored_item.y && y <= (stored_item.y + stored_item.height - 1))) {
+      clicked = stored_item; // return the item if valid
+    }       
+  });
+
+  return clicked;
+}
+
 function onmousedown(e) {
   if (hasLoaded && e.button === 0) {
     if (!isDrawing) {
       startX = e.clientX - bounds.left;
       startY = e.clientY - bounds.top;
       
-      isDrawing = true;
+      s_X = round_to_grid(startX);
+      s_Y = round_to_grid(startY);
+
+      console.log("CHECK MOUSE DOWN: ", s_X, s_Y);
+      valid_start = click_in_box(s_X, s_Y); // only draw if selecting conveyor from valid obj
+      if (valid_start) {
+        startObj = valid_start; 
+        isDrawing = true;
+      }
     }
-    
     draw();
   }
 }
@@ -238,16 +263,27 @@ function onmousedown(e) {
 function onmouseup(e) {
   if (hasLoaded && e.button === 0) {
     if (isDrawing) {
-      existingLines.push({
+      // only finish line if endpoint is valid obj
+      let valid_line_end = click_in_box(round_to_grid(mouseX), round_to_grid(mouseY));  
+      if (valid_line_end) {
+        // create line and store objects it connects
+        existingLines.push({
         startX: startX,
         startY: startY,
         endX: mouseX,
-        endY: mouseY
-      });
-      
+        endY: mouseY,
+        obj_1: startObj,
+        obj_2: valid_line_end
+        });
+        
+        startObj.connectors += 1; // increment connectors for obj (don't exceed max for an obj)
+        valid_line_end.connectors += 1;
+        
+        startObj = null; // reset
+        endObj = null;
+      }
       isDrawing = false;
-    }
-    
+    } 
     draw();
   }
 }
@@ -279,7 +315,6 @@ function unload_line() {
   
   hasLoaded = true; 
 }
-
 
 </script>
 </body>
