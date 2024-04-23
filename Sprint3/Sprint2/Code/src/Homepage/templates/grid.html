@@ -65,14 +65,15 @@ var endObj = null;
 var isDrawing = false;
 var existingLines = [];
 const item_coords = [];
-const pixel_size = 20; // Size of the grid cell
+const size = {"x": 64, "y": 28}
+const pixel_size = window.innerWidth * .97 / size.x; // Size of the grid cell
 
 var tooltip = document.getElementById("tooltip");
 
 
 // canvas dim, rounded to not cut off cells
-canvas.width = Math.round(window.innerWidth * .99 / pixel_size) * pixel_size;
-canvas.height = Math.round(window.innerHeight * .89 / pixel_size) * pixel_size;
+canvas.width = size.x * pixel_size;
+canvas.height = size.y * pixel_size;
 
 box0 = {x: 0, y:0, color:"white"}
 box1 = {x: 2, y:2, color:"blue"}
