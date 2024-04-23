@@ -1,6 +1,4 @@
 var enemies = []; //enemy objects
-var enemyFragments = []; //this array stores enemy "speeds"
-var enemyHP = []; //enemy hitpoints
 
 var towers = []; //tower objects
 
@@ -50,7 +48,7 @@ function moveEnemies() {
     
         //get styles of the thing that is being targetted and enemy
         var targetStyles = window.getComputedStyle(target);
-        var enemyStyles = window.getComputedStyle(enemies[i]);
+        var enemyStyles = window.getComputedStyle(enemies[i].object);
     
         // get y value
         var targetTop = parseFloat(targetStyles.top);
@@ -62,21 +60,21 @@ function moveEnemies() {
     
     
         // Calculate the fraction of the distance to move in this frame
-        var changeX = (targetLeft - enemyLeft) / enemyFragments[i];
-        var changeY = (targetTop - enemyTop) / enemyFragments[i];
+        var changeX = (targetLeft - enemyLeft) / enemies[i].speed;
+        var changeY = (targetTop - enemyTop) / enemies[i].speed;
     
         // Calculate new positions for enemy
         var newX = enemyLeft + changeX;
         var newY = enemyTop + changeY;
     
         // Update the x and y positions of enemies[i] in pixels
-        enemies[i].style.left = `${newX}px`;
-        enemies[i].style.top = `${newY}px`;
+        enemies[i].object.style.left = `${newX}px`;
+        enemies[i].object.style.top = `${newY}px`;
 
         //by reducing speed fragment we make it speed up the next time
         //this is to make sure that enemies aren't slowing down
-        if(enemyFragments[i] > 5){
-            enemyFragments[i] -= 1;
+        if(enemies[i].speed > 5){
+            enemies[i].speed -= 1;
         }
         
         var contactThreshold = 10; // pixels you need to be close enough to count as a touch
@@ -102,8 +100,9 @@ function moveEnemies() {
 
 function activateTowers() {
 
-    lasersActive = true;
+    lasersActive = true; //to indicate that things are there and will need to be cleared
 
+    //getting the dimensions of the canvas
     const canvas = document.getElementById("weaponField");
     var canvasRect = canvas.getBoundingClientRect();
     canvas.width = canvasRect.width;
@@ -126,12 +125,12 @@ function activateTowers() {
         for(var j = 0; j < enemies.length; j++){
             
             //enemy styles
-            var enemyStyles = window.getComputedStyle(enemies[j]);
+            var enemyStyles = window.getComputedStyle(enemies[j].object);
             var enemyTop = parseInt(enemyStyles.top);
             var enemyLeft = parseInt(enemyStyles.left);
             
             //enemy dimensions
-            var enemyRect = enemies[j].getBoundingClientRect();
+            var enemyRect = enemies[j].object.getBoundingClientRect();
             const enemyX = enemyRect.left - canvasRect.left;
             const enemyY = enemyRect.top - canvasRect.top;
             
@@ -166,14 +165,12 @@ function activateTowers() {
 //destroy is a parameter to indicate kill enemy even if it has sufficient hp
 function attackEnemy(j, destroy=false){
 
-    enemyHP[j] -= 1;
+    enemies[j].health -= 1;
 
-    if(enemyHP[j] == 0 || destroy){
+    if(enemies[j].health == 0 || destroy){
 
-        enemies[j].parentNode.removeChild(enemies[j]);
+        enemies[j].object.parentNode.removeChild(enemies[j].object);
         enemies.splice(j, 1);
-        enemyFragments.splice(j, 1);
-        enemyHP.splice(j, 1);
 
         score++;
     }
@@ -240,10 +237,13 @@ function runRound() {
 
 function mainFunc(){
 
+    //starting wave
     sendEnemyWave();
 
+    //decrement wave count
     enemyWaves--;
 
+    //go!
     runRound();
 }
 
@@ -251,33 +251,33 @@ function sendEnemyWave(){
 
     for(var i = 0; i < enemyCount; i++){
     
-        var newRock = document.createElement("img"); // Change 'div' to 'img'
+        var newRock = document.createElement("img"); // creating the new element
 
         newID = "enemy" + i.toString();
         newRock.id = newID;
 
+        //dimensions
         newRock.style.width = '60px';
-        newRock.style.height = '60px';
-        // The backgroundColor and borderRadius are not needed for an image, so those lines are removed.
+        newRock.style.height = '60px'; 
 
+        //enemyType
         newRock.src = assetsPath + 'enemies/tile007.png'; // Set the source to the PNG sprite
 
-        newRock.style.position="absolute";
+        newRock.style.position="absolute"; //better for placement
 
-        var position = randomInt(10, 80);
+        var position = randomInt(10, 80); //come from a random spot within the canvas left side
         
-        newRock.style.left="1%";
+        newRock.style.left="1%"; 
         newRock.style.top= position.toString() + "%";
-        //newRock.style.top = "50%";
 
 
         var enemyHolder = document.getElementById("viewPort")
 
         enemyHolder.appendChild(newRock);
 
-        enemies.push(newRock);
-        enemyFragments.push(201);
-        enemyHP.push(1);
+        var enemyToPush = new enemy(newRock)
+
+        enemies.push(enemyToPush);
     }
 
 }
@@ -396,5 +396,20 @@ function createEndingCover(message) {
     document.body.appendChild(overlay);
 }
   
+
+class enemy{
+
+    constructor(object, health = 1, speed = 201){
+
+        this.health = health;
+        this.speed = speed;
+        this.object = object;
+    }
+
+}
+
+class tower{
+
+}
  
   
