@@ -82,7 +82,7 @@ function moveEnemies() {
             
             lives--; //enemy hit target, delete enemy
 
-            attackEnemy(i, true);
+            selfDestructEnemy(i, true);
 
 
             if(lives == 0){ //force end game upon end of game
@@ -111,12 +111,12 @@ function activateTowers() {
     for(var i = 0; i < towers.length; i++){
 
         //tower styles
-        var towerStyles = window.getComputedStyle(towers[i])
+        var towerStyles = window.getComputedStyle(towers[i].object)
         var towerTop = parseInt(towerStyles.top);
         var towerLeft = parseInt(towerStyles.left);
 
         // Set the drawing buffer size to match the displayed size so we can draw on full canvas
-        var towerRect = towers[i].getBoundingClientRect();
+        var towerRect = towers[i].object.getBoundingClientRect();
 
         //tower dimensions
         const towerX = towerRect.left - canvasRect.left;
@@ -146,7 +146,7 @@ function activateTowers() {
                 draw.lineTo(enemyX, enemyY);
                 draw.strokeStyle = "red";
                 draw.stroke();
-                attackEnemy(j);
+                attackEnemy(j, i);
                 
                 break; //towers only attack one enemy a frame
             }
@@ -161,16 +161,30 @@ function activateTowers() {
     }
 }
 
+function attackEnemy(enemyIndex, towerIndex, destroy=false){
+
+    enemies[enemyIndex].health -= towers[towerIndex].damage;
+
+    if(enemies[enemyIndex].health <= 0 || destroy){
+
+        enemies[enemyIndex].object.parentNode.removeChild(enemies[enemyIndex].object);
+        enemies.splice(enemyIndex, 1);
+
+        score++;
+    }
+    
+}
+
 //j the index of array
 //destroy is a parameter to indicate kill enemy even if it has sufficient hp
-function attackEnemy(j, destroy=false){
+function selfDestructEnemy(enemyIndex, destroy=false){
 
-    enemies[j].health -= 1;
+    enemies[enemyIndex].health -= 1;
 
-    if(enemies[j].health == 0 || destroy){
+    if(enemies[enemyIndex].health == 0 || destroy){
 
-        enemies[j].object.parentNode.removeChild(enemies[j].object);
-        enemies.splice(j, 1);
+        enemies[enemyIndex].object.parentNode.removeChild(enemies[enemyIndex].object);
+        enemies.splice(enemyIndex, 1);
 
         score++;
     }
@@ -320,7 +334,9 @@ function placeTower(){
 
         document.getElementById("viewPort").appendChild(newTower);
 
-        towers.push(newTower);
+        towerToPush = new tower(newTower);
+
+        towers.push(towerToPush);
     
     }, { once: true });
 
@@ -410,6 +426,13 @@ class enemy{
 
 class tower{
 
+    constructor(object, health = 35, damage = 1, laserCount = 0){
+
+        this.object = object;
+        this.health = health;
+        this.damage = damage;
+        this.laserCount = laserCount;
+    }
 }
  
   
