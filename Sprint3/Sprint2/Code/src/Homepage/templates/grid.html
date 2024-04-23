@@ -22,10 +22,23 @@ canvas {
 #toolbox button {
   margin: 0 5px;
 }
+
+.tooltip {
+  position: absolute;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 15px;
+  border-radius: 15px;
+  pointer-events: none; /* Ensures the tooltip does not interfere with mouse events */
+  display: none; /* Initially hide the tooltip */
+}
+
 </style>
 </head>
 <body>
 <canvas id="canvas" width="500" height="500"></canvas>
+<div id="tooltip" class="tooltip"></div>
+
 <div id="toolbox">
   <button onclick='change_button("1")'>Button 1</button>
   <button onclick='change_button("2")'>Button 2</button>
@@ -53,6 +66,9 @@ var isDrawing = false;
 var existingLines = [];
 const item_coords = [];
 const pixel_size = 20; // Size of the grid cell
+
+var tooltip = document.getElementById("tooltip");
+
 
 // canvas dim, rounded to not cut off cells
 canvas.width = Math.round(window.innerWidth * .99 / pixel_size) * pixel_size;
@@ -89,7 +105,7 @@ const drawBoard = () => {
   
   for (var i = 0; i < existingLines.length; ++i) { // redraw conveyors
     var line = existingLines[i];
-    console.log("STORED OBJECTS: ", line.obj_1, line.obj_2);
+    // console.log("STORED LINE OBJECTS: ", line.obj_1, line.obj_2);
     ctx.moveTo(line.startX,line.startY);
     ctx.lineTo(line.endX,line.endY);
   }
@@ -121,6 +137,8 @@ const drawRect = (x, y, len, width, color, new_box=true) => {
           height: width,
           color: color,
           connectors: 0,
+          tooltipText: "Rectangle is " + color, // temporary textbox per item
+          tooltipVisible: false
       };
 
     // Push rectangle object to the array
@@ -189,6 +207,34 @@ canvas.addEventListener('click', (event) => {
   drawRect(gridX, gridY, curr_box.x, curr_box.y, curr_box.color);
 });
 
+canvas.addEventListener('click', (event) => { // mouse click on object
+  const rect = canvas.getBoundingClientRect();
+  bounds = canvas.getBoundingClientRect();
+  const x = event.clientX - rect.left;
+  const y = event.clientY - rect.top;
+
+  const gridX = round_to_grid(x);
+  const gridY = round_to_grid(y);
+
+  let found_obj = click_in_box(gridX, gridY);
+
+  if (found_obj) { // create textbox if hit object
+    if (!(found_obj.tooltipVisible)) {
+      tooltip.style.display = "block";
+      tooltip.textContent = found_obj.tooltipText;
+      tooltip.style.left = event.clientX + 10 + "px";
+      tooltip.style.top = event.clientY + 10 + "px";
+      found_obj.tooltipVisible = true;
+    } else { // enable textbox removal on double click
+      found_obj.tooltipVisible = false;
+      tooltip.style.display = "none";
+    }
+    
+  } else { // when we click off box, disable textbox, adjust this later?
+    tooltip.style.display = "none";
+  }
+});
+
 //-----------------------Starting grid-----------------------------------
 
 drawBoard(); // instantiate board
@@ -229,7 +275,7 @@ function draw() {
   }
 }
 
-function click_in_box(x, y) { // draw line if origin is valid obj
+function click_in_box(x, y) { // detect mouse inside of existing objects
   let clicked = false;
   item_coords.forEach(stored_item => { 
     if ((x >= stored_item.x && x <= (stored_item.x + stored_item.width - 1)) && (y >= stored_item.y && y <= (stored_item.y + stored_item.height - 1))) {
@@ -265,7 +311,7 @@ function onmouseup(e) {
     if (isDrawing) {
       // only finish line if endpoint is valid obj
       let valid_line_end = click_in_box(round_to_grid(mouseX), round_to_grid(mouseY));  
-      if (valid_line_end) {
+      if (valid_line_end && valid_line_end != startObj) {
         // create line and store objects it connects
         existingLines.push({
         startX: startX,
