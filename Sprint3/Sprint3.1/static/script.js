@@ -1,6 +1,8 @@
 function newGame() {
     // testing purposes
     console.log("newGame has started");
+    createMaterialDB(); //init materials DB
+    createProductDB(); //initialize products DB
     //should render newGame 
    window.location.href = '/newGame'; //this works 
 }
@@ -171,6 +173,28 @@ function reset(){
     })
     .then(data => {
         updateStatus("Reset the Database: Update to See Default");
+    });
+}
+
+function createMaterialDB(){
+    //this fxn  inits the materials DB
+    return fetch('/createMaterial', { method: 'GET'})
+    .then(response => {
+        return response.json();
+    })
+    .then(data => {
+        updateStatus("Materials Database Created !");
+    });
+}
+
+function createProductDB(){
+    //this fxn  inits the products DB
+    return fetch('/createProduct', { method: 'GET'})
+    .then(response => {
+        return response.json();
+    })
+    .then(data => {
+        updateStatus("Products Database created !");
     });
 }
 
