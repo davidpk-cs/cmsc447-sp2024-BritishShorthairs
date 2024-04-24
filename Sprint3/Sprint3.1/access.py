@@ -126,7 +126,43 @@ def reset():
 
     return jsonify("Reset Successfully")
 
+############# Beyond this point are functions for materials.db ###################
+'''
+@app.route('/createMaterial')
+def createMaterial():
+    conn = sqlite3.connect('materials.db')
+    cur = conn.cursor()
 
+    materialsTable = 'materialsTable'
+     #scrap the table
+    cur.execute(f'DROP TABLE IF EXISTS {materialsTable}')
+
+    #redo the table
+    cur.execute(f'CREATE TABLE IF NOT EXISTS {materialsTable} (\
+                   name TEXT NOT NULL,\
+                   quantity INT NOT NULL\
+                  
+    )')
+'''
+
+############## Beyond this point are functions for products.db###################
+'''
+@app.route('/createProduct')
+def createProduct():
+    conn = sqlite3.connect('products.db')
+    cur = conn.cursor()
+
+    productsTable = 'productsTable'
+    #scrap the table
+    cur.execute(f'DROP TABLE IF EXISTS {productsTable}')
+
+    #redo the table
+    cur.execute(f'CREATE TABLE IF NOT EXISTS {productsTable} (\
+                   name TEXT NOT NULL,\
+                   quantity INT NOT NULL\
+                  
+    )')
+'''
 
 if __name__ == '__main__':
     

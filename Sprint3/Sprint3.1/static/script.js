@@ -113,6 +113,8 @@ function addEntry(){
     
 }
 
+
+
 function search(){
     
     var searchSelect = document.getElementById("searchType");
