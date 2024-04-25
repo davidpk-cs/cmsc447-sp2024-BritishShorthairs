@@ -34,7 +34,6 @@ function loadData() {
 
     var newHTML = "<tr>\
     <th>Name</th>\
-    <th>ID</th>\
     <th>Points</th>\
     </tr>";
 
@@ -43,7 +42,6 @@ function loadData() {
         newHTML += "<tr>";
         newHTML += "<th>" + data[i][0] + "</th>";
         newHTML += "<th>" + data[i][1].toString() + "</th>";
-        newHTML += "<th>" + data[i][2].toString() + "</th>";
         newHTML += "</tr>";
     }
 
@@ -58,12 +56,6 @@ function deleteEntry(){
 
     var idField = document.getElementById("deleteID");
     var id = idField.value;
-
-    //will delete players based off of username 
-   /* if(isValidNum(id) == 0){
-        updateStatus("Failed to Delete, Invalid ID, ID must be an integer");
-        return;
-    }*/
 
     updateStatus("Deleted Student Of the ID specified If that student exists: Update Page to See New Table")
 
@@ -80,23 +72,19 @@ function deleteEntry(){
 }
 
 function addEntry(){
-
-    var idField = document.getElementById("createID");
     var nameField = document.getElementById("createName");
-    var scoreField = document.getElementById("createScore");
-    var id = idField.value;
     var name = nameField.value;
     var score = 0; //all new players must start at score 0
-    //var score = scoreField.value;
+    
 
-    if(isValidNum(score) == 0 || isValidNum(id) == 0){
+    if(isValidNum(score) == 0){
         updateStatus("Failed to Add, Invalid ID or Score, ID and Score must be an integer");
         return;
     }
 
 
 
-    var fullTuple = [name, id, score];
+    var fullTuple = [name,score];
 
     updateStatus("Added New Student If ID Is Unique and Entry Sizes do not Exceed the Set Max: Update Page to See New Table");
 
@@ -109,7 +97,6 @@ function addEntry(){
         data: fullTuple,
     })
     });
-
     //after player is added they will be redirected to start the game
     newGame();
     
@@ -145,7 +132,6 @@ function search(){
 
         var newHTML = "<tr>\
         <th>Name</th>\
-        <th>ID</th>\
         <th>Points</th>\
         </tr>";
 
@@ -154,7 +140,6 @@ function search(){
             newHTML += "<tr>";
             newHTML += "<th>" + data[i][0] + "</th>";
             newHTML += "<th>" + data[i][1].toString() + "</th>";
-            newHTML += "<th>" + data[i][2].toString() + "</th>";
             newHTML += "</tr>";
         }
 
@@ -212,6 +197,8 @@ function isValidNum(theString) {
 
     return regex.test(theString);
 }
+
+
 
 
 window.addEventListener('load', loadData);
