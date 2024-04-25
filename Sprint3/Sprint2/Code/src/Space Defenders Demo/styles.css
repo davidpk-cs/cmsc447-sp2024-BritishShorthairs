@@ -26,8 +26,8 @@ html, body{
 
 #viewPort{
 
-    height: 80%;
-    width: 80%;
+    height: 600px;
+    width: 1280px;
     position:relative;
     margin-top:50px;
     margin-right:auto;

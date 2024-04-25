@@ -2,16 +2,16 @@ var enemies = []; //enemy objects
 
 var towers = []; //tower objects
 
-var enemyCount = 3; //number of enemies per wave
-var enemyWaves = -1; //number of waves of enemies sent in
+
 
 var lasersActive = false; //indicating that lasers are present on the screen, so we know to clean
 
 var score = 0; //number of points
 
-var credits = 10; //money
 
-var lives = 100; //lives
+const coverName = "coverDiv";
+const endingCoverName = "endingDiv";
+
 
 //------------
 const framesPerSecond = 60; //program tested on high refresh rate screens it works fine
@@ -35,24 +35,126 @@ var activeTowerPlacement = false;
 
 var assetsPath = "../assets/" //location of assets folder
 
+var homeBaseTop = 0;
+var homeBaseLeft = 0;
 
 
+var credits = 1500; //money
+
+var lives = 100; //lives
+
+var failureOdds = 40; //range is 20% to 60%;
+var hardHitOdds = 25; //range is 10-30%
+var enemyDamage = 3; //the range is 3-5
+var enemyHP = 1; //range is 3-5
+var enemyCount = 1; //the range is 20-50 number of enemies per wave
+var enemyWaves = 1; //the range is 20-30, number of waves of enemies sent in 
+var towerRange = 200; //the range is 100-200
+var maxEnemyCount = 40;
+towerPrice = 140; //the range is 120 to 220
+
+
+function generateEconomy(){
+
+    var currentSkew = randomInt(1, 10);
+    failureOdds = randomSkew(20, 60, currentSkew);
+    currentSkew = newSkew(20, 60, failureOdds);
+    hardHitOdds = randomSkew(10, 30, currentSkew);
+    currentSkew = newSkew(10, 30, hardHitOdds);
+    enemyDamage = randomSkew(3, 5, currentSkew);
+    currentSkew = newSkew(3, 5, enemyDamage);
+    enemyHP = randomSkew(3, 5, currentSkew);
+    currentSkew = newSkew(3, 5, enemyHP);
+    enemyCount = randomSkew(20, 50, currentSkew);
+    currentSkew = newSkew(20, 50, enemyCount);
+    enemyWaves = randomSkew(20, 30, currentSkew);
+    currentSkew = newSkew(20, 30, enemyWaves);
+    towerRange = randomSkew(100, 200, currentSkew);
+    currentSkew = newSkew(100, 200, towerRange);
+    towerPrice = randomSkew(120, 220, currentSkew);
+
+    // Logging the values
+    console.log("failureOdds:", failureOdds);
+    console.log("hardHitOdds:", hardHitOdds);
+    console.log("enemyDamage:", enemyDamage);
+    console.log("enemyHP:", enemyHP);
+    console.log("enemyCount:", enemyCount);
+    console.log("enemyWaves:", enemyWaves);
+    console.log("towerRange:", towerRange);
+    console.log("towerPrice:", towerPrice);
+}
+
+
+function setup(){
+
+    //get the target object
+    var target = document.getElementById("homeBase");
+    
+    //get styles of the thing that is being targetted and enemy
+    var targetStyles = window.getComputedStyle(target);
+
+    // get y value
+    homeBaseTop = parseFloat(targetStyles.top);
+    homeBaseLeft = parseFloat(targetStyles.left);
+
+
+    //give the player the briefing
+    //coverScreenWithTransparentDiv();
+
+    //var div = document.getElementById(coverName);
+
+    generateEconomy();
+
+}
+
+function randomSkew(min, max, skew) {
+
+    const range = max - min + 1; //establish the range
+    
+    //make a number
+    let randomNumber = Math.random() ** (skew * 0.5); // higher skew pushes it higher
+    
+    return Math.floor(randomNumber * range) + min;
+}
+
+function newSkew(min, max, generatedNumber) {
+
+    const range = max - min + 1;
+    
+    //see where in the range the number was generated
+    const position = (generatedNumber - min) / range;
+    
+    //produce a new skew
+    const skew = 10 - Math.floor(position * 10);
+    
+    // get it within range
+    return Math.max(1, Math.min(skew, 10));
+}
+
+
+function searchTarget(){
+
+    var towerIndex = -1;
+
+    
+
+    for(var i = 0; i < enemies.length; i++){
+
+        var enemyStyles = 0;
+    }
+}
 
 function moveEnemies() {
     //console.log("First function");
 
     for (var i = 0; i < enemies.length; i++) {
 
-        //get the target object
-        var target = document.getElementById("homeBase");
-    
-        //get styles of the thing that is being targetted and enemy
-        var targetStyles = window.getComputedStyle(target);
         var enemyStyles = window.getComputedStyle(enemies[i].object);
-    
+
         // get y value
-        var targetTop = parseFloat(targetStyles.top);
-        var targetLeft = parseFloat(targetStyles.left);
+        var targetTop = homeBaseTop;
+        var targetLeft = homeBaseLeft;
+
     
         //get x value
         var enemyTop = parseFloat(enemyStyles.top);
@@ -80,7 +182,11 @@ function moveEnemies() {
         var contactThreshold = 10; // pixels you need to be close enough to count as a touch
         if (Math.abs(newX - targetLeft) <= contactThreshold && Math.abs(newY - targetTop) <= contactThreshold) {
             
-            lives--; //enemy hit target, delete enemy
+            lives -= enemyDamage; //enemy hit target, delete enemy
+
+            if(lives < 0){
+                lives = 0;
+            }
 
             selfDestructEnemy(i, true);
 
@@ -110,17 +216,21 @@ function activateTowers() {
 
     for(var i = 0; i < towers.length; i++){
 
-        //tower styles
-        var towerStyles = window.getComputedStyle(towers[i].object)
-        var towerTop = parseInt(towerStyles.top);
-        var towerLeft = parseInt(towerStyles.left);
+    
+        var towerTop = towers[i].top;
+        var towerLeft = towers[i].left;   
 
         // Set the drawing buffer size to match the displayed size so we can draw on full canvas
         var towerRect = towers[i].object.getBoundingClientRect();
 
-        //tower dimensions
-        const towerX = towerRect.left - canvasRect.left;
-        const towerY = towerRect.top - canvasRect.top
+        // Tower dimensions so we can center
+        const towerWidth = towerRect.width; 
+        const towerHeight = towerRect.height; 
+
+        //this puts the laser it fires in the center!
+        const towerX = towerRect.left - canvasRect.left + (towerWidth / 2); 
+        const towerY = towerRect.top - canvasRect.top + (towerHeight / 2); 
+
 
         for(var j = 0; j < enemies.length; j++){
             
@@ -135,10 +245,10 @@ function activateTowers() {
             const enemyY = enemyRect.top - canvasRect.top;
             
             //calculate distance
-            var distance = Math.sqrt((enemyTop - towerTop)**2 + (enemyLeft - towerLeft)**2);
+            var distance = distanceFormula(towerX, towerY, enemyX, enemyY);
 
             //if close enough, attack!
-            if(distance < 100){
+            if(distance < towerRange){
 
                 draw = canvas.getContext("2d");
                 draw.beginPath();
@@ -219,7 +329,7 @@ function runRound() {
 
         if (currentFunction === 1) {
 
-            if(enemyWaves && enemies.length < 40){
+            if(enemyWaves && enemies.length < maxEnemyCount){
                 sendEnemyWave();
                 enemyCount++;
                 enemyWaves--;
@@ -232,7 +342,7 @@ function runRound() {
         }
     }
 
-    if(lives == 0){
+    if(lives == 0 || (enemies.length == 0 && enemyWaves == 0)){
 
         createEndingCover("Good Game! Total Score: " + score.toString());
 
@@ -289,7 +399,7 @@ function sendEnemyWave(){
 
         enemyHolder.appendChild(newRock);
 
-        var enemyToPush = new enemy(newRock)
+        var enemyToPush = new enemy(newRock, enemyHP, enemyDamage);
 
         enemies.push(enemyToPush);
     }
@@ -299,11 +409,11 @@ function sendEnemyWave(){
 
 function placeTower(){
 
-    if(credits == 0){
+    if(credits < towerPrice){
         return;
     }
 
-    credits--;
+    credits -= towerPrice;
 
     document.getElementById("creditBoard").innerText = "Credits Remaining: " + credits.toString();
 
@@ -334,7 +444,11 @@ function placeTower(){
 
         document.getElementById("viewPort").appendChild(newTower);
 
-        towerToPush = new tower(newTower);
+        var towerStyles = window.getComputedStyle(newTower)
+        var towerTop = parseInt(towerStyles.top);
+        var towerLeft = parseInt(towerStyles.left);
+
+        towerToPush = new tower(newTower, towerLeft, towerTop);
 
         towers.push(towerToPush);
     
@@ -356,6 +470,8 @@ function coverScreenWithTransparentDiv() {
     //this is to make sure you can't do anything once you start the game
    
     const overlay = document.createElement('div');
+
+    overlay.id = coverName;
   
     // Style the div to be fully transparent
     overlay.style.position = 'fixed'; 
@@ -380,7 +496,7 @@ function createEndingCover(message) {
   
     // make the div
     const overlay = document.createElement('div');
-    overlay.id = 'customOverlay';
+    overlay.id = endingCoverName;
     overlay.style.position = 'fixed';
     overlay.style.top = '0';
     overlay.style.left = '0';
@@ -415,24 +531,45 @@ function createEndingCover(message) {
 
 class enemy{
 
-    constructor(object, health = 1, speed = 201){
+    constructor(object, health = 1, damage = 1, speed = 201){
 
         this.health = health;
         this.speed = speed;
         this.object = object;
-    }
+
+        this.damage = damage;
+    } 
 
 }
 
 class tower{
 
-    constructor(object, health = 35, damage = 1, laserCount = 0){
+    constructor(object, xPos, yPos, health = 35, damage = 1, laserCount = 0){
 
         this.object = object;
         this.health = health;
         this.damage = damage;
         this.laserCount = laserCount;
+
+        this.top = xPos;
+        this.left = yPos;
     }
+}
+
+
+function distanceFormula(x1, y1, x2, y2) {
+    
+    var dx = x2 - x1;
+    var dy = y2 - y1;
+
+    var dxSquared = Math.pow(dx, 2);
+    var dySquared = Math.pow(dy, 2);
+    
+    var distanceSquared = dxSquared + dySquared;
+    
+    var distance = Math.sqrt(distanceSquared);
+    
+    return distance;
 }
  
   
