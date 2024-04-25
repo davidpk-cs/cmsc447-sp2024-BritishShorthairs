@@ -127,27 +127,76 @@ def reset():
     return jsonify("Reset Successfully")
 
 ############# Beyond this point are functions for materials.db ###################
-'''
-@app.route('/createMaterial')
+
+@app.route('/createMaterial', methods=['GET'])
 def createMaterial():
-    conn = sqlite3.connect('materials.db')
-    cur = conn.cursor()
+    
+    connection = sqlite3.connect('materials.db')
+
+    cursor = connection.cursor()
 
     materialsTable = 'materialsTable'
-     #scrap the table
-    cur.execute(f'DROP TABLE IF EXISTS {materialsTable}')
+
+    #scrap the table
+    cursor.execute(f'DROP TABLE IF EXISTS {materialsTable}')
 
     #redo the table
-    cur.execute(f'CREATE TABLE IF NOT EXISTS {materialsTable} (\
-                   name TEXT NOT NULL,\
-                   quantity INT NOT NULL\
-                  
+    cursor.execute(f'CREATE TABLE IF NOT EXISTS {materialsTable} (\
+                   materialName TEXT NOT NULL,\
+                   quantity INT PRIMARY KEY NOT NULL\
     )')
-'''
+
+    #the default materials
+    defaultMat = [("planet rock", 1), ("Rock ", 2), ("Orb", 3)]
+
+    for i in defaultMat:
+        cursor.execute(f'INSERT INTO {materialsTable} (materialName, quantity) VALUES (?, ?)', i)
+        
+    connection.commit()
+
+    cursor.close()
+    connection.close()
+
+    return jsonify("Reset Materials Successfully")
 
 ############## Beyond this point are functions for products.db###################
+@app.route('/createProduct', methods=['GET'])
+def createProduct():
+    
+    connection = sqlite3.connect('products.db')
+
+    cursor = connection.cursor()
+
+    productsTable = 'productsTable'
+
+    #scrap the table
+    cursor.execute(f'DROP TABLE IF EXISTS {productsTable}')
+
+    #redo the table
+    cursor.execute(f'CREATE TABLE IF NOT EXISTS {productsTable} (\
+                   productName TEXT NOT NULL,\
+                   quantity INT PRIMARY KEY NOT NULL\
+    )')
+
+    #tthe default products
+    defaultPro = [("Orb Tower", 1), ("Star Tower ", 2), ("Brick Tower", 3)]
+
+    for i in defaultPro:
+        cursor.execute(f'INSERT INTO {productsTable} (ProductName, quantity) VALUES (?, ?)', i)
+        
+    connection.commit()
+
+    cursor.close()
+    connection.close()
+
+    return jsonify("Reset Products Successfully")
+
+
+
 '''
-@app.route('/createProduct')
+############## Beyond this point are functions for products.db###################
+
+@app.route('/createProduct', methods=['GET'])
 def createProduct():
     conn = sqlite3.connect('products.db')
     cur = conn.cursor()
@@ -158,10 +207,19 @@ def createProduct():
 
     #redo the table
     cur.execute(f'CREATE TABLE IF NOT EXISTS {productsTable} (\
-                   name TEXT NOT NULL,\
-                   quantity INT NOT NULL\
-                  
+                   productName TEXT NOT NULL\            
     )')
+    defaultProduct = [("Orb Tower"),("Galactic Rock Tower")]
+
+    #insert defaults
+    for i in defaultProduct:
+       cur.execute(f'INSERT INTO {productsTable} (productName) VALUES (?)', i)
+    conn.commit()
+
+    cur.close()
+    conn.close()
+
+    return jsonify("createProdcuts Reset Successfully")
 '''
 
 if __name__ == '__main__':
