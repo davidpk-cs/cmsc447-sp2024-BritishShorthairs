@@ -59,12 +59,12 @@ def addEntry():
     data = request.get_json()
     info = data.get('data')
 
-    tuple_info = (info[0], int(info[1]), int(info[2]))
+    tuple_info = (info[0], int(info[1]))
 
     #puts into the database
     connection = sqlite3.connect('highscores.db')
     cursor = connection.cursor()
-    cursor.execute('INSERT OR IGNORE INTO scoreTable (name, id, points) VALUES (?, ?, ?)', tuple_info)
+    cursor.execute('INSERT OR IGNORE INTO scoreTable (name, points) VALUES (?,?)', tuple_info)
 
 
     connection.commit()
@@ -109,15 +109,14 @@ def reset():
     #redo the table
     cursor.execute(f'CREATE TABLE IF NOT EXISTS {scoreTable} (\
                    name TEXT NOT NULL,\
-                   id INT PRIMARY KEY NOT NULL,\
                    points INT NOT NULL\
     )')
 
     #the defaults specified in hw2
-    defaultData = [("Alien Invader", 1, 80), ("Jabba the hutt ", 2, 92), ("Darth Vader", 3, 91)]
+    defaultData = [("Alien Invader", 80), ("Jabba the hutt ", 92), ("Darth Vader", 91)]
 
     for i in defaultData:
-        cursor.execute(f'INSERT INTO {scoreTable} (name, id, points) VALUES (?, ?, ?)', i)
+        cursor.execute(f'INSERT INTO {scoreTable} (name, points) VALUES (?, ?)', i)
         
     connection.commit()
 
@@ -191,36 +190,6 @@ def createProduct():
 
     return jsonify("Reset Products Successfully")
 
-
-
-'''
-############## Beyond this point are functions for products.db###################
-
-@app.route('/createProduct', methods=['GET'])
-def createProduct():
-    conn = sqlite3.connect('products.db')
-    cur = conn.cursor()
-
-    productsTable = 'productsTable'
-    #scrap the table
-    cur.execute(f'DROP TABLE IF EXISTS {productsTable}')
-
-    #redo the table
-    cur.execute(f'CREATE TABLE IF NOT EXISTS {productsTable} (\
-                   productName TEXT NOT NULL\            
-    )')
-    defaultProduct = [("Orb Tower"),("Galactic Rock Tower")]
-
-    #insert defaults
-    for i in defaultProduct:
-       cur.execute(f'INSERT INTO {productsTable} (productName) VALUES (?)', i)
-    conn.commit()
-
-    cur.close()
-    conn.close()
-
-    return jsonify("createProdcuts Reset Successfully")
-'''
 
 if __name__ == '__main__':
     
