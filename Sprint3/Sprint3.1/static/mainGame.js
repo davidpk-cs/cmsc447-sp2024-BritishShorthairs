@@ -345,7 +345,7 @@ function runRound() {
             createEndingCover("Mission Success! Total Score: " + score.toString());
         }
         else{
-            createEndingCover("Nice Try! Better Luck Next Time!");
+            createEndingCover("Nice Try! Better Luck Next Time!", false);
         }
 
         return;
@@ -524,7 +524,7 @@ function coverScreenWithTranslucentDiv() {
 }
 
 
-function createEndingCover(message) {
+function createEndingCover(message, won=true) {
 
     // Check if overlay already exists and kill if needed
     const existingOverlay = document.getElementById('customOverlay');
@@ -555,10 +555,21 @@ function createEndingCover(message) {
     // Create the reload button
     const button = document.createElement('button');
     button.id = "restartButton";
-    button.textContent = "Restart Game";
-    button.onclick = function() {
-      window.location.reload();
-    };
+    
+    if(won == false){
+        button.textContent = "Restart Game";
+        button.onclick = function() {
+        window.location.reload();
+        };
+    }
+    else{
+        button.textContent = "Next"
+        button.onclick = function(){
+            nextLevel();
+        }
+    }
+
+
   
     // add message to the div
     overlay.appendChild(header);
@@ -847,7 +858,7 @@ function sendLoot(lootInfo){
 
 function nextLevel(){
 
-    //send the game either to level 2 or Matt and Rippy's crafting phase
+    window.location.href = '/level2'; //this works 
 }
 
   
