@@ -40,13 +40,12 @@ canvas {
 <div id="tooltip" class="tooltip"></div>
 
 <div id="toolbox">
-  <button onclick='change_button("1")'>Button 1</button>
-  <button onclick='change_button("2")'>Button 2</button>
-  <button onclick='change_button("3")'>Button 3</button>
-  <button onclick='redirect_page()'>Redirect</button>
-  <button onclick='drawBoard()'>Refresh</button>
+  <button onclick='change_button("1")'>Small Box</button>
+  <button onclick='change_button("2")'>Medium Box</button>
+  <button onclick='change_button("3")'>Large Box</button>
   <button onclick='load_line()'>Conveyer</button>
-
+  <button onclick='load_mouse()'>Mouse</button>
+  <button onclick='drawBoard()'>Refresh</button>
 </div>
 
 <script>
@@ -66,7 +65,7 @@ var isDrawing = false;
 var existingLines = [];
 const item_coords = [];
 const size = {"x": 64, "y": 28}
-const pixel_size = window.innerWidth * .97 / size.x; // Size of the grid cell
+const pixel_size = window.innerWidth * .96 / size.x; // Size of the grid cell
 
 var tooltip = document.getElementById("tooltip");
 
@@ -75,47 +74,80 @@ var tooltip = document.getElementById("tooltip");
 canvas.width = size.x * pixel_size;
 canvas.height = size.y * pixel_size;
 
-box0 = {x: 0, y:0, color:"white"}
-box1 = {x: 2, y:2, color:"blue"}
-box2 = {x: 8, y: 2, color:"red"}
-box3 = {x: 6, y: 14, color:"green"}
-curr_box = box1
+null_building = {
+  x: 0, y:0, color:"white",
+  type: "null_building",
+  image_path: "",
+  setting: ""
+}
+constructor_building = {
+  x: 3, y:3, color:"blue",
+  type: "constructor",
+  image_path: "",
+  setting: ""
+}
+pad_building = {
+  x: 6, y: 6, color:"red",
+  type: "pad",
+  image_path: "",
+  setting: ""
+}
+shop_building = {
+  x: 6, y:4, color:"green",
+  type: "shop",
+  image_path: "",
+  setting: ""
+}
+
+curr_building = constructor_building;
+
+mouse_is_active = false;
 
 //-----------------------Game funct-----------------------------------
 
 const drawBoard = () => {
+
+  console.log(item_coords)
   // clear the canvas before a redraw
   ctx.clearRect(0, 0,
                 canvas.width, canvas.height);
-  
-  for (let x = 0; x <= canvas.width + pixel_size; x += pixel_size) { // draw board
+  //ctx.fillStyle = "#ffffff";
+  //ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.lineWidth = 1;
+
+  // redraw the lines
+  for (let x = 0; x <= canvas.width + pixel_size; x += pixel_size) { 
     for (let y = 0; y <= canvas.height + pixel_size; y += pixel_size) {
       ctx.strokeStyle = "black";
       ctx.strokeRect(x, y, pixel_size, pixel_size);
     }
   }
-
-  item_coords.forEach(stored_item => {    // redraw all items
-    //console.log(stored_item) 
-    drawRect(stored_item.x, stored_item.y, stored_item.width, stored_item.height, stored_item.color, false)
-  });
   
+  // redraw all items
+  item_coords.forEach(stored_item => {
+    //console.log(stored_item) 
+    drawRect(stored_item.x, stored_item.y, stored_item.building, false)
+  });
+  //ctx.stroke();
+
+
   ctx.strokeStyle = "black";
-  ctx.lineWidth = 2;
+  ctx.lineWidth = 10;
   ctx.beginPath();
   
   for (var i = 0; i < existingLines.length; ++i) { // redraw conveyors
     var line = existingLines[i];
-    // console.log("STORED LINE OBJECTS: ", line.obj_1, line.obj_2);
-    ctx.moveTo(line.startX,line.startY);
-    ctx.lineTo(line.endX,line.endY);
+    // // console.log("STORED LINE OBJECTS: ", line.obj_1, line.obj_2);
+    // ctx.moveTo(line.startX,line.startY);
+    // ctx.lineTo(line.endX,line.endY);
+    canvas_arrow(20, line.startX, line.startY, line.endX, line.endY)
+
   }
-  
   ctx.stroke();
 };
 
-const drawRect = (x, y, len, width, color, new_box=true) => {
-  ctx.fillStyle = color;
+const drawRect = (x, y, building, new_box=true) => {
+  ctx.fillStyle = building.color;
   //console.log('Clicked pos rect: ', x, y); // check console on web 
 
   // Check if any object conflicts with where we clicked for new 
@@ -126,19 +158,16 @@ const drawRect = (x, y, len, width, color, new_box=true) => {
   console.log(conflict)
   // only create a rect and store it if no conflict
   if (!conflict) {
-    ctx.fillStyle = color;
+    ctx.fillStyle = building.color;
     ctx.fillRect(x * pixel_size, y * pixel_size, 
-               pixel_size * len, pixel_size * width);
+               pixel_size * building.y, pixel_size * building.x);
   
     // store rect here (top left corner, and its width and height)
     const item = {
           x: x,
           y: y,
-          width: len,
-          height: width,
-          color: color,
+          building: curr_building,
           connectors: 0,
-          tooltipText: "Rectangle is " + color, // temporary textbox per item
           tooltipVisible: false
       };
 
@@ -152,8 +181,8 @@ const drawRect = (x, y, len, width, color, new_box=true) => {
 
 const placement_conflict = (x, y) => {
   // make an arbitrary rect for new item
-  r_x = x + curr_box.x - 1; 
-  b_y = y + curr_box.y - 1;
+  r_x = x + curr_building.x - 1; 
+  b_y = y + curr_building.y - 1;
   // console.log("Curr box: ", x, y, r_x, y, x, b_y, r_x, b_y);
 
   // conflict: right x-coords are > grid right boundary (grid's max x)
@@ -170,12 +199,12 @@ const placement_conflict = (x, y) => {
   conflict = false;
 
   item_coords.forEach(stored_item => {    
-    r_x2 = stored_item.x + stored_item.width - 1; 
-    b_y2 = stored_item.y + stored_item.height - 1;
+    r_x2 = stored_item.x + stored_item.building.x - 1; 
+    b_y2 = stored_item.y + stored_item.building.y - 1;
 
     // console.log("existing box: ", stored_item.x, stored_item.y, r_x2, stored_item.y, stored_item.x, b_y2, r_x2, b_y2);
 
-    // conflict when curr_box inhibits an exisiting box
+    // conflict when curr_building inhibits an exisiting box
     if (!(x > r_x2 || r_x < stored_item.x)) { 
       if (!(y > b_y2 || b_y < stored_item.y)) {
         conflict = stored_item;
@@ -192,7 +221,7 @@ const round_to_grid = (coord) => {
 
 const dump_obj = () => { // adapt this later to send objects somewhere else or reload them
   item_coords.forEach(stored_item => {    
-    console.log(stored_item.x, stored_item.y, stored_item.curr_box.x, curr_box.y)
+    console.log(stored_item.x, stored_item.y, stored_item.building.x, stored_item.building.y)
   });
 };
 
@@ -205,7 +234,7 @@ canvas.addEventListener('click', (event) => {
   const gridX = round_to_grid(x);
   const gridY = round_to_grid(y);
 
-  drawRect(gridX, gridY, curr_box.x, curr_box.y, curr_box.color);
+  drawRect(gridX, gridY, curr_building);
 });
 
 canvas.addEventListener('click', (event) => { // mouse click on object
@@ -219,10 +248,10 @@ canvas.addEventListener('click', (event) => { // mouse click on object
 
   let found_obj = click_in_box(gridX, gridY);
 
-  if (found_obj) { // create textbox if hit object
+  if (found_obj && mouse_is_active) { // create textbox if hit object
     if (!(found_obj.tooltipVisible)) {
       tooltip.style.display = "block";
-      tooltip.textContent = found_obj.tooltipText;
+      tooltip.textContent = found_obj.building.type;
       tooltip.style.left = event.clientX + 10 + "px";
       tooltip.style.top = event.clientY + 10 + "px";
       found_obj.tooltipVisible = true;
@@ -250,11 +279,11 @@ function change_button(x) {
   unload_line()
   console.log(x)
   if (x === "1") {
-    curr_box = box1
+    curr_building = constructor_building
   } else if (x === "2") {
-    curr_box = box2
+    curr_building = pad_building
   } else if (x === "3") {
-    curr_box = box3
+    curr_building = shop_building
   }
 }
 
@@ -270,16 +299,29 @@ function draw() {
     ctx.strokeStyle = "darkred";
     ctx.lineWidth = 3;
     ctx.beginPath();
-    ctx.moveTo(startX,startY);
-    ctx.lineTo(mouseX,mouseY);
+    // ctx.moveTo(startX,startY);
+    // ctx.lineTo(mouseX,mouseY);
+    canvas_arrow(startX, startY, mouseX, mouseY)
     ctx.stroke();
   }
+  
+}
+
+function canvas_arrow(headlen=10, fromx, fromy, tox, toy) {
+  var dx = tox - fromx;
+  var dy = toy - fromy;
+  var angle = Math.atan2(dy, dx);
+  ctx.moveTo(fromx, fromy);
+  ctx.lineTo(tox, toy);
+  ctx.lineTo(tox - headlen * Math.cos(angle - Math.PI / 6), toy - headlen * Math.sin(angle - Math.PI / 6));
+  ctx.moveTo(tox, toy);
+  ctx.lineTo(tox - headlen * Math.cos(angle + Math.PI / 6), toy - headlen * Math.sin(angle + Math.PI / 6));
 }
 
 function click_in_box(x, y) { // detect mouse inside of existing objects
   let clicked = false;
   item_coords.forEach(stored_item => { 
-    if ((x >= stored_item.x && x <= (stored_item.x + stored_item.width - 1)) && (y >= stored_item.y && y <= (stored_item.y + stored_item.height - 1))) {
+    if ((x >= stored_item.x && x <= (stored_item.x + stored_item.building.x - 1)) && (y >= stored_item.y && y <= (stored_item.y + stored_item.building.y - 1))) {
       clicked = stored_item; // return the item if valid
     }       
   });
@@ -347,7 +389,7 @@ function onmousemove(e) {
 }
 
 function load_line() {
-  curr_box = box0
+  curr_building = null_building
   canvas.onmousedown = onmousedown;
   canvas.onmouseup = onmouseup;
   canvas.onmousemove = onmousemove;
@@ -362,6 +404,11 @@ function unload_line() {
   
   hasLoaded = true; 
 }
+
+function load_mouse() {
+  curr_building = null_building
+  mouse_is_active = true;
+} 
 
 </script>
 </body>
