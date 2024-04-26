@@ -191,6 +191,36 @@ def createProduct():
     return jsonify("Reset Products Successfully")
 
 
+
+'''
+############## Beyond this point are functions for products.db###################
+
+@app.route('/createProduct', methods=['GET'])
+def createProduct():
+    conn = sqlite3.connect('products.db')
+    cur = conn.cursor()
+
+    productsTable = 'productsTable'
+    #scrap the table
+    cur.execute(f'DROP TABLE IF EXISTS {productsTable}')
+
+    #redo the table
+    cur.execute(f'CREATE TABLE IF NOT EXISTS {productsTable} (\
+                   productName TEXT NOT NULL\            
+    )')
+    defaultProduct = [("Orb Tower"),("Galactic Rock Tower")]
+
+    #insert defaults
+    for i in defaultProduct:
+       cur.execute(f'INSERT INTO {productsTable} (productName) VALUES (?)', i)
+    conn.commit()
+
+    cur.close()
+    conn.close()
+
+    return jsonify("createProdcuts Reset Successfully")
+'''
+
 if __name__ == '__main__':
     
 

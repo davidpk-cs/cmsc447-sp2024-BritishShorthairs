@@ -30,7 +30,7 @@ var currentFunction = 0; //so we know what func to run
 var canPlace = true;
 var activeTowerPlacement = false;
 
-var assetsPath = "../assets/"
+var assetsPath = "static/Assets/"
 
 
 var currentFrame = 0;
