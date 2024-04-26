@@ -395,20 +395,20 @@ function sendEnemyWave(){
         //1 top, 2 right, 3 bottom, 4left
 
         if(spawnSide == 1){
-            newRock.style.top = "1%";
-            newRock.style.left = randomInt(0, 100).toString() + "%";
+            newRock.style.top = "3%";
+            newRock.style.left = randomInt(3, 97).toString() + "%";
         }
         else if(spawnSide == 3){
-            newRock.style.top = "99%";
-            newRock.style.left = randomInt(0, 100).toString() + "%";
+            newRock.style.top = "97%";
+            newRock.style.left = randomInt(3, 97).toString() + "%";
         }
         else if(spawnSide == 2){
-            newRock.style.top = randomInt(0, 100).toString() + "%";
-            newRock.style.left = "99%";
+            newRock.style.top = randomInt(3, 97).toString() + "%";
+            newRock.style.left = "97%";
         }
         else if(spawnSide == 4){
-            newRock.style.top = randomInt(0, 100).toString() + "%";
-            newRock.style.left = "1%";
+            newRock.style.top = randomInt(3, 97).toString() + "%";
+            newRock.style.left = "3%";
         }
     
 
