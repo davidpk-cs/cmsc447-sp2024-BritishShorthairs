@@ -2,8 +2,6 @@ var enemies = []; //enemy objects
 
 var towers = []; //tower objects
 
-
-
 var lasersActive = false; //indicating that lasers are present on the screen, so we know to clean
 
 var score = 0; //number of points
@@ -44,14 +42,16 @@ var credits = 1500; //money
 var lives = 100; //lives
 
 var failureOdds = 40; //range is 20% to 60%;
-var hardHitOdds = 25; //range is 10-30%
-var enemyDamage = 3; //the range is 3-5
-var enemyHP = 1; //range is 3-5
-var enemyCount = 1; //the range is 20-50 number of enemies per wave
+var criticalStrikeOdds = 25; //range is 10-30%
+var enemyDamage = 3; //the range is 6-9
+var enemyHP = 1; //range is 4-5
+var enemyCount = 1; //the range is 20-35 number of enemies per wave
 var enemyWaves = 1; //the range is 20-30, number of waves of enemies sent in 
-var towerRange = 200; //the range is 100-200
+var towerRange = 200; //the range is 90-140
 var maxEnemyCount = 40;
 towerPrice = 140; //the range is 120 to 220
+
+towerDamage = 2;
 
 
 function generateEconomy(){
@@ -59,29 +59,19 @@ function generateEconomy(){
     var currentSkew = randomInt(1, 10);
     failureOdds = randomSkew(20, 60, currentSkew);
     currentSkew = newSkew(20, 60, failureOdds);
-    hardHitOdds = randomSkew(10, 30, currentSkew);
-    currentSkew = newSkew(10, 30, hardHitOdds);
-    enemyDamage = randomSkew(3, 5, currentSkew);
-    currentSkew = newSkew(3, 5, enemyDamage);
-    enemyHP = randomSkew(3, 5, currentSkew);
-    currentSkew = newSkew(3, 5, enemyHP);
-    enemyCount = randomSkew(20, 50, currentSkew);
-    currentSkew = newSkew(20, 50, enemyCount);
+    criticalStrikeOdds = randomSkew(10, 30, currentSkew);
+    currentSkew = newSkew(10, 30, criticalStrikeOdds);
+    enemyDamage = randomSkew(6, 9, currentSkew);
+    currentSkew = newSkew(6, 9, enemyDamage);
+    enemyHP = randomSkew(4, 5, currentSkew);
+    currentSkew = newSkew(4, 5, enemyHP);
+    enemyCount = randomSkew(20, 35, currentSkew);
+    currentSkew = newSkew(20, 35, enemyCount);
     enemyWaves = randomSkew(20, 30, currentSkew);
     currentSkew = newSkew(20, 30, enemyWaves);
-    towerRange = randomSkew(100, 200, currentSkew);
-    currentSkew = newSkew(100, 200, towerRange);
+    towerRange = randomSkew(90, 140, currentSkew);
+    currentSkew = newSkew(90, 140, towerRange);
     towerPrice = randomSkew(120, 220, currentSkew);
-
-    // Logging the values
-    console.log("failureOdds:", failureOdds);
-    console.log("hardHitOdds:", hardHitOdds);
-    console.log("enemyDamage:", enemyDamage);
-    console.log("enemyHP:", enemyHP);
-    console.log("enemyCount:", enemyCount);
-    console.log("enemyWaves:", enemyWaves);
-    console.log("towerRange:", towerRange);
-    console.log("towerPrice:", towerPrice);
 }
 
 
@@ -101,9 +91,11 @@ function setup(){
     //give the player the briefing
     //coverScreenWithTransparentDiv();
 
-    //var div = document.getElementById(coverName);
-
     generateEconomy();
+
+    //give the player the briefing
+    coverScreenWithTranslucentDiv();
+    setUpBriefing();
 
 }
 
@@ -131,18 +123,6 @@ function newSkew(min, max, generatedNumber) {
     return Math.max(1, Math.min(skew, 10));
 }
 
-
-function searchTarget(){
-
-    var towerIndex = -1;
-
-    
-
-    for(var i = 0; i < enemies.length; i++){
-
-        var enemyStyles = 0;
-    }
-}
 
 function moveEnemies() {
     //console.log("First function");
@@ -385,7 +365,7 @@ function sendEnemyWave(){
         newRock.style.height = '60px'; 
 
         //enemyType
-        newRock.src = assetsPath + 'enemies/tile007.png'; // Set the source to the PNG sprite
+        newRock.src = assetsPath + 'projectiles/Asteroid 01 - Base.png'; // Set the source to the PNG sprite
 
         newRock.style.position="absolute"; //better for placement
 
@@ -485,6 +465,26 @@ function coverScreenWithTransparentDiv() {
     document.body.appendChild(overlay);
 }
 
+function coverScreenWithTranslucentDiv() {
+
+    //this is to make sure you can't do anything once you start the game
+   
+    const overlay = document.createElement('div');
+
+    overlay.id = coverName;
+  
+    // Style the div to be fully transparent
+    overlay.style.position = 'fixed'; 
+    overlay.style.top = '0'; 
+    overlay.style.left = '0';
+    overlay.style.width = '100vw'; // Cover the full viewport width
+    overlay.style.height = '100vh'; // Cover the full viewport height
+    overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.9)'; //  transparent background
+    overlay.style.zIndex = '1000'; 
+  
+    document.body.appendChild(overlay);
+}
+
 
 function createEndingCover(message) {
 
@@ -544,7 +544,7 @@ class enemy{
 
 class tower{
 
-    constructor(object, xPos, yPos, health = 35, damage = 1, laserCount = 0){
+    constructor(object, xPos, yPos, health = 35, damage = towerDamage, laserCount = 0){
 
         this.object = object;
         this.health = health;
@@ -555,6 +555,112 @@ class tower{
         this.left = yPos;
     }
 }
+
+class failureFixer{ 
+    constructor(){
+        this.price = randomInt(90, 175);
+        this.message = "I can roll out a fix to ensure your UFOs can't miss!" }
+    purchase(){
+        if(credits < this.price){
+            return false;}
+        else{ credits -= this.price;
+            failureOdds = 0;
+            return true;} } }
+
+class criticalStrikeFixer{ 
+    constructor(){
+        this.price = randomInt(60, 115);
+        this.message = "I'll divert incoming asteroids to reduce their chances of hitting a critical spot of our planet!" }
+    purchase(){
+        if(credits < this.price){
+            return false;}
+        else{ credits -= this.price;
+            criticalStrikeOdds = Math.floor(0.35 * criticalStrikeOdds);
+            return true;} } }
+
+
+class enemyDamageFixer{ 
+    constructor(){
+        this.price = randomInt(160, 265);
+        this.message = "I'll damage the asteroids with my fleet of cannon ships to reduce the damage they deal if they hit our planet!" }
+    purchase(){
+        if(credits < this.price){
+            return false;}
+        else{ credits -= this.price;
+            enemyDamage -= randomInt(2, 3);
+            return true;} } }
+
+class enemyHealthFixer{ 
+    constructor(){
+        this.price = randomInt(150, 230);
+        this.message = "I'll weaken the asteroids with my fleet so that your UFO's can take them out with less hits!" }
+    purchase(){
+        if(credits < this.price){
+            return false;}
+        else{ credits -= this.price;
+            enemyHP -= randomInt(1, 2);
+            return true;} } }
+
+
+class enemyCountFixer{ 
+    constructor(){
+        this.price = randomInt(200, 320);
+        this.message = "I'll destroy a portion of every wave of asteroids before they come near!" }
+    purchase(){
+        if(credits < this.price){
+            return false;}
+        else{ credits -= this.price;
+            enemyCount = Math.floor(0.70 * enemyCount);
+            return true;} } }
+
+class enemyWaveFixer{ 
+    constructor(){
+        this.price = randomInt(260, 410);
+        this.message = "I'll destroy as many waves of asteroids as I can!" }
+    purchase(){
+        if(credits < this.price){
+            return false;}
+        else{ credits -= this.price;
+            enemyWaves -= Math.floor(this.price / 50);
+            return true;} } }
+
+
+class towerRangeFixer{ 
+    constructor(){
+        this.price = randomInt(300, 500);
+        this.message = "I'll upgrade the range of all your towers!" }
+    purchase(){
+        if(credits < this.price){
+            return false;}
+        else{ credits -= this.price;
+            towerRange += Math.floor(this.price / 3.8);
+            return true;} } }
+
+
+class livesFixer{ 
+    constructor(){
+        this.price = randomInt(100, 200);
+        this.message = "I'll fortify the defenses on the planet so it can withstand more hits!" }
+    purchase(){
+        if(credits < this.price){
+            return false;}
+        else{ credits -= this.price;
+            lives += floor(lives * 0.75);
+            return true;} } }
+
+
+class towerDamageFixer{
+    constructor(){
+        this.price = randomInt(300, 540);
+        this.message = "I'll boost the damage capabilities of your towers!" }
+    purchase(){
+        if(credits < this.price){
+            return false;}
+        else{ credits -= this.price;
+            towerDamage += 1;
+            return true;} }   
+}
+
 
 
 function distanceFormula(x1, y1, x2, y2) {
@@ -572,4 +678,108 @@ function distanceFormula(x1, y1, x2, y2) {
     return distance;
 }
  
+
+function setUpBriefing(){
+
+    
+    // Initialize one instance of each class
+    const fixers = [
+        new failureFixer(),
+        new criticalStrikeFixer(),
+        new enemyDamageFixer(),
+        new enemyHealthFixer(),
+        new enemyCountFixer(),
+        new enemyWaveFixer(),
+        new towerRangeFixer(),
+        new livesFixer(),
+        new towerDamageFixer()
+    ];
+
+    // Generate an array of 6 random indexes
+    const chosenFixersIndexes = [];
+    while (chosenFixersIndexes.length < 6) {
+        const index = randomInt(0, fixers.length - 1);
+        if (!chosenFixersIndexes.includes(index)) {
+            chosenFixersIndexes.push(index);
+        }
+    }
+
+
+    var div = document.getElementById(coverName);
+
+    div.innerHTML = defaultBrief;
+
+
+    //----------
+
+    briefingInfo = document.getElementById("briefingInfo");
+
+    briefingInfo.innerHTML += "<p> Credits: " + credits.toString() + "<p>"; 
+    briefingInfo.innerHTML += "<p> Tower Failure Likelihood " + failureOdds.toString() + "<p>";
+    briefingInfo.innerHTML += "<p> Enemy Crit Chance " + criticalStrikeOdds.toString() + "<p>";
+    briefingInfo.innerHTML += "<p> Enemy Damage " + enemyDamage.toString() + "<p>";
+    briefingInfo.innerHTML += "<p> Enemy HP " + enemyHP.toString() + "<p>";
+    briefingInfo.innerHTML += "<p> Tower Range " + towerRange.toString() + "<p>";
+    briefingInfo.innerHTML += "<p> Tower Price " + towerPrice.toString() + "<p>";
+
+
+    //----------
+
+    contractShop = document.getElementById("contractShop");
+
+    toAppend = "";
+
+    for(var i = 0; i < chosenFixersIndexes.length; i++){
+
+        j = chosenFixersIndexes[i];
+
+        toAppend += "<div class=\"contractOffer\">";
+        toAppend += "<p>" + fixers[j].message + "<p>"
+        toAppend += "<button>" + "Contract: " + fixers[j].price.toString() + " Credits" + "</button>"
+        toAppend += "</div>";
+    }
+
+    contractShop.innerHTML = toAppend;
+
+}
+
+
+function endBriefing(){
+
+    finishedBriefing = document.getElementById(coverName);
+    finishedBriefing.remove();
+}
+
+
+const defaultBrief = `
+
+<div id="missionBrief">
+
+        <div id="missionBriefingReport">
+
+            <h1 id="briefingTitle">Briefing</h1>
+
+            <div id="briefingInfo">
+                <p>Aliens have stirred the asteroid Belts around our home planet! Thank you for taking on the role of defending our home!
+                    Unfortunately, the only available towers we have for purchase are UFOs.... The good news is, we have several contractors
+                    offering their services to you, for a cost. See if any of these things are worth it! Just make sure that you save some 
+                    money for UFOs..... You are going to need it!
+                </p>
+            </div>
+
+        </div>
+
+        <div id="contractShop">
+
+        </div>
+
+        <button id="enterGameButton" onclick="endBriefing()">Finished</button>
+
+    </div>
+    
+`
+
+
+
+
   

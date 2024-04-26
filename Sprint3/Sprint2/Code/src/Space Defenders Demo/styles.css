@@ -84,3 +84,103 @@ html, body{
     margin-right:10px;
     margin-left:10px;
 }
+
+
+#missionBrief{
+
+    background-image: url('../assets/backgrounds/bg2.png'); /* Sets the background image */
+    background-size: cover; /* Cover the entire area of the box */
+
+    border: 3px solid darkcyan;
+    height:70%;
+    width:70%;
+
+    position:absolute;
+    top:50%;
+    left:50%;
+
+    transform: translate(-50%, -50%);
+}
+
+#briefingTitle{
+
+    color:white;
+    text-align: center;
+}
+
+#briefingInfo{
+    display:flex;
+    justify-content:space-around;
+    flex-wrap:wrap;
+
+    border-color:white;
+
+    color:white;
+
+    text-align:center;
+}
+
+#breifingInfo{
+    margin:2px;
+}
+
+#contractShop{
+
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:space-evenly;
+
+}
+
+.contractOffer{
+
+
+    border-color:lightgreen;
+    border-radius: 5px;
+    height:120px;
+    width:300px;
+
+    border: 3px solid rgb(120, 150, 163);
+
+    background-color:black;
+    color:white;
+    text-align:center;
+
+    margin:15px;
+    
+}
+
+.contractOffer button{
+    background: linear-gradient(to left, lightblue, rgb(147, 147, 204));
+    padding:2px;
+    color:darkblue;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    border-color:navy;
+}
+
+.contractOffer button:hover{
+    background: linear-gradient(to right, darkblue, navy);
+    color:white;
+    border-color:white;
+}
+
+
+#enterGameButton{
+
+    background-color:lightblue;
+    color:darkgoldenrod;
+    height:60px;
+    font-size:3em;
+    border-radius:10px;
+    border: 2px solid darkgoldenrod;
+
+    display:block;
+    margin: 0 auto;
+}
+
+#enterGameButton:hover{
+
+    color:lightblue;
+    background-color:darkgoldenrod;
+    border-color:lightblue;
+}
