@@ -21,6 +21,20 @@ def gridPage():
 @app.route('/newGame')
 def newGame():
     return render_template('main.html')
+
+
+@app.route('/level2')
+def level2():
+    return render_template('level2.html')
+
+@app.route('/level3')
+def level3():
+    return render_template('level3.html')
+
+@app.route('/levelEndess')
+def levelEndless():
+    return render_template('levelEndless')
+
 @app.route('/input')
 def input():
     return render_template('inputUser.html')
