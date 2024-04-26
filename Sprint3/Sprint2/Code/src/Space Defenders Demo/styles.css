@@ -184,3 +184,25 @@ html, body{
     background-color:darkgoldenrod;
     border-color:lightblue;
 }
+
+
+#restartButton{
+    background-color:lightgreen;
+    color:goldenrod;
+    height:60px;
+    font-size:3em;
+    border-radius:10px;
+    border: 2px solid goldenrod;
+}
+
+#restartButton:hover{
+    color:lightgreen;
+    background-color: goldenrod;
+    border:2px solid lightgreen;
+}
+
+#endingMessage{
+    color:darkblue;
+    font-size:3em;
+    margin:20px;
+}

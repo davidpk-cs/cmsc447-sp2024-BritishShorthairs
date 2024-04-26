@@ -37,9 +37,9 @@ var homeBaseTop = 0;
 var homeBaseLeft = 0;
 
 
-var credits = 1500; //money
+var credits = 1800; //money
 
-var lives = 100; //lives
+var lives = 300; //lives
 
 var failureOdds = 40; //range is 20% to 60%;
 var criticalStrikeOdds = 25; //range is 10-30%
@@ -51,7 +51,7 @@ var towerRange = 200; //the range is 90-140
 var maxEnemyCount = 40;
 towerPrice = 140; //the range is 120 to 220
 
-towerDamage = 2;
+towerDamage = 3;
 
 
 function generateEconomy(){
@@ -95,6 +95,16 @@ function setup(){
 
     //give the player the briefing
     coverScreenWithTranslucentDiv();
+
+    // Generate an array of 6 random indexes, this is for available contracts
+    while (chosenFixersIndexes.length < 6) {
+        const index = randomInt(0, fixers.length - 1);
+        if (!chosenFixersIndexes.includes(index)) {
+            chosenFixersIndexes.push(index);
+        }
+    }
+
+
     setUpBriefing();
 
 }
@@ -164,6 +174,10 @@ function moveEnemies() {
             
             lives -= enemyDamage; //enemy hit target, delete enemy
 
+            if(randomInt(0, 100) < criticalStrikeOdds){
+                lives -= enemyDamage * 2;
+            }
+
             if(lives < 0){
                 lives = 0;
             }
@@ -196,7 +210,10 @@ function activateTowers() {
 
     for(var i = 0; i < towers.length; i++){
 
-    
+        if(randomInt(0, 100) < failureOdds){
+            continue;
+        }
+
         var towerTop = towers[i].top;
         var towerLeft = towers[i].left;   
 
@@ -324,7 +341,12 @@ function runRound() {
 
     if(lives == 0 || (enemies.length == 0 && enemyWaves == 0)){
 
-        createEndingCover("Good Game! Total Score: " + score.toString());
+        if(enemies.length == 0 && lives > 0){
+            createEndingCover("Mission Success! Total Score: " + score.toString());
+        }
+        else{
+            createEndingCover("Nice Try! Better Luck Next Time!");
+        }
 
         return;
     }
@@ -369,10 +391,26 @@ function sendEnemyWave(){
 
         newRock.style.position="absolute"; //better for placement
 
-        var position = randomInt(10, 80); //come from a random spot within the canvas left side
-        
-        newRock.style.left="1%"; 
-        newRock.style.top= position.toString() + "%";
+        var spawnSide = randomInt(1, 4); 
+        //1 top, 2 right, 3 bottom, 4left
+
+        if(spawnSide == 1){
+            newRock.style.top = "1%";
+            newRock.style.left = randomInt(0, 100).toString() + "%";
+        }
+        else if(spawnSide == 3){
+            newRock.style.top = "99%";
+            newRock.style.left = randomInt(0, 100).toString() + "%";
+        }
+        else if(spawnSide == 2){
+            newRock.style.top = randomInt(0, 100).toString() + "%";
+            newRock.style.left = "99%";
+        }
+        else if(spawnSide == 4){
+            newRock.style.top = randomInt(0, 100).toString() + "%";
+            newRock.style.left = "1%";
+        }
+    
 
 
         var enemyHolder = document.getElementById("viewPort")
@@ -510,11 +548,13 @@ function createEndingCover(message) {
   
     // Create the header with the message
     const header = document.createElement('h2');
+    header.id = "endingMessage";
     header.textContent = message;
     header.style.textAlign = 'center';
   
     // Create the reload button
     const button = document.createElement('button');
+    button.id = "restartButton";
     button.textContent = "Restart Game";
     button.onclick = function() {
       window.location.reload();
@@ -645,7 +685,7 @@ class livesFixer{
         if(credits < this.price){
             return false;}
         else{ credits -= this.price;
-            lives += floor(lives * 0.75);
+            lives += Math.floor(lives * 0.75);
             return true;} } }
 
 
@@ -681,30 +721,6 @@ function distanceFormula(x1, y1, x2, y2) {
 
 function setUpBriefing(){
 
-    
-    // Initialize one instance of each class
-    const fixers = [
-        new failureFixer(),
-        new criticalStrikeFixer(),
-        new enemyDamageFixer(),
-        new enemyHealthFixer(),
-        new enemyCountFixer(),
-        new enemyWaveFixer(),
-        new towerRangeFixer(),
-        new livesFixer(),
-        new towerDamageFixer()
-    ];
-
-    // Generate an array of 6 random indexes
-    const chosenFixersIndexes = [];
-    while (chosenFixersIndexes.length < 6) {
-        const index = randomInt(0, fixers.length - 1);
-        if (!chosenFixersIndexes.includes(index)) {
-            chosenFixersIndexes.push(index);
-        }
-    }
-
-
     var div = document.getElementById(coverName);
 
     div.innerHTML = defaultBrief;
@@ -714,7 +730,8 @@ function setUpBriefing(){
 
     briefingInfo = document.getElementById("briefingInfo");
 
-    briefingInfo.innerHTML += "<p> Credits: " + credits.toString() + "<p>"; 
+    briefingInfo.innerHTML += "<p> Credits: " + credits.toString() + "<p>";
+    briefingInfo.innerHTML += "<p> Planet HP: " + lives.toString() + "<p>"; 
     briefingInfo.innerHTML += "<p> Tower Failure Likelihood " + failureOdds.toString() + "<p>";
     briefingInfo.innerHTML += "<p> Enemy Crit Chance " + criticalStrikeOdds.toString() + "<p>";
     briefingInfo.innerHTML += "<p> Enemy Damage " + enemyDamage.toString() + "<p>";
@@ -735,7 +752,7 @@ function setUpBriefing(){
 
         toAppend += "<div class=\"contractOffer\">";
         toAppend += "<p>" + fixers[j].message + "<p>"
-        toAppend += "<button>" + "Contract: " + fixers[j].price.toString() + " Credits" + "</button>"
+        toAppend += "<button onclick = \"" +  "doContract(" + j.toString() + ")\">" + "Contract: " + fixers[j].price.toString() + " Credits" + "</button>"
         toAppend += "</div>";
     }
 
@@ -748,6 +765,26 @@ function endBriefing(){
 
     finishedBriefing = document.getElementById(coverName);
     finishedBriefing.remove();
+}
+
+function doContract(index){
+
+    if (fixers[index].purchase()){
+    
+        var toRemove = chosenFixersIndexes.indexOf(index);
+
+        chosenFixersIndexes.splice(toRemove, 1);
+
+        endBriefing();
+        coverScreenWithTranslucentDiv();
+        setUpBriefing(); 
+
+    }
+
+    else{
+
+        return;
+    }
 }
 
 
@@ -779,7 +816,18 @@ const defaultBrief = `
     
 `
 
+const fixers = [
+    new failureFixer(),
+    new criticalStrikeFixer(),
+    new enemyDamageFixer(),
+    new enemyHealthFixer(),
+    new enemyCountFixer(),
+    new enemyWaveFixer(),
+    new towerRangeFixer(),
+    new livesFixer(),
+    new towerDamageFixer()
+];
 
-
+const chosenFixersIndexes = [];
 
   
