@@ -40,9 +40,9 @@ canvas {
 <div id="tooltip" class="tooltip"></div>
 
 <div id="toolbox">
-  <button onclick='change_button("1")'>Small Box</button>
-  <button onclick='change_button("2")'>Medium Box</button>
-  <button onclick='change_button("3")'>Large Box</button>
+  <button onclick='change_button("1")'>Constructor</button>
+  <button onclick='change_button("2")'>Pad</button>
+  <button onclick='change_button("3")'>Shop</button>
   <button onclick='load_line()'>Conveyer</button>
   <button onclick='load_mouse()'>Mouse</button>
   <button onclick='drawBoard()'>Refresh</button>
@@ -93,7 +93,7 @@ pad_building = {
   setting: ""
 }
 shop_building = {
-  x: 6, y:4, color:"green",
+  x: 4, y:4, color:"green",
   type: "shop",
   image_path: "",
   setting: ""
@@ -389,6 +389,9 @@ function onmousemove(e) {
 }
 
 function load_line() {
+  if (mouse_is_active) {
+    mouse_is_active = false;
+  }
   curr_building = null_building
   canvas.onmousedown = onmousedown;
   canvas.onmouseup = onmouseup;
@@ -398,6 +401,10 @@ function load_line() {
 }
 
 function unload_line() {
+  if (mouse_is_active) {
+    mouse_is_active = false;
+  }
+
   canvas.onmousedown = false;
   canvas.onmouseup = false;
   canvas.onmousemove = false;
