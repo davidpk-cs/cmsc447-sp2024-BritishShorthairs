@@ -13,11 +13,8 @@
         position:absolute;
         width:100px;
         height:100px;
-
-
-        background-color:gold;
-        border-color:black;
-        border-style:solid;
+        background:none;
+        border:none;
         }
 
         html, body{
@@ -26,7 +23,7 @@
 
         margin: 0; /* Removes default margin */
         padding: 0; /* Removes default padding */
-        background: linear-gradient(to bottom, #160174, #e6e9f0); /* Subtle gradient from white to light grey */
+        background: linear-gradient(to bottom, #138bb7, #0e292c); /* Subtle gradient from white to light grey */
         background-attachment: fixed; /* Keeps the background stationary during scroll */
         font-family: 'Roboto', sans-serif; /* A modern, readable font */
         color: #333; /* A dark color for text that ensures readability */
@@ -224,11 +221,12 @@
     <div id = "topBar">
 
         <button class="topBarItem" onclick="mainFunc()">Play Game</button>
-        <button class="topBarItem" onclick="placeTower()">Place Tower</button>
+        <button class="topBarItem" onclick="initiatePurchase()">Purchase Tower</button>
 
         <p class="topBarItem" id="scoreBoard">Score: 0</p>
         <p class = "topBarItem" id="creditBoard">Total Credits Remaining: 10</p>
         <p class = "topBarItem" id="livesBoard">Lives Remaining: 100</p>
+        <p class = "topBarItem" id="messageBoard"></p>
 
         <p></p>
     </div>
@@ -237,7 +235,7 @@
 
         <canvas id="weaponField"></canvas>
     
-        <img id="homeBase" onload="setup()" src="{{ url_for('static', filename='/assets/planets/planet5.png') }}" style="top:50%;
+        <img id="homeBase" onload="setup()" src="{{ url_for('static', filename='/assets/planets/earthSprite.png') }}" style="top:50%;
         left:50%; transform:translate(-50%, -50%);">
         
     
