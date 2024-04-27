@@ -79,17 +79,16 @@ function setup(){
 
     //get the target object
     var target = document.getElementById("homeBase");
-    
-    //get styles of the thing that is being targetted and enemy
+
+    //get styles of the thing that is being targeted
     var targetStyles = window.getComputedStyle(target);
 
-    // get y value
-    homeBaseTop = parseFloat(targetStyles.top);
-    homeBaseLeft = parseFloat(targetStyles.left);
+    // get x and y values of the center of the home planet
+    homeBaseTop = parseFloat(targetStyles.top) - (parseFloat(targetStyles.height) / 4);
+    homeBaseLeft = parseFloat(targetStyles.left) - (parseFloat(targetStyles.width) / 4);
 
+    console.log(homeBaseTop, homeBaseLeft);
 
-    //give the player the briefing
-    //coverScreenWithTransparentDiv();
 
     generateEconomy();
 
@@ -145,7 +144,6 @@ function moveEnemies() {
         var targetTop = homeBaseTop;
         var targetLeft = homeBaseLeft;
 
-    
         //get x value
         var enemyTop = parseFloat(enemyStyles.top);
         var enemyLeft = parseFloat(enemyStyles.left);
@@ -238,8 +236,8 @@ function activateTowers() {
             
             //enemy dimensions
             var enemyRect = enemies[j].object.getBoundingClientRect();
-            const enemyX = enemyRect.left - canvasRect.left;
-            const enemyY = enemyRect.top - canvasRect.top;
+            const enemyX = enemyRect.left - canvasRect.left + (enemyRect.width);
+            const enemyY = enemyRect.top - canvasRect.top + (enemyRect.height);
             
             //calculate distance
             var distance = distanceFormula(towerX, towerY, enemyX, enemyY);
@@ -469,6 +467,20 @@ function placeTower(){
         towerToPush = new tower(newTower, towerLeft, towerTop);
 
         towers.push(towerToPush);
+
+        // Check if the tower is sticking out of the right or bottom edges
+        var parentWidth = viewPortPos.width;
+        var parentHeight = viewPortPos.height;
+
+        if (towerLeft + parseInt(towerStyles.width) > parentWidth) {
+            // If the tower is sticking out of the right edge, adjust its left position
+            newTower.style.left = (parentWidth - parseInt(towerStyles.width)) + 'px';
+        }
+
+        if (towerTop + parseInt(towerStyles.height) > parentHeight) {
+            // If the tower is sticking out of the bottom edge, adjust its top position
+            newTower.style.top = (parentHeight - parseInt(towerStyles.height)) + 'px';
+        }
     
     }, { once: true });
 
@@ -776,6 +788,8 @@ function endBriefing(){
 
     finishedBriefing = document.getElementById(coverName);
     finishedBriefing.remove();
+
+
 }
 
 function doContract(index){
