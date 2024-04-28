@@ -40,15 +40,15 @@ var homeBaseLeft = 0;
 var homeBaseObject = "";
 
 
-var credits = 1800; //money
+var credits = 2800; //money
 
-var lives = 300; //lives
+var lives = 300000; //lives
 
-var lifeStyle = 25; //range is 20% to 60%;
-var enemyDamage = 1000; //the range is 6-9
-var enemyHP = 10; //range is 4-5
-var enemyCount = 15; //the range is 20-35 number of enemies per wave
-var enemyWaves = 10; //the range is 20-30, number of waves of enemies sent in 
+var enemyDamage = 1; //the range is 6-9
+var enemyHP = 3; //range is 4-5
+var enemyCount = 5; //the range is 20-35 number of enemies per wave
+var enemyWaves = 60; 
+var maxEnemyWaves = enemyWaves;
 var maxEnemyCount = 10;
 towerPrice = 140; //the range is 120 to 220
 
@@ -126,11 +126,11 @@ function moveEnemies() {
 
     for (var i = 0; i < enemies.length; i++) {
 
-        if(deadTowers.includes(enemies[i].target)){
-            enemies[i].taret = -1;
-        }
+        var contactThreshold = enemies[i].target < 0 ? enemies[i].range + 40: enemies[i].range; // pixels you need to be close enough to count as a touch
 
-        var enemyStyles = window.getComputedStyle(enemies[i].object);
+        if(deadTowers.includes(enemies[i].target)){
+            enemies[i].target = -1;
+        }
 
         // get y value
         var targetTop = homeBaseTop;
@@ -150,43 +150,51 @@ function moveEnemies() {
             baseStyles = window.getComputedStyle(homeBaseObject);
             var targetX = targetLeft + (parseFloat(baseStyles.width) / 2);
             var targetY = targetTop + (parseFloat(baseStyles.height) / 2);
-            console.log(targetX, targetY);
         }
+        
+        var enemyStyles = window.getComputedStyle(enemies[i].object);
 
         //get x value
         var enemyTop = parseFloat(enemyStyles.top);
         var enemyLeft = parseFloat(enemyStyles.left);
-    
-    
-        // Calculate the fraction of the distance to move in this frame
-        var changeX = (targetLeft - enemyLeft) / enemies[i].speed;
-        var changeY = (targetTop - enemyTop) / enemies[i].speed;
-    
-        // Calculate new positions for enemy
-        var newX = enemyLeft + changeX;
-        var newY = enemyTop + changeY;
-    
-        // Update the x and y positions of enemies[i] in pixels
-        enemies[i].object.style.left = `${newX}px`;
-        enemies[i].object.style.top = `${newY}px`;
 
-        //by reducing speed fragment we make it speed up the next time
-        //this is to make sure that enemies aren't slowing down
-        if(enemies[i].speed > 5){
-            enemies[i].speed -= 1;
-        }
+        var width = parseFloat(enemyStyles.width);
+        var height = parseFloat(enemyStyles.height);
+        var enemyX =  enemyLeft + (width / 2);
+        var enemyY = enemyTop + (height / 2);
 
-        //now let's establish the new X and new Y values for the canvas, so they are centered
-        var enemyX = newX + (parseFloat(enemyStyles.width) / 2);
-        var enemyY = newY + (parseFloat(enemyStyles.height) / 2);
         
-        var contactThreshold = enemies[i].target < 0 ? 130: 90; // pixels you need to be close enough to count as a touch
-        if (Math.abs(newX - targetLeft) <= contactThreshold && Math.abs(newY - targetTop) <= contactThreshold) {
+        if((Math.abs(enemyX - targetX) > contactThreshold || Math.abs(enemyY - targetY) > contactThreshold)){
+
+            // Calculate the fraction of the distance to move in this frame
+            var changeX = (targetLeft - enemyLeft) / enemies[i].speed;
+            var changeY = (targetTop - enemyTop) / enemies[i].speed;
+        
+            // Calculate new positions for enemy
+            var newX = enemyLeft + changeX;
+            var newY = enemyTop + changeY;
+        
+            // Update the x and y positions of enemies[i] in pixels
+            enemies[i].object.style.left = `${newX}px`;
+            enemies[i].object.style.top = `${newY}px`;
+
+            //by reducing speed fragment we make it speed up the next time
+            //this is to make sure that enemies aren't slowing down
+            if(enemies[i].speed > 5){
+                enemies[i].speed -= 1;
+            }
+
+            //now let's establish the new X and new Y values for the canvas, so they are centered
+            enemyX = newX + (width / 2);
+            enemyY = newY + (height / 2);
+        }
+        
+        if (Math.abs(enemyX - targetX) <= contactThreshold && Math.abs(enemyY - targetY) <= contactThreshold) {
             
             //if targetting homebase
             if(enemies[i].target < 0){
 
-                lives -= enemyDamage; //enemy hit target, delete enemy
+                lives -= enemies[i].damage; //enemy hit target, delete enemy
 
                 if(lives < 0){
                     lives = 0;
@@ -197,8 +205,6 @@ function moveEnemies() {
             else{
                 attackTower(i);
             }
-
-            selfDestructEnemy(i, true);
 
             draw = canvas.getContext("2d");
             draw.beginPath();
@@ -212,6 +218,9 @@ function moveEnemies() {
                 return;
             }
 
+        }
+        else{
+            console.log("Why??", enemies[i].target);
         }
 
     }
@@ -304,7 +313,6 @@ function activateTowers() {
 
 function attackEnemy(enemyIndex, towerIndex, destroy=false){
 
-    console.log(towerIndex);
     enemies[enemyIndex].health -= towers[towerIndex].damage;
 
     //double damage if it is a critical strike
@@ -467,6 +475,24 @@ function sendEnemyWave(){
 
         var enemyToPush = new enemy(newRock, enemyHP, enemyDamage);
 
+        var phase = determineQuarter(enemyWaves, maxEnemyWaves);
+        
+        //spawn a mix of different levels instead of blasting top level ones at the end
+        phase = randomInt(1, phase); 
+
+        if(phase == 1){
+            enemyToPush.level1();
+        }
+        else if (phase == 2){
+            enemyToPush.level2();
+        }
+        else if (phase == 3){
+            enemyToPush.level3();
+        }
+        else{
+            enemyToPush.level4()
+        }
+
         enemies.push(enemyToPush);
     }
 
@@ -536,7 +562,7 @@ function placeTower(){
         towers.push(pendingTower);
 
         activeTowerPlacement = false;
-        document.getElementById("messageBoard").innerText = "";
+        document.getElementById("messageBoard").innerText = "200 To Purchase a New Tower";
     
     }, { once: true });
 
@@ -650,11 +676,12 @@ function createEndingCover(message, won=true) {
 
 class enemy{
 
-    constructor(object, health = 1, damage = 1, speed = 201){
+    constructor(object, health = 1, damage = 1, range = 90, speed = 201){
 
         this.health = health;
         this.speed = speed;
         this.object = object;
+        this.range = range;
 
         this.damage = damage;
 
@@ -662,6 +689,33 @@ class enemy{
 
         this.hasAttacked = false; //if the enemy already dished an attack in a cycle
     } 
+
+    level1(){
+        this.health += 2;
+        this.damage += 0;
+        this.range += 10;
+
+        this.object.src = assetsPath + "enemies/ufo4.png";
+    }
+    level2(){
+        this.health += 3;
+        this.damage += 1;
+        this.range += 30;
+
+        this.object.src = assetsPath + "enemies/ufo5.png";
+    }
+    level3(){
+        this.health += 4;
+        this.damage += 2;
+        this.range += 50;
+        this.object.src = assetsPath + "enemies/ufo6.png";
+    }
+    level4(){
+        this.halth += 7;
+        this.damage += 5;
+        this.range += 60;
+        this.object.src = assetsPath + "enemies/ufo7.png";
+    }
 
 }
 
@@ -751,6 +805,11 @@ function setUpPurchase(){
 }
 
 function initiatePurchase(){
+
+    if(credits < 200){
+        document.getElementById("messageBoard").innerText = "Can Not Afford Tower";
+        return;
+    }
 
     if(activeTowerPlacement){
         return;
@@ -906,6 +965,18 @@ upgradeOptions = [new healthUpgrade(),
     new laserCountUpgrade(),
     new criticalStrikeUpgrade(),
     new rangeUpgrade()];
+
+
+
+//this will let me see how much progress of the round has been
+function determineQuarter(value1, value2) {
+    if (value2 === 0) {
+        return 4;
+    }
+    // Calculate which quarter it's in
+    var quarter = Math.floor(value1 / (value2 / 4)) + 1;
+    return quarter;
+}
 
 
 var pendingTower = new tower("none", 0, 0);
