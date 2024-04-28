@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Factorio-like Game with Moving Items</title>
+  <style>
+    canvas {
+      border: 1px solid black;
+    }
+    .toolbox {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background-color: #f4f4f4;
+      padding: 10px;
+      display: flex;
+      justify-content: center;
+    }
+    .toolbox button {
+      margin: 0 10px;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="canvas" width="500" height="500"></canvas>
+  <div class="toolbox">
+    <button onclick="setCurrentTool('steel')">Steel Source</button>
+    <button onclick="setCurrentTool('copper')">Copper Source</button>
+    <button onclick="setCurrentTool('storage')">Storage</button>
+    <button onclick="setCurrentTool('constructor')">Constructor</button>
+    <button onclick="setCurrentTool('conveyor')">Conveyor Belt</button>
+    <button onclick="startMovingItems()">Start Conveyor Belts</button>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const gridSize = 20; // Size of each grid cell in pixels
+    const width = 25;  // Number of columns
+    const height = 25; // Number of rows
+
+    const buildings = [];
+    const conveyorBelts = [];
+    const movingItems = []; // Tracks items moving along conveyors
+    let currentTool = null; // Current tool/building selected
+    let firstClick = null; // Used for conveyor belt placement
+
+    // Draw the grid
+    function drawGrid() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.strokeStyle = 'lightgray';
+      for (let x = 0; x < width; x++) {
+        for (let y = 0; y < height; y++) {
+          ctx.strokeRect(x * gridSize, y * gridSize, gridSize, gridSize);
+        }
+      }
+    }
+
+    // Draw buildings with inventory
+    function drawBuildings() {
+      buildings.forEach(building => {
+        ctx.fillStyle = building.color;
+        ctx.fillRect(building.x * gridSize, building.y * gridSize, gridSize, gridSize);
+        ctx.fillStyle = 'white';
+        ctx.fillText(`${building.type} (${building.inventory})`, building.x * gridSize + 2, building.y * gridSize + 8);
+        console.log(building.type)
+        console.log(building.inventory)
+      });
+    }
+
+    // Draw conveyor belts
+    function drawConveyorBelts() {
+      ctx.strokeStyle = 'red';
+      ctx.lineWidth = 2;
+      conveyorBelts.forEach(belt => {
+        ctx.beginPath();
+        ctx.moveTo(belt.start.x * gridSize + gridSize / 2, belt.start.y * gridSize + gridSize / 2);
+        ctx.lineTo(belt.end.x * gridSize + gridSize / 2, belt.end.y * gridSize + gridSize / 2);
+        ctx.stroke();
+      });
+    }
+
+    // Draw moving items along conveyor belts
+    function drawMovingItems() {
+      movingItems.forEach(item => {
+        ctx.fillStyle = item.color;
+        ctx.beginPath();
+        ctx.arc(
+          item.currentX * gridSize,
+          item.currentY * gridSize,
+          gridSize / 4, // Radius of the circle
+          0,
+          2 * Math.PI
+        );
+        ctx.fill();
+      });
+    }
+
+    // Function to start moving inventory along the conveyor belts
+    function startMovingItems() {
+      setInterval(() => {
+        conveyorBelts.forEach(belt => {
+          const startBuilding = buildings.find(b => b.x === belt.start.x && b.y === belt.start.y);
+          const endBuilding = buildings.find(b => b.x === belt.end.x && b.y === belt.end.y);
+
+          if (startBuilding && endBuilding && startBuilding.inventory > 0) {
+            // Move one item from start to end
+            startBuilding.inventory--;
+            endBuilding.inventory++;
+
+            // Create a moving item to represent the transfer
+            const item = {
+              type: startBuilding.type,
+              color:
+                startBuilding.type === 'steel'
+                  ? 'blue'
+                  : startBuilding.type === 'copper'
+                  ? 'orange'
+                  : 'green',
+              startX: belt.start.x,
+              startY: belt.start.y,
+              endX: belt.end.x,
+              endY: belt.end.y,
+              currentX: belt.start.x,
+              currentY: belt.start.y,
+              progress: 0 // Represents progress along the belt
+            };
+
+            movingItems.push(item);
+          }
+        });
+
+        animateMovingItems(); // Animate the items moving along the belts
+
+        draw(); // Redraw the canvas
+      }, 1000); // Adjust time interval to control movement frequency
+    }
+
+    // Animate the moving items across the conveyor belts
+    function animateMovingItems() {
+      const step = 0.1; // Smaller values make the animation smoother
+
+      movingItems.forEach(item => {
+        if (item.progress < 1) {
+          item.progress += step;
+          item.currentX = item.startX + item.progress * (item.endX - item.startX);
+          item.currentY = item.startY + item.progress * (item.endY - item.startY);
+        } else {
+          // Remove completed items from the array
+          movingItems.splice(movingItems.indexOf(item), 1);
+        }
+      });
+    }
+
+    // Function to place a building
+    function placeBuilding(type, x, y) {
+      let color;
+      let num;
+      switch (type) {
+        case 'steel':
+          color = 'blue';
+          num = Infinity;
+          break;
+        case 'copper':
+          color = 'orange';
+          num = Infinity;
+          break;
+        case 'storage':
+          color = 'lightblue';
+          num = 0;
+          break;
+        case 'constructor':
+          color = 'green';
+          num = 0;
+          break;
+      }
+
+      buildings.push({ type, x, y, color, inventory: num });
+    }
+
+    // Function to add conveyor belts
+    function addConveyorBelt(start, end) {
+      conveyorBelts.push({ start, end });
+    }
+
+    // Function to set the current tool
+    function setCurrentTool(tool) {
+      currentTool = tool;
+    }
+
+    // Handle canvas clicks for building placement
+    canvas.addEventListener('click', event => {
+      const rect = canvas.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+      const gridX = Math.floor(x / gridSize);
+      const gridY = Math.floor(y / gridSize);
+
+      if (currentTool === 'conveyor') {
+        if (!firstClick) {
+          firstClick = { x: gridX, y: gridY };
+        } else {
+          const start = firstClick;
+          const end = { x: gridX, y: gridY };
+
+          if (start !== end) {
+            addConveyorBelt(start, end); // Add a new conveyor belt
+          }
+
+          firstClick = null;
+        }
+      } else {
+        if (currentTool) {
+          placeBuilding(currentTool, gridX, gridY);
+        }
+      }
+
+      draw(); // Redraw the canvas
+    });
+
+    // Draw the canvas (grid, buildings, belts, and moving items)
+    function draw() {
+      drawGrid();
+      drawBuildings();
+      drawConveyorBelts();
+      drawMovingItems(); // Draw the moving items across belts
+    }
+
+    // Initial draw
+    draw();
+
+  </script>
+</body>
+</html>
