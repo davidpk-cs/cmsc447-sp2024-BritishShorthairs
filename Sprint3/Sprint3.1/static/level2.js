@@ -1,6 +1,7 @@
 var enemies = []; //enemy objects
 
 var towers = []; //tower objects
+var deadTowers = []; //indexes of towers that have been destroyed
 
 var lasersActive = false; //indicating that lasers are present on the screen, so we know to clean
 
@@ -36,25 +37,27 @@ var assetsPath = "static/Assets/" //location of assets folder
 var homeBaseTop = 0;
 var homeBaseLeft = 0;
 
+var homeBaseObject = "";
+
 
 var credits = 1800; //money
 
 var lives = 300; //lives
 
 var lifeStyle = 25; //range is 20% to 60%;
-var criticalStrikeOdds = 25; //range is 10-30%
-var enemyDamage = 3; //the range is 6-9
-var enemyHP = 1; //range is 4-5
-var enemyCount = 1; //the range is 20-35 number of enemies per wave
-var enemyWaves = 1; //the range is 20-30, number of waves of enemies sent in 
-var towerRange = 200; //the range is 90-140
-var maxEnemyCount = 40;
+var enemyDamage = 1000; //the range is 6-9
+var enemyHP = 10; //range is 4-5
+var enemyCount = 15; //the range is 20-35 number of enemies per wave
+var enemyWaves = 10; //the range is 20-30, number of waves of enemies sent in 
+var maxEnemyCount = 10;
 towerPrice = 140; //the range is 120 to 220
 
 towerDamage = 3;
 
 
 function setup(){
+
+    homeBaseObject = document.getElementById("homeBase");
 
     //get the target object
     var target = document.getElementById("homeBase");
@@ -70,16 +73,85 @@ function setup(){
 }
 
 
+//enemies select a target here
+function findTarget(){
+
+    deadTowers.sort();
+
+    for(var i = deadTowers.length - 1; i >= 0; i--){
+
+        towers.splice(deadTowers[i], 1);
+    }
+
+    deadTowers = [];
+
+    for(var i = 0; i < enemies.length; i++){
+
+        enemies[i].hasAttacked = false;
+
+        enemyStyles = window.getComputedStyle(enemies[i].object);
+        var top = parseFloat(enemyStyles.top) - (parseFloat(enemyStyles.height));
+        var left = parseFloat(enemyStyles.left) - (parseFloat(enemyStyles.width));
+
+        var homeBaseDistance = distanceFormula(left, top, homeBaseLeft, homeBaseTop);
+        
+        nearestIndex = -1;
+        nearestDistance = homeBaseDistance;
+
+        for(var j = 0; j < towers.length; j++){
+
+            distance = distanceFormula(left, top, towers[j].left, towers[j].top)
+            
+            if(distance < nearestDistance){
+
+                nearestIndex = j;
+                nearestDistance = distance;
+            }
+            
+        }
+
+        enemies[i].target = nearestIndex;
+    }
+
+}
+
+
 function moveEnemies() {
-    //console.log("First function");
+
+    //getting the dimensions of the canvas
+    const canvas = document.getElementById("weaponField");
+    var canvasRect = canvas.getBoundingClientRect();
+    canvas.width = canvasRect.width;
+    canvas.height = canvasRect.height;
 
     for (var i = 0; i < enemies.length; i++) {
+
+        if(deadTowers.includes(enemies[i].target)){
+            enemies[i].taret = -1;
+        }
 
         var enemyStyles = window.getComputedStyle(enemies[i].object);
 
         // get y value
         var targetTop = homeBaseTop;
         var targetLeft = homeBaseLeft;
+
+        if(enemies[i].target >= 0){
+            targetTop = towers[enemies[i].target].top;
+            targetLeft = towers[enemies[i].target].left;
+
+            var targetStyles = window.getComputedStyle(towers[enemies[i].target].object);
+
+            var targetX = targetLeft + (parseFloat(targetStyles.width) / 2);
+            var targetY = targetTop + (parseFloat(targetStyles.height) / 2);
+        }
+        else{
+
+            baseStyles = window.getComputedStyle(homeBaseObject);
+            var targetX = targetLeft + (parseFloat(baseStyles.width) / 2);
+            var targetY = targetTop + (parseFloat(baseStyles.height) / 2);
+            console.log(targetX, targetY);
+        }
 
         //get x value
         var enemyTop = parseFloat(enemyStyles.top);
@@ -103,34 +175,62 @@ function moveEnemies() {
         if(enemies[i].speed > 5){
             enemies[i].speed -= 1;
         }
+
+        //now let's establish the new X and new Y values for the canvas, so they are centered
+        var enemyX = newX + (parseFloat(enemyStyles.width) / 2);
+        var enemyY = newY + (parseFloat(enemyStyles.height) / 2);
         
-        var contactThreshold = 10; // pixels you need to be close enough to count as a touch
+        var contactThreshold = enemies[i].target < 0 ? 130: 90; // pixels you need to be close enough to count as a touch
         if (Math.abs(newX - targetLeft) <= contactThreshold && Math.abs(newY - targetTop) <= contactThreshold) {
             
-            lives -= enemyDamage; //enemy hit target, delete enemy
+            //if targetting homebase
+            if(enemies[i].target < 0){
 
-            if(randomInt(0, 100) < criticalStrikeOdds){
-                lives -= enemyDamage * 2;
+                lives -= enemyDamage; //enemy hit target, delete enemy
+
+                if(lives < 0){
+                    lives = 0;
+                }
+
             }
 
-            if(lives < 0){
-                lives = 0;
+            else{
+                attackTower(i);
             }
 
             selfDestructEnemy(i, true);
 
+            draw = canvas.getContext("2d");
+            draw.beginPath();
+            draw.moveTo(enemyX, enemyY);
+            draw.lineTo(targetX, targetY);
+            draw.strokeStyle = "green";
+            draw.stroke();
 
             if(lives == 0){ //force end game upon end of game
                 document.getElementById("livesBoard").innerText = "Lives Remaining: 0";
                 return;
             }
-            
+
         }
 
     }
 
     //update lives count
     document.getElementById("livesBoard").innerText = "Lives Remaining: " + lives.toString();
+}
+
+function attackTower(enemyIndex){
+
+    towerIndex = enemies[enemyIndex].target;
+    towers[towerIndex].health -= enemies[enemyIndex].damage;
+
+    if(towers[towerIndex].health <= 0){
+
+        towers[towerIndex].object.remove();
+        deadTowers.push(towerIndex);
+    }
+
 }
 
 function activateTowers() {
@@ -145,9 +245,7 @@ function activateTowers() {
 
     for(var i = 0; i < towers.length; i++){
 
-        if(randomInt(0, 100) < failureOdds){
-            continue;
-        }
+        var attacksLeft = towers[i].laserCount;
 
         var towerTop = towers[i].top;
         var towerLeft = towers[i].left;   
@@ -180,7 +278,7 @@ function activateTowers() {
             var distance = distanceFormula(towerX, towerY, enemyX, enemyY);
 
             //if close enough, attack!
-            if(distance < towerRange){
+            if(distance < towers[i].range){
 
                 draw = canvas.getContext("2d");
                 draw.beginPath();
@@ -190,11 +288,12 @@ function activateTowers() {
                 draw.stroke();
                 attackEnemy(j, i);
                 
-                break; //towers only attack one enemy a frame
+                if(attacksLeft == 0){
+                    break; 
+                }
+                attacksLeft--; //make sure towers attack only as many times as they can
             }
-            else{
-                //console.log("not found");
-            }
+
 
         }
 
@@ -205,7 +304,13 @@ function activateTowers() {
 
 function attackEnemy(enemyIndex, towerIndex, destroy=false){
 
+    console.log(towerIndex);
     enemies[enemyIndex].health -= towers[towerIndex].damage;
+
+    //double damage if it is a critical strike
+    if(randomInt(0, 100) < towers[towerIndex].critOdds){
+        enemies[enemyIndex].health -= towers[towerIndex].damage;
+    }
 
     if(enemies[enemyIndex].health <= 0 || destroy){
 
@@ -243,7 +348,7 @@ function runRound() {
 
         if (currentFunction === 0) {
 
-            var canvas = document.getElementById('weaponField'); // Replace 'myCanvas' with the id of your canvas
+            var canvas = document.getElementById('weaponField'); 
             var ctx = canvas.getContext('2d');
             // Clear the entire canvas
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -253,6 +358,13 @@ function runRound() {
         
         //frame 2
         else {
+
+            var canvas = document.getElementById('weaponField'); 
+            var ctx = canvas.getContext('2d');
+            // Clear the entire canvas of enemy lasers
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+
             activateTowers();
         }
     } 
@@ -270,7 +382,8 @@ function runRound() {
             moveEnemies();
         } 
         else {
-            //nothing over here, just keep existing canvas
+            findTarget(); 
+            //this is an uneventful frame where enemies search and identify targets
         }
     }
 
@@ -364,6 +477,13 @@ function placeTower(){
 
     document.getElementById("creditBoard").innerText = "Credits Remaining: " + credits.toString();
 
+    document.getElementById("messageBoard").innerText = "Please Place Down Your Tower!"
+
+
+    activeTowerPlacement = true;
+
+    endUpgrade();
+
     document.getElementById('viewPort').addEventListener('click', function(event) {
 
 
@@ -372,7 +492,7 @@ function placeTower(){
         var x = event.clientX - viewPortPos.left;
         var y = event.clientY - viewPortPos.top;
 
-        var newTower = document.createElement("img");
+        var newTower = pendingTower.object;
 
         newTower.src = assetsPath + "enemies/ufoBlue.png"; // Setting the source of the image
 
@@ -390,17 +510,15 @@ function placeTower(){
 
         document.getElementById("viewPort").appendChild(newTower);
 
-        var towerStyles = window.getComputedStyle(newTower)
-        var towerTop = parseInt(towerStyles.top);
-        var towerLeft = parseInt(towerStyles.left);
-
-        towerToPush = new tower(newTower, towerLeft, towerTop);
-
-        towers.push(towerToPush);
 
         // Check if the tower is sticking out of the right or bottom edges
         var parentWidth = viewPortPos.width;
         var parentHeight = viewPortPos.height;
+
+        var towerStyles = window.getComputedStyle(newTower);
+
+        var towerTop = parseInt(towerStyles.top);
+        var towerLeft = parseInt(towerStyles.left);
 
         if (towerLeft + parseInt(towerStyles.width) > parentWidth) {
             // If the tower is sticking out of the right edge, adjust its left position
@@ -411,6 +529,14 @@ function placeTower(){
             // If the tower is sticking out of the bottom edge, adjust its top position
             newTower.style.top = (parentHeight - parseInt(towerStyles.height)) + 'px';
         }
+
+        pendingTower.left = towerLeft;
+        pendingTower.top = towerTop;
+
+        towers.push(pendingTower);
+
+        activeTowerPlacement = false;
+        document.getElementById("messageBoard").innerText = "";
     
     }, { once: true });
 
@@ -531,19 +657,24 @@ class enemy{
         this.object = object;
 
         this.damage = damage;
+
+        this.target = -1;
+
+        this.hasAttacked = false; //if the enemy already dished an attack in a cycle
     } 
 
 }
 
 class tower{
 
-    constructor(object, xPos, yPos, health = 35, damage = towerDamage, laserCount = 0, criticalStrikeOdds = 25){
+    constructor(object, xPos, yPos, health = 35, damage = towerDamage, laserCount = 1, criticalStrikeOdds = 25, range = 120){
 
         this.object = object;
         this.health = health;
         this.damage = damage;
         this.laserCount = laserCount;
         this.critOdds = criticalStrikeOdds;
+        this.range = range;
 
         this.top = xPos;
         this.left = yPos;
@@ -553,6 +684,8 @@ class tower{
         this.damageUpgradesLeft = 3;
         this.laserCountUpgradesLeft = 1;
         this.critUpgradesLeft = 3;
+        this.rangeUpgradesLeft = 2;
+
     }
 }
 
@@ -590,10 +723,12 @@ function setUpPurchase(){
     briefingInfo.innerHTML += "<p> Tower Crit Chance " + pendingTower.critOdds.toString() + "<p>";
     briefingInfo.innerHTML += "<p> Tower Laser Count " + pendingTower.laserCount.toString() + "<p>";
     briefingInfo.innerHTML += "<p> Tower Damage " + pendingTower.damage.toString() + "<p>";
+    briefingInfo.innerHTML += "<p> Tower Range " + pendingTower.range.toString() + "<p>";
     briefingInfo.innerHTML += "<p> Remaining Health Upgrades " + pendingTower.healthUpgradesLeft.toString() + "<p>";
     briefingInfo.innerHTML += "<p> Remaining Crit Upgrades " + pendingTower.critUpgradesLeft.toString() + "<p>";
     briefingInfo.innerHTML += "<p> Remaining Laser Count Upgrades " + pendingTower.laserCountUpgradesLeft.toString() + "<p>";
     briefingInfo.innerHTML += "<p> Remaining Damage Upgrades " + pendingTower.damageUpgradesLeft.toString() + "<p>";
+    briefingInfo.innerHTML += "<p> Remaining Range Upgrades " + pendingTower.rangeUpgradesLeft.toString() + "<p>";
 
     //----------
 
@@ -616,6 +751,10 @@ function setUpPurchase(){
 }
 
 function initiatePurchase(){
+
+    if(activeTowerPlacement){
+        return;
+    }
 
     var newTower = document.createElement("img");
 
@@ -646,6 +785,10 @@ function endUpgrade(){
 
 function doUpgrade(index){
     upgradeOptions[index].purchase();
+
+    endUpgrade();
+    coverScreenWithTranslucentDiv();
+    setUpPurchase();
 }
 
 
@@ -658,7 +801,7 @@ const defaultBrief = `
 
         <div id="missionBriefingReport">
 
-            <h1 id="briefingTitle">Briefing</h1>
+            <h1 id="briefingTitle">Build your Tower!</h1>
 
             <div id="briefingInfo">
                 <p>Your UFO is being made for you! Would you like to upgrade it?
@@ -689,7 +832,7 @@ class healthUpgrade{
         }
         credits -= this.price;
         pendingTower.health += 25;
-        pandingTower.healthUpgradesLeft -= 1;
+        pendingTower.healthUpgradesLeft -= 1;
         return true;
     }
 }
@@ -742,10 +885,27 @@ class criticalStrikeUpgrade{
     }
 }
 
+class rangeUpgrade{
+    constructor(){
+        this.price = 100;
+        this.message = "Upgrade Range";
+    }
+    purchase(){
+        if(credits < this.price || pendingTower.critUpgradesLeft == 0){
+            return false;
+        }
+        credits -= this.price;
+        pendingTower.range += 75;
+        pendingTower.rangeUpgradesLeft -= 1;
+        return true;
+    }
+}
+
 upgradeOptions = [new healthUpgrade(), 
     new damageUpgrade(), 
     new laserCountUpgrade(),
-    new criticalStrikeUpgrade()];
+    new criticalStrikeUpgrade(),
+    new rangeUpgrade()];
 
 
 var pendingTower = new tower("none", 0, 0);
