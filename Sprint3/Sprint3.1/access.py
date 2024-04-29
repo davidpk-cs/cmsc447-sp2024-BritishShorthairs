@@ -204,16 +204,18 @@ def createProduct():
 
     return jsonify("Reset Products Successfully")
 
+#uodates the scores according during gameplay
 @app.route('/updateScore', methods=['POST'])
 def updateScore():
-    # Get data from the request
+    #grab sdata sent
     data = request.get_json()
     username = data.get('username')
     newScore = data.get('score')
 
-    # Update the score in the database for the specified username
+
     connection = sqlite3.connect('highscores.db')
     cursor = connection.cursor()
+    #sql cmd to match score to username 
     cursor.execute("UPDATE scoreTable SET points = ? WHERE name = ?", (newScore, username))
     connection.commit()
 
