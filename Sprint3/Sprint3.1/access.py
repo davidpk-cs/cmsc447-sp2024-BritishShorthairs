@@ -72,13 +72,14 @@ def addEntry():
     #gets data from the script.js file 
     data = request.get_json()
     info = data.get('data')
-
-    tuple_info = (info[0], int(info[1]))
+    #new data should be 0 at add
+    tuple_info = (info[0], int(info[1]),int(info[2]), int(info[3]),int(info[4]))
 
     #puts into the database
     connection = sqlite3.connect('highscores.db')
     cursor = connection.cursor()
-    cursor.execute('INSERT OR IGNORE INTO scoreTable (name, points) VALUES (?,?)', tuple_info)
+    # each level has different score
+    cursor.execute('INSERT OR IGNORE INTO scoreTable (name, points1,points2,points3,final) VALUES (?,?,?,?,?)', tuple_info)
 
 
     connection.commit()
@@ -95,8 +96,8 @@ def search():
 
     columnName = ""
 
-    if(searchType == "Search Score"):
-        columnName = "points"
+    if(searchType == "Search Final"):
+        columnName = "final"
     elif(searchType == "Search Name"):
         columnName = "name"
 
@@ -120,17 +121,20 @@ def reset():
     #scrap the table
     cursor.execute(f'DROP TABLE IF EXISTS {scoreTable}')
 
-    #redo the table
+    #redo the table new additional values
     cursor.execute(f'CREATE TABLE IF NOT EXISTS {scoreTable} (\
                    name TEXT NOT NULL,\
-                   points INT NOT NULL\
+                   points1 INT NOT NULL,\
+                   points2 INT NOT NULL,\
+                   points3 INT NOT NULL,\
+                   final INT NOT NULL\
     )')
 
     #the defaults specified in hw2
-    defaultData = [("Alien Invader", 80), ("Jabba the hutt ", 92), ("Darth Vader", 91)]
+    defaultData = [("Alien Invader", 10,20,30,40), ("Jabba the hutt ",95,97,98,100), ("Darth Vader",91,91,91,91)]
 
     for i in defaultData:
-        cursor.execute(f'INSERT INTO {scoreTable} (name, points) VALUES (?, ?)', i)
+        cursor.execute(f'INSERT INTO {scoreTable} (name, points1,points2,points3,final) VALUES (?, ?, ?, ?,?)', i)
         
     connection.commit()
 
