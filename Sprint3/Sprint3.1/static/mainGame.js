@@ -1,4 +1,5 @@
 var enemies = []; //enemy objects
+var deadEnemies = [];
 
 var towers = []; //tower objects
 
@@ -106,6 +107,14 @@ function setup(){
 
     setUpBriefing();
 
+}
+
+function cleanDeadAsteroids(){
+
+    for(var i = 0; i < deadEnemies.length; i++){
+
+        deadEnemies[i].object.remove();
+    }
 }
 
 function randomSkew(min, max, skew) {
@@ -272,8 +281,9 @@ function attackEnemy(enemyIndex, towerIndex, destroy=false){
 
     if(enemies[enemyIndex].health <= 0 || destroy){
 
-        enemies[enemyIndex].object.parentNode.removeChild(enemies[enemyIndex].object);
-        enemies.splice(enemyIndex, 1);
+        
+        deadEnemies.push(enemies.splice(enemyIndex, 1)[0]);
+        deadEnemies[deadEnemies.length - 1].object.src = assetsPath + 'explosions/tile000.png'
 
         score++;
     }
@@ -333,7 +343,7 @@ function runRound() {
             moveEnemies();
         } 
         else {
-            //nothing over here, just keep existing canvas
+            cleanDeadAsteroids();
         }
     }
 
