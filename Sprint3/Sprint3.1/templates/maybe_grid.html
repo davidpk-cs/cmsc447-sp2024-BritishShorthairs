@@ -65,6 +65,7 @@
         ctx.fillText(`${building.type} (${building.inventory})`, building.x * gridSize + 2, building.y * gridSize + 8);
         console.log(building.type)
         console.log(building.inventory)
+        //console.log(buildings.length);
       });
     }
 
@@ -214,14 +215,14 @@
           const start = firstClick;
           const end = { x: gridX, y: gridY };
 
-          if (start !== end) {
+          if (start !== end && placement_conflict(start.x, start.y) && placement_conflict(end.x, end.y)) { // add conveyor if start & end valid obj
             addConveyorBelt(start, end); // Add a new conveyor belt
           }
 
           firstClick = null;
         }
       } else {
-        if (currentTool) {
+        if (currentTool && !(placement_conflict(gridX, gridY))) { // make sure new building doesn't conflict with others
           placeBuilding(currentTool, gridX, gridY);
         }
       }
@@ -235,6 +236,20 @@
       drawBuildings();
       drawConveyorBelts();
       drawMovingItems(); // Draw the moving items across belts
+    }
+
+    function placement_conflict(x, y) {
+      // check if our curr click hits an existing obj
+      conflict = false;
+
+      buildings.forEach(building => {    
+        console.log(building.x, x, building.y, y);
+        if (building.x == x && building.y == y) {
+          conflict = true;
+        }
+      });
+      
+      return conflict;
     }
 
     // Initial draw
