@@ -54,6 +54,8 @@ towerPrice = 140; //the range is 120 to 220
 
 towerDamage = 3;
 
+//testing sendHighScores
+//sendHighScores("Alien Invader",200,"final")
 
 function generateEconomy(){
 
@@ -872,7 +874,7 @@ const chosenFixersIndexes = [];
 //One should take a high score and pass it into flask to be put in the database for level 1
 //
 
-function sendHighScores(username,score){
+function sendHighScores(username,score,level){
     //this takes in a  username and a score and posts updates the score to the 
     //specified username (works kind of like add and delete)
     fetch('/updateScore', {
@@ -882,7 +884,8 @@ function sendHighScores(username,score){
         },
         body: JSON.stringify({
             username: username,
-            score: score
+            score: score,
+            level: level
         })
     })
     .then(response => {

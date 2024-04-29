@@ -34,7 +34,10 @@ function loadData() {
 
     var newHTML = "<tr>\
     <th>Name</th>\
-    <th>Points</th>\
+    <th>Level 1</th>\
+    <th>Level 2</th>\
+    <th>Level 3</th>\
+    <th>Final</th>\
     </tr>";
 
     for(var i = 0; i < data.length; i++){
@@ -42,6 +45,9 @@ function loadData() {
         newHTML += "<tr>";
         newHTML += "<th>" + data[i][0] + "</th>";
         newHTML += "<th>" + data[i][1].toString() + "</th>";
+        newHTML += "<th>" + data[i][2].toString() + "</th>";
+        newHTML += "<th>" + data[i][3].toString() + "</th>";
+        newHTML += "<th>" + data[i][4].toString() + "</th>";
         newHTML += "</tr>";
     }
 
@@ -74,17 +80,19 @@ function deleteEntry(){
 function addEntry(){
     var nameField = document.getElementById("createName");
     var name = nameField.value;
-    var score = 0; //all new players must start at score 0
-    
+    var score1 = 0; //all new players must start at score 0
+    var score2 = 0;
+    var score3 = 0;
+    var final = 0;
 
-    if(isValidNum(score) == 0){
+    if(isValidNum(score1) == 0){
         updateStatus("Failed to Add, Invalid ID or Score, ID and Score must be an integer");
         return;
     }
 
 
 
-    var fullTuple = [name,score];
+    var fullTuple = [name,score1,score2,score3,final];
 
     updateStatus("Added New Student If ID Is Unique and Entry Sizes do not Exceed the Set Max: Update Page to See New Table");
 
