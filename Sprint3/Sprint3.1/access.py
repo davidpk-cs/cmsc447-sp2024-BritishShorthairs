@@ -124,9 +124,9 @@ def reset():
     #redo the table new additional values
     cursor.execute(f'CREATE TABLE IF NOT EXISTS {scoreTable} (\
                    name TEXT NOT NULL,\
-                   points1 INT NOT NULL,\
-                   points2 INT NOT NULL,\
-                   points3 INT NOT NULL,\
+                   level1 INT NOT NULL,\
+                   level2 INT NOT NULL,\
+                   level3 INT NOT NULL,\
                    final INT NOT NULL\
     )')
 
@@ -134,7 +134,7 @@ def reset():
     defaultData = [("Alien Invader", 10,20,30,40), ("Jabba the hutt ",95,97,98,100), ("Darth Vader",91,91,91,91)]
 
     for i in defaultData:
-        cursor.execute(f'INSERT INTO {scoreTable} (name, points1,points2,points3,final) VALUES (?, ?, ?, ?,?)', i)
+        cursor.execute(f'INSERT INTO {scoreTable} (name, level1,level2,level3,final) VALUES (?, ?, ?, ?,?)', i)
         
     connection.commit()
 
@@ -142,6 +142,35 @@ def reset():
     connection.close()
 
     return jsonify("Reset Successfully")
+
+#uodates the scores according during gameplay
+@app.route('/updateScore', methods=['POST'])
+def updateScore():
+    #grab sdata sent
+    data = request.get_json()
+    username = data.get('username')
+    newScore = data.get('score')
+    level = data.get('level')
+
+
+    connection = sqlite3.connect('highscores.db')
+    cursor = connection.cursor()
+    #sql cmd to match score to username 
+    if level == 'level1':
+        cursor.execute("UPDATE scoreTable SET level1 = ? WHERE name = ?", (newScore, username))
+    elif level == 'level2':
+        cursor.execute("UPDATE scoreTable SET level2 = ? WHERE name = ?", (newScore, username))
+    elif level == 'level3':
+        cursor.execute("UPDATE scoreTable SET level3 = ? WHERE name = ?", (newScore, username))
+    elif level == 'final':
+        cursor.execute("UPDATE scoreTable SET final = ? WHERE name = ?", (newScore, username))
+    else:
+        return jsonify("Invalid level specified")
+    connection.commit()
+
+    connection.close()
+
+    return jsonify("Score Updated Successfully")
 
 ############# Beyond this point are functions for materials.db ###################
 
@@ -207,25 +236,6 @@ def createProduct():
     connection.close()
 
     return jsonify("Reset Products Successfully")
-
-#uodates the scores according during gameplay
-@app.route('/updateScore', methods=['POST'])
-def updateScore():
-    #grab sdata sent
-    data = request.get_json()
-    username = data.get('username')
-    newScore = data.get('score')
-
-
-    connection = sqlite3.connect('highscores.db')
-    cursor = connection.cursor()
-    #sql cmd to match score to username 
-    cursor.execute("UPDATE scoreTable SET points = ? WHERE name = ?", (newScore, username))
-    connection.commit()
-
-    connection.close()
-
-    return jsonify("Score Updated Successfully")
 
 if __name__ == '__main__':
     
