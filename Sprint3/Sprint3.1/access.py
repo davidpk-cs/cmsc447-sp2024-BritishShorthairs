@@ -3,6 +3,16 @@ import sqlite3
 
 app = Flask(__name__)
 
+'''def set_player_name(name):
+    #global var 
+    global curr_player
+    #
+    curr_player = name
+    print(curr_player)
+
+#init globals
+curr_player = ""'''
+
 #This displays the homePage
 @app.route('/')
 def home():
@@ -79,10 +89,13 @@ def addEntry():
     connection = sqlite3.connect('highscores.db')
     cursor = connection.cursor()
     # each level has different score
-    cursor.execute('INSERT OR IGNORE INTO scoreTable (name, points1,points2,points3,final) VALUES (?,?,?,?,?)', tuple_info)
+    cursor.execute('INSERT OR IGNORE INTO scoreTable (name, level1,level2,level3,final) VALUES (?,?,?,?,?)', tuple_info)
 
 
     connection.commit()
+    #call set global var for curr_player
+    #set_player_name(info[0])
+
     return jsonify("Successful Add")
 
 
@@ -171,6 +184,7 @@ def updateScore():
     connection.close()
 
     return jsonify("Score Updated Successfully")
+
 
 ############# Beyond this point are functions for materials.db ###################
 
