@@ -204,36 +204,22 @@ def createProduct():
 
     return jsonify("Reset Products Successfully")
 
+@app.route('/updateScore', methods=['POST'])
+def updateScore():
+    # Get data from the request
+    data = request.get_json()
+    username = data.get('username')
+    newScore = data.get('score')
 
+    # Update the score in the database for the specified username
+    connection = sqlite3.connect('highscores.db')
+    cursor = connection.cursor()
+    cursor.execute("UPDATE scoreTable SET points = ? WHERE name = ?", (newScore, username))
+    connection.commit()
 
-'''
-############## Beyond this point are functions for products.db###################
+    connection.close()
 
-@app.route('/createProduct', methods=['GET'])
-def createProduct():
-    conn = sqlite3.connect('products.db')
-    cur = conn.cursor()
-
-    productsTable = 'productsTable'
-    #scrap the table
-    cur.execute(f'DROP TABLE IF EXISTS {productsTable}')
-
-    #redo the table
-    cur.execute(f'CREATE TABLE IF NOT EXISTS {productsTable} (\
-                   productName TEXT NOT NULL\            
-    )')
-    defaultProduct = [("Orb Tower"),("Galactic Rock Tower")]
-
-    #insert defaults
-    for i in defaultProduct:
-       cur.execute(f'INSERT INTO {productsTable} (productName) VALUES (?)', i)
-    conn.commit()
-
-    cur.close()
-    conn.close()
-
-    return jsonify("createProdcuts Reset Successfully")
-'''
+    return jsonify("Score Updated Successfully")
 
 if __name__ == '__main__':
     
