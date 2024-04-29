@@ -3,6 +3,8 @@ var enemies = []; //enemy objects
 var towers = []; //tower objects
 var deadTowers = []; //indexes of towers that have been destroyed
 
+var deadEnemyObjects = [];
+
 var lasersActive = false; //indicating that lasers are present on the screen, so we know to clean
 
 var score = 0; //number of points
@@ -76,14 +78,23 @@ function setup(){
 //enemies select a target here
 function findTarget(){
 
-    deadTowers.sort();
 
-    for(var i = deadTowers.length - 1; i >= 0; i--){
+    for(var i = deadEnemyObjects.length - 1; i >= 0; i--){
 
-        towers.splice(deadTowers[i], 1);
+        deadEnemyObjects[i].remove();
     }
 
+
+    deadTowers.sort();
+    for(var i = deadTowers.length - 1; i >= 0; i--){
+        towers[deadTowers[i]].object.remove();
+        towers.splice(deadTowers[i], 1);
+
+    }
     deadTowers = [];
+
+
+
 
     for(var i = 0; i < enemies.length; i++){
 
@@ -194,7 +205,7 @@ function moveEnemies() {
             //if targetting homebase
             if(enemies[i].target < 0){
 
-                lives -= enemies[i].damage; //enemy hit target, delete enemy
+                lives -= enemies[i].damage; //enemy hit target
 
                 if(lives < 0){
                     lives = 0;
@@ -219,9 +230,6 @@ function moveEnemies() {
             }
 
         }
-        else{
-            console.log("Why??", enemies[i].target);
-        }
 
     }
 
@@ -236,7 +244,7 @@ function attackTower(enemyIndex){
 
     if(towers[towerIndex].health <= 0){
 
-        towers[towerIndex].object.remove();
+        towers[towerIndex].object.src = assetsPath + "explosions/tile002.png";
         deadTowers.push(towerIndex);
     }
 
@@ -322,8 +330,8 @@ function attackEnemy(enemyIndex, towerIndex, destroy=false){
 
     if(enemies[enemyIndex].health <= 0 || destroy){
 
-        enemies[enemyIndex].object.parentNode.removeChild(enemies[enemyIndex].object);
-        enemies.splice(enemyIndex, 1);
+        deadEnemyObjects.push(enemies.splice(enemyIndex, 1)[0].object)
+        deadEnemyObjects[deadEnemyObjects.length - 1].src = assetsPath + "explosions/tile003.png";
 
         score++;
     }
@@ -338,8 +346,8 @@ function selfDestructEnemy(enemyIndex, destroy=false){
 
     if(enemies[enemyIndex].health == 0 || destroy){
 
-        enemies[enemyIndex].object.parentNode.removeChild(enemies[enemyIndex].object);
-        enemies.splice(enemyIndex, 1);
+        deadEnemyObjects.push(enemies.splice(enemyIndex, 1)[0])
+        deadEnemyObjects[deadEnemyObects.length - 1].src = assetsPath + "explosions/tile004.png";
 
         score++;
     }
@@ -950,7 +958,7 @@ class rangeUpgrade{
         this.message = "Upgrade Range";
     }
     purchase(){
-        if(credits < this.price || pendingTower.critUpgradesLeft == 0){
+        if(credits < this.price || pendingTower.rangeUpgradesLeft == 0){
             return false;
         }
         credits -= this.price;
