@@ -20,6 +20,22 @@
     .toolbox button {
       margin: 0 10px;
     }
+    #interface {
+      display: none; /* hide by default */
+      width: 200px;
+      height: 150px;
+      background-color: rgb(203, 177, 132);
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 20px;
+      border-radius: 10px;
+      border-top: 5px solid #000;
+      /* init pos */
+      top: 200px; 
+      left: 700px; 
+    }
   </style>
 </head>
 <body>
@@ -30,7 +46,11 @@
     <button onclick="setCurrentTool('storage')">Storage</button>
     <button onclick="setCurrentTool('constructor')">Constructor</button>
     <button onclick="setCurrentTool('conveyor')">Conveyor Belt</button>
+    <button onclick="setCurrentTool('mouse')">Mouse</button>
   </div>
+
+  <!-- Interface elements -->
+  <div id="interface"></div>
 
   <script>
     const canvas = document.getElementById('canvas');
@@ -65,6 +85,7 @@
         ctx.fillText(`${building.type} (${building.inventory})`, building.x * gridSize + 2, building.y * gridSize + 8);
         console.log(building.type)
         console.log(building.inventory)
+        //console.log(buildings.length);
       });
     }
 
@@ -207,21 +228,35 @@
       const gridX = Math.floor(x / gridSize);
       const gridY = Math.floor(y / gridSize);
 
-      if (currentTool === 'conveyor') {
+      if (currentTool === 'mouse') {
+        get_building = placement_conflict(gridX, gridY);
+        if (get_building) { // if we hit a building, show prompt
+          console.log("SHOW ME");
+          document.getElementById('interface').style.display = 'block';
+          document.getElementById('interface').textContent = get_building.type; // add inv to display
+        } else {
+          document.getElementById('interface').style.display = 'none';
+        }
+      }
+
+      else if (currentTool === 'conveyor') {
         if (!firstClick) {
           firstClick = { x: gridX, y: gridY };
         } else {
           const start = firstClick;
           const end = { x: gridX, y: gridY };
 
-          if (start !== end) {
-            addConveyorBelt(start, end); // Add a new conveyor belt
+          if (start !== end && placement_conflict(start.x, start.y) && placement_conflict(end.x, end.y)) { // add conveyor if start & end valid obj
+            let all_clear = check_conveyor_rules(start, end);
+            if (all_clear) {
+              addConveyorBelt(start, end); // Add a new conveyor belt
+            }
           }
 
           firstClick = null;
         }
       } else {
-        if (currentTool) {
+        if (currentTool && !(placement_conflict(gridX, gridY))) { // make sure new building doesn't conflict with others
           placeBuilding(currentTool, gridX, gridY);
         }
       }
@@ -235,6 +270,45 @@
       drawBuildings();
       drawConveyorBelts();
       drawMovingItems(); // Draw the moving items across belts
+    }
+
+    function placement_conflict(x, y) {
+      // check if our curr click hits an existing obj
+      conflict = false;
+
+      buildings.forEach(building => {    
+        console.log(building.x, x, building.y, y);
+        if (building.x == x && building.y == y) {
+          conflict = building;
+        }
+      });
+      
+      return conflict;
+    }
+
+    function check_conveyor_rules(start_obj, end_obj) {
+      //let valid = true;
+      
+      const startBuilding = buildings.find(b => b.x === start_obj.x && b.y === start_obj.y);
+      const endBuilding = buildings.find(b => b.x === end_obj.x && b.y === end_obj.y);
+      
+      // (1) cannot connect 2 buildings of same type by conveyor unless they are both constructors
+      if (startBuilding.type === endBuilding.type && (startBuilding.type != 'constructor' && endBuilding.type != 'constructor')) {
+        return false;
+      }
+      // (2) cannot make copper or steel landing pads an endpoint for a conveyor belt
+      if (endBuilding.type === 'copper' || endBuilding.type === 'steel') {
+        return false;
+      }
+      // (3) cannot make a storage (placeholder for shops and launch pads) be a starting point for a conveyor
+      if (startBuilding.type === 'storage') {
+        return false;
+      }
+
+      // (4) only let a constructor-constructor if [end constructor] recipe requires [start constructor] item
+      // (5) only allow storage to connect to constructor of a finished product (for launching to David)
+      
+      return true;
     }
 
     // Initial draw
