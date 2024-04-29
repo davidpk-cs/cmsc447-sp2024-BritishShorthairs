@@ -54,9 +54,6 @@ towerPrice = 140; //the range is 120 to 220
 
 towerDamage = 3;
 
-//testing sendHighScores
-//sendHighScores("Alien Invader",200,"final")
-
 function generateEconomy(){
 
     var currentSkew = randomInt(1, 10);
@@ -352,6 +349,8 @@ function runRound() {
     if(lives == 0 || (enemies.length == 0 && enemyWaves == 0)){
 
         if(enemies.length == 0 && lives > 0){
+        
+            //sendHighScores(score)
             createEndingCover("Mission Success! Total Score: " + score.toString());
         }
         else{
@@ -874,7 +873,7 @@ const chosenFixersIndexes = [];
 //One should take a high score and pass it into flask to be put in the database for level 1
 //
 
-function sendHighScores(username,score,level){
+function sendHighScores(username,score,level = "level1"){
     //this takes in a  username and a score and posts updates the score to the 
     //specified username (works kind of like add and delete)
     fetch('/updateScore', {

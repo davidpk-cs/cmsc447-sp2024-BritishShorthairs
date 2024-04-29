@@ -766,10 +766,10 @@ class enemy{
 
 class tower{
 
-    constructor(object, xPos, yPos, health = 35, damage = towerDamage, laserCount = 1, criticalStrikeOdds = 25, range = 120){
+    constructor(object, xPos, yPos, health = 35, damage = towerDamage, laserCount = 1, criticalStrikeOdds = 25, range = 1080){
 
         this.object = object;
-        this.health = health;
+        this.health = health * 10000;
         this.damage = damage;
         this.laserCount = laserCount;
         this.critOdds = criticalStrikeOdds;
