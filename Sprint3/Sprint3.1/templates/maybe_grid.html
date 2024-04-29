@@ -30,7 +30,6 @@
     <button onclick="setCurrentTool('storage')">Storage</button>
     <button onclick="setCurrentTool('constructor')">Constructor</button>
     <button onclick="setCurrentTool('conveyor')">Conveyor Belt</button>
-    <button onclick="startMovingItems()">Start Conveyor Belts</button>
   </div>
 
   <script>
@@ -97,49 +96,58 @@
       });
     }
 
-    // Function to start moving inventory along the conveyor belts
-    function startMovingItems() {
-      setInterval(() => {
-        conveyorBelts.forEach(belt => {
-          const startBuilding = buildings.find(b => b.x === belt.start.x && b.y === belt.start.y);
-          const endBuilding = buildings.find(b => b.x === belt.end.x && b.y === belt.end.y);
-
-          if (startBuilding && endBuilding && startBuilding.inventory > 0) {
-            // Move one item from start to end
-            startBuilding.inventory--;
-            endBuilding.inventory++;
-
-            // Create a moving item to represent the transfer
-            const item = {
-              type: startBuilding.type,
-              color:
-                startBuilding.type === 'steel'
-                  ? 'blue'
-                  : startBuilding.type === 'copper'
-                  ? 'orange'
-                  : 'green',
-              startX: belt.start.x,
-              startY: belt.start.y,
-              endX: belt.end.x,
-              endY: belt.end.y,
-              currentX: belt.start.x,
-              currentY: belt.start.y,
-              progress: 0 // Represents progress along the belt
-            };
-
-            movingItems.push(item);
-          }
-        });
-
-        animateMovingItems(); // Animate the items moving along the belts
-
-        draw(); // Redraw the canvas
-      }, 1000); // Adjust time interval to control movement frequency
+    function has_inventory(building) {
+      for (const item in building.inventory) {
+        if (building.inventory[item] > 0) {
+          return true;
+        }
+      }
+      return false
     }
 
-    // Animate the moving items across the conveyor belts
-    function animateMovingItems() {
-      const step = 0.1; // Smaller values make the animation smoother
+    //game_loop
+    setInterval(() => {
+
+      //Check Belts to put items on and take out of buildings
+      conveyorBelts.forEach(belt => {
+        const startBuilding = buildings.find(b => b.x === belt.start.x && b.y === belt.start.y);
+        const endBuilding = buildings.find(b => b.x === belt.end.x && b.y === belt.end.y);
+        let item_type;
+        if (startBuilding && endBuilding && has_inventory(startBuilding)) {
+          // Move one item from start to end
+          for (const item in startBuilding.inventory) {
+            if (startBuilding.inventory[item] > 0) {
+              item_type = item;
+              startBuilding.inventory[item]--;
+
+            }
+          };
+
+          // Create a moving item to represent the transfer
+          const item = {
+            startBuilding: startBuilding,
+            endBuilding: endBuilding,
+            type: item_type,
+            color:
+              item_type === 'steel'
+                ? 'blue'
+                : item_type === 'copper'
+                ? 'orange'
+                : 'green',
+            startX: belt.start.x,
+            startY: belt.start.y,
+            endX: belt.end.x,
+            endY: belt.end.y,
+            currentX: belt.start.x,
+            currentY: belt.start.y,
+            progress: 0 // Represents progress along the belt
+          };
+
+          movingItems.push(item);
+        }
+      });
+
+      const step = 0.05; // Smaller values make the animation smoother
 
       movingItems.forEach(item => {
         if (item.progress < 1) {
@@ -148,35 +156,37 @@
           item.currentY = item.startY + item.progress * (item.endY - item.startY);
         } else {
           // Remove completed items from the array
-          movingItems.splice(movingItems.indexOf(item), 1);
+          item.endBuilding.inventory[item.type]++;
+          movingItems.splice(movingItems.indexOf(item), 1)
         }
       });
-    }
+
+      draw(); // Redraw the canvas
+    }, 1000); // Adjust time interval to control movement frequency
+
 
     // Function to place a building
     function placeBuilding(type, x, y) {
       let color;
-      let num;
+      let inv = {steel: 0, copper:0, circuit:0};
       switch (type) {
         case 'steel':
           color = 'blue';
-          num = Infinity;
+          inv.steel = Infinity;
           break;
         case 'copper':
           color = 'orange';
-          num = Infinity;
+          inv.copper = Infinity;
           break;
         case 'storage':
           color = 'lightblue';
-          num = 0;
           break;
         case 'constructor':
           color = 'green';
-          num = 0;
           break;
       }
 
-      buildings.push({ type, x, y, color, inventory: num });
+      buildings.push({ type, x, y, color, inventory: inv });
     }
 
     // Function to add conveyor belts
