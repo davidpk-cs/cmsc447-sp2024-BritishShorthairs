@@ -231,9 +231,15 @@
       if (currentTool === 'mouse') {
         get_building = placement_conflict(gridX, gridY);
         if (get_building) { // if we hit a building, show prompt
-          console.log("SHOW ME");
           document.getElementById('interface').style.display = 'block';
-          document.getElementById('interface').textContent = get_building.type; // add inv to display
+
+          var invText = ''; // add inventory to display
+          for (const item in get_building.inventory) {
+            console.log(get_building.inventory[item]);
+            invText += `\n\t${item}: ${get_building.inventory[item]}`;
+          }
+          // display text
+          document.getElementById('interface').textContent = 'Building Name:\n\t' + get_building.type + "\nInventory:\n\t" + invText;
         } else {
           document.getElementById('interface').style.display = 'none';
         }
