@@ -5,6 +5,10 @@ var deadTowers = []; //indexes of towers that have been destroyed
 
 var deadEnemyObjects = [];
 
+var towerOptions = [[3, 3, 4, 5, 6, 0],[2, 2, 2, 3, 1, 0],[0, 1, 4, 2, 5, 0],[2, 3, 1, 1, 0, 287],
+[2, 2, 3, 0, 4, 420]];
+//health,damage, crit chance, laser count, range
+
 var lasersActive = false; //indicating that lasers are present on the screen, so we know to clean
 
 var score = 0; //number of points
@@ -558,7 +562,6 @@ function placeTower(){
 
     activeTowerPlacement = true;
 
-    endUpgrade();
 
     document.getElementById('viewPort').addEventListener('click', function(event) {
 
@@ -842,16 +845,7 @@ function setUpPurchase(){
     briefingInfo = document.getElementById("briefingInfo");
 
     briefingInfo.innerHTML += "<p> Credits: " + credits.toString() + "<p>";
-    briefingInfo.innerHTML += "<p> Tower Health: " + pendingTower.health.toString() + "<p>"; 
-    briefingInfo.innerHTML += "<p> Tower Crit Chance " + pendingTower.critOdds.toString() + "<p>";
-    briefingInfo.innerHTML += "<p> Tower Laser Count " + pendingTower.laserCount.toString() + "<p>";
-    briefingInfo.innerHTML += "<p> Tower Damage " + pendingTower.damage.toString() + "<p>";
-    briefingInfo.innerHTML += "<p> Tower Range " + pendingTower.range.toString() + "<p>";
-    briefingInfo.innerHTML += "<p> Remaining Health Upgrades " + pendingTower.healthUpgradesLeft.toString() + "<p>";
-    briefingInfo.innerHTML += "<p> Remaining Crit Upgrades " + pendingTower.critUpgradesLeft.toString() + "<p>";
-    briefingInfo.innerHTML += "<p> Remaining Laser Count Upgrades " + pendingTower.laserCountUpgradesLeft.toString() + "<p>";
-    briefingInfo.innerHTML += "<p> Remaining Damage Upgrades " + pendingTower.damageUpgradesLeft.toString() + "<p>";
-    briefingInfo.innerHTML += "<p> Remaining Range Upgrades " + pendingTower.rangeUpgradesLeft.toString() + "<p>";
+    
 
     //----------
 
@@ -859,13 +853,23 @@ function setUpPurchase(){
 
     toAppend = "";
 
-    for(var i = 0; i < upgradeOptions.length; i++){
+    for(var i = 0; i < towerOptions.length; i++){
+
+        var buttonMsg = towerOptions[i][5].toString() + " Credits";
+
+        if(towerOptions[i][5] == 0){
+            buttonMsg = "Deploy";
+        }
 
         j = i;
 
         toAppend += "<div class=\"contractOffer\">";;
-        toAppend += "<p>" + upgradeOptions[j].message + "<p>";
-        toAppend += "<button onclick = \"" +  "doUpgrade(" + j.toString() + ")\">" + "Contract: " + upgradeOptions[j].price.toString() + " Credits" + "</button>";
+        toAppend += "<p>Health: " + towerOptions[i][0] + "<p>";
+        toAppend += "<p>Damage: " + towerOptions[i][1] + "<p>";
+        toAppend += "<p>Crit: " + towerOptions[i][2] + "<p>";
+        toAppend += "<p>Lasers: " + towerOptions[i][3] + "<p>";
+        toAppend += "<p>Range: " + towerOptions[i][4] + "<p>";
+        toAppend += "<button onclick = \"" +  "deployTower(" + j.toString() + ")\">" + buttonMsg + "</button>";
         toAppend += "</div>";
     }
 
@@ -873,12 +877,52 @@ function setUpPurchase(){
 
 }
 
-function initiatePurchase(){
+function deployTower(index){
 
-    if(credits < 200){
-        document.getElementById("messageBoard").innerText = "Can Not Afford Tower";
+    if(credits < towerOptions[index][5]){
         return;
     }
+    credits -= towerOptions[index][5];
+    pendingTower.health = setHealth(towerOptions[index][0]);
+    pendingTower.damage = setDamage(towerOptions[index[1]]);
+    pendingTower.critOdds = setCrit(towerOptions[index][2]);
+    pendingTower.setLasers = setLasers(towerOptions[index][3]);
+    pendingTower.setRange = setRange(towerOptions[index][4]);
+
+    endUpgrade();
+    placeTower();
+
+    towerOptions.splice(index, 0);
+
+}
+
+function setHealth(level){
+    health = 70;
+    health += level * 20;
+    return health;
+}
+function setDamage(level){
+    damage = 8;
+    damage += level * 3;
+    return damage;
+}
+function setCrit(level){
+    crit = 10;
+    crit += level * 15;
+    return crit;
+}
+function setLasers(level){
+    lasers = 1;
+    lasers += level;
+    return lasers;
+}
+function setRange(level){
+    range = 140;
+    range += level * 40;
+}
+
+function initiatePurchase(){
+
 
     if(activeTowerPlacement){
         return;
@@ -905,20 +949,9 @@ function initiatePurchase(){
 
 
 function endUpgrade(){
-
     finishedBriefing = document.getElementById(coverName);
     finishedBriefing.remove();
-
 }
-
-function doUpgrade(index){
-    upgradeOptions[index].purchase();
-
-    endUpgrade();
-    coverScreenWithTranslucentDiv();
-    setUpPurchase();
-}
-
 
 
 
@@ -929,10 +962,11 @@ const defaultBrief = `
 
         <div id="missionBriefingReport">
 
-            <h1 id="briefingTitle">Build your Tower!</h1>
+            <h1 id="briefingTitle">Choose your Tower!</h1>
 
             <div id="briefingInfo">
-                <p>Your UFO is being made for you! Would you like to upgrade it?
+                <p>Which of Your Towers do you want to deploy? If you have cash to spare, we have some
+                preowned UFOs for cheap!
                 </p>
             </div>
 
@@ -942,100 +976,11 @@ const defaultBrief = `
 
         </div>
 
-        <button id="enterGameButton" onclick="placeTower()">Finalize</button>
+        <button id="enterGameButton" onclick="endUpgrade()">Exit</button>
 
     </div>
     
 `
-
-
-class healthUpgrade{
-    constructor(){
-        this.price = 50;
-        this.message = "Upgrade Health";
-    }
-    purchase(){
-        if(credits < this.price || pendingTower.healthUpgradesLeft == 0){
-            return false;
-        }
-        credits -= this.price;
-        pendingTower.health += 25;
-        pendingTower.healthUpgradesLeft -= 1;
-        return true;
-    }
-}
-
-class damageUpgrade{
-    constructor(){
-        this.price = 50;
-        this.message = "Upgrade Damage";
-    }
-    purchase(){
-        if(credits < this.price || pendingTower.damageUpgradesLeft == 0){
-            return false;
-        }
-        credits -= this.price;
-        pendingTower.damage += 3;
-        pendingTower.damageUpgradesLeft -= 1;
-        return true;
-    }
-}
-
-class laserCountUpgrade{
-    constructor(){
-        this.price = 150;
-        this.message = "Add another Laser";
-    }
-    purchase(){
-        if(credits < this.price || pendingTower.laserCountUpgradesLeft == 0){
-            return false;
-        }
-        credits -= this.price;
-        pendingTower.laserCount += 1;
-        pendingTower.laserCountUpgradesLeft -= 1;
-        return true;
-    }
-}
-
-class criticalStrikeUpgrade{
-    constructor(){
-        this.price = 100;
-        this.message = "Boost the Crit Chance";
-    }
-    purchase(){
-        if(credits < this.price || pendingTower.critUpgradesLeft == 0){
-            return false;
-        }
-        credits -= this.price;
-        pendingTower.critOdds += 15;
-        pendingTower.critUpgradesLeft -= 1;
-        return true;
-    }
-}
-
-class rangeUpgrade{
-    constructor(){
-        this.price = 100;
-        this.message = "Upgrade Range";
-    }
-    purchase(){
-        if(credits < this.price || pendingTower.rangeUpgradesLeft == 0){
-            return false;
-        }
-        credits -= this.price;
-        pendingTower.range += 75;
-        pendingTower.rangeUpgradesLeft -= 1;
-        return true;
-    }
-}
-
-upgradeOptions = [new healthUpgrade(), 
-    new damageUpgrade(), 
-    new laserCountUpgrade(),
-    new criticalStrikeUpgrade(),
-    new rangeUpgrade()];
-
-
 
 //this will let me see how much progress of the round has been
 function determineQuarter(value1, value2) {

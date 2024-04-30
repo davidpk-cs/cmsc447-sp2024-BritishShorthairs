@@ -884,6 +884,8 @@ function initiatePurchase(){
         return;
     }
 
+    credits -= 200;
+
     var newTower = document.createElement("img");
 
     newTower.src = assetsPath + "enemies/ufoBlue.png"; // Setting the source of the image
@@ -1071,7 +1073,7 @@ function sendLoot(lootInfo){
 
 function nextLevel(){
 
-    window.location.href = '/level2'; //this works 
+    window.location.href = '/level3'; //this works 
 }
 
   

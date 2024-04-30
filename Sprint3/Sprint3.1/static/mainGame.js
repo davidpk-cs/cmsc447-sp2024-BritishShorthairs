@@ -682,7 +682,7 @@ class failureFixer{
 class criticalStrikeFixer{ 
     constructor(){
         this.price = randomInt(60, 115);
-        this.message = "I'll divert incoming asteroids to reduce their chances of hitting a critical spot of our planet!" }
+        this.message = "I'll put extra shielding in weak spots on our planet!" }
     purchase(){
         if(credits < this.price){
             return false;}
@@ -694,7 +694,7 @@ class criticalStrikeFixer{
 class enemyDamageFixer{ 
     constructor(){
         this.price = randomInt(160, 265);
-        this.message = "I'll damage the asteroids with my fleet of cannon ships to reduce the damage they deal if they hit our planet!" }
+        this.message = "I'll reduce the impact if they hit our planet!" }
     purchase(){
         if(credits < this.price){
             return false;}
@@ -705,7 +705,7 @@ class enemyDamageFixer{
 class enemyHealthFixer{ 
     constructor(){
         this.price = randomInt(150, 230);
-        this.message = "I'll weaken the asteroids with my fleet so that your UFO's can take them out with less hits!" }
+        this.message = "I'll go on ahead and make the asteroids more brittle." }
     purchase(){
         if(credits < this.price){
             return false;}

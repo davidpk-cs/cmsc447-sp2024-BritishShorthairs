@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Space Defenders</title>
-    <script src ="{{ url_for('static', filename='level2.js') }}"></script>
+    <script src ="{{ url_for('static', filename='level3.js') }}"></script>
     
     <style>
         #homeBase{
@@ -140,6 +140,13 @@
 
         .contractOffer{
 
+        width:100px;
+        justify-content:center;
+        height:200px;
+
+        display:flex;
+
+        flex-wrap:wrap;
 
         border-color:lightgreen;
         border-radius: 5px;
@@ -156,12 +163,16 @@
 
         }
 
+        .contractOffer p{
+            margin:1px;
+        }
+
         .contractOffer button{
-        background: linear-gradient(to left, lightblue, rgb(147, 147, 204));
-        padding:2px;
-        color:darkblue;
-        font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-        border-color:navy;
+            margin:1px;
+            background: linear-gradient(to left, lightblue, rgb(147, 147, 204));
+            color:darkblue;
+            font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+            border-color:navy;
         }
 
         .contractOffer button:hover{
