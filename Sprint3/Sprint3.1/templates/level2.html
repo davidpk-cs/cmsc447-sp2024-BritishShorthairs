@@ -212,6 +212,42 @@
         font-size:3em;
         margin:20px;
         }
+
+        .difficultyContainer {
+        position: absolute;
+        top:50%;
+        left:50%;
+        transform:translate(-50%, -50%);
+        width: 100%;
+        height: 300px; /* Adjust height as needed */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        }
+
+        .difficultyButton {
+            padding: 20px 40px; /* Adjust padding to make buttons larger */
+            font-size: 18px; /* Adjust font size */
+            background-color: #003366; /* Deep blue */
+            border: 2px solid #FFFFFF; /* White border */
+            color: #FFFFFF; /* White text */
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            margin: 10px 5px;
+            cursor: pointer;
+            border-radius: 8px; /* Adjust border radius */
+            transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+            text-wrap:wrap;
+            width:200px;
+            height:200px;
+        }
+
+        .difficultyButton:hover {
+            background-color: #FFFFFF; /* White */
+            border-color: #003366; /* Deep blue */
+            color: #003366; /* Deep blue text */
+        }
     </style>
 
 
@@ -235,7 +271,7 @@
 
         <canvas id="weaponField"></canvas>
     
-        <img id="homeBase" onload="setup()" src="{{ url_for('static', filename='/assets/planets/earthSprite.png') }}" style="top:50%;
+        <img id="homeBase" onload="chooseDifficulty()" src="{{ url_for('static', filename='/assets/planets/earthSprite.png') }}" style="top:50%;
         left:50%; transform:translate(-50%, -50%);">
         
     

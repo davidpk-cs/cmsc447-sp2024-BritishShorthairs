@@ -48,14 +48,38 @@ var lives = 300000; //lives
 
 var enemyDamage = 1; //the range is 6-9
 var enemyHP = 3; //range is 4-5
-var enemyCount = 5; //the range is 20-35 number of enemies per wave
-var enemyWaves = 60; 
+var enemyCount = 1; //the range is 20-35 number of enemies per wave
+var enemyWaves = 100; 
 var maxEnemyWaves = enemyWaves;
 var maxEnemyCount = 10;
 towerPrice = 140; //the range is 120 to 220
 
 towerDamage = 3;
 
+
+function chooseDifficulty(){
+
+    coverScreenWithTranslucentDiv();
+
+    cover = document.getElementById(coverName);
+
+    cover.innerHTML = `<div class = "difficultyContainer">
+        <button class = "difficultyButton" onclick="endDifficultyScreen(1)">Normal - Not too Hard</button>
+        <button class = "difficultyButton" onclick="endDifficultyScreen(2)">Hard - Tougher Enemies</button>
+    </div>`;
+    
+}
+
+function endDifficultyScreen(difficulty = 1){
+
+    if(difficulty == 2){
+        hardMode();
+    }
+
+    endUpgrade();
+
+    setup();
+}
 
 function setup(){
 
@@ -83,6 +107,7 @@ function findTarget(){
 
         deadEnemyObjects[i].remove();
     }
+    deadEnemyObjects = [];
 
 
     deadTowers.sort();
@@ -217,6 +242,12 @@ function moveEnemies() {
                 attackTower(i);
             }
 
+            if(enemies[i].selfDestruct == true){
+
+                selfDestructEnemy(i, true);
+                return;
+            }
+
             draw = canvas.getContext("2d");
             draw.beginPath();
             draw.moveTo(enemyX, enemyY);
@@ -305,10 +336,11 @@ function activateTowers() {
                 draw.stroke();
                 attackEnemy(j, i);
                 
+                attacksLeft--; //make sure towers attack only as many times as they can
                 if(attacksLeft == 0){
                     break; 
                 }
-                attacksLeft--; //make sure towers attack only as many times as they can
+                
             }
 
 
@@ -347,7 +379,7 @@ function selfDestructEnemy(enemyIndex, destroy=false){
     if(enemies[enemyIndex].health == 0 || destroy){
 
         deadEnemyObjects.push(enemies.splice(enemyIndex, 1)[0])
-        deadEnemyObjects[deadEnemyObects.length - 1].src = assetsPath + "explosions/tile004.png";
+        deadEnemyObjects[deadEnemyObjects.length - 1].src = assetsPath + "explosions/tile001.png";
 
         score++;
     }
@@ -390,8 +422,8 @@ function runRound() {
         if (currentFunction === 1) {
 
             if(enemyWaves && enemies.length < maxEnemyCount){
+                
                 sendEnemyWave();
-                enemyCount++;
                 enemyWaves--;
             }
 
@@ -462,11 +494,11 @@ function sendEnemyWave(){
             newRock.style.top = "3%";
             newRock.style.left = randomInt(3, 97).toString() + "%";
         }
-        else if(spawnSide == 3){
+        else if(spawnSide == 2){
             newRock.style.top = "97%";
             newRock.style.left = randomInt(3, 97).toString() + "%";
         }
-        else if(spawnSide == 2){
+        else if(spawnSide == 3){
             newRock.style.top = randomInt(3, 97).toString() + "%";
             newRock.style.left = "97%";
         }
@@ -483,22 +515,32 @@ function sendEnemyWave(){
 
         var enemyToPush = new enemy(newRock, enemyHP, enemyDamage);
 
-        var phase = determineQuarter(enemyWaves, maxEnemyWaves);
+        var phase = determineQuarter(maxEnemyWaves - enemyWaves, maxEnemyWaves);
         
         //spawn a mix of different levels instead of blasting top level ones at the end
         phase = randomInt(1, phase); 
 
-        if(phase == 1){
+        if(phase <= 1){
             enemyToPush.level1();
         }
         else if (phase == 2){
             enemyToPush.level2();
         }
         else if (phase == 3){
-            enemyToPush.level3();
+            if(randomInt(1, 4) < 4){
+                enemyToPush.level3();
+            }
+            else{
+                enemyToPush.killerAsteroid();
+            }
         }
-        else{
-            enemyToPush.level4()
+        else if(phase == 4){
+            if(randomInt(1, 4) < 4){
+                enemyToPush.level4();
+            }
+            else{
+                enemyToPush.boss1();
+            }
         }
 
         enemies.push(enemyToPush);
@@ -695,6 +737,8 @@ class enemy{
 
         this.target = -1;
 
+        this.selfDestruct = false;
+
         this.hasAttacked = false; //if the enemy already dished an attack in a cycle
     } 
 
@@ -703,36 +747,53 @@ class enemy{
         this.damage += 0;
         this.range += 10;
 
-        this.object.src = assetsPath + "enemies/ufo4.png";
+        this.object.src = assetsPath + "enemies/ufo8.png";
     }
     level2(){
         this.health += 3;
         this.damage += 1;
         this.range += 30;
 
-        this.object.src = assetsPath + "enemies/ufo5.png";
+        this.object.src = assetsPath + "enemies/ufo9.png";
     }
     level3(){
         this.health += 4;
         this.damage += 2;
         this.range += 50;
-        this.object.src = assetsPath + "enemies/ufo6.png";
+        this.object.src = assetsPath + "enemies/ufo10.png";
     }
     level4(){
-        this.health += 7;
+        this.halth += 7;
         this.damage += 5;
         this.range += 60;
-        this.object.src = assetsPath + "enemies/ufo7.png";
+        this.object.src = assetsPath + "enemies/ufo11.png";
     }
-    
+    killerAsteroid(){
+        this.health += 25;
+        this.damage = 1;
+        this.range = 20;
+
+        this.selfDestruct = true;
+
+        this.object.src = assetsPath + "projectiles/asteroid 01 - base.png"
+    }
+    boss1(){
+        this.health += 15;
+        this.damage += 8;
+        this.range += 65;
+        this.object.src = assetsPath + "enemies/ufo3.png";
+    }
+
+
+
 }
 
 class tower{
 
-    constructor(object, xPos, yPos, health = 35, damage = towerDamage, laserCount = 1, criticalStrikeOdds = 25, range = 120){
+    constructor(object, xPos, yPos, health = 60, damage = towerDamage, laserCount = 1, criticalStrikeOdds = 25, range = 120){
 
         this.object = object;
-        this.health = health;
+        this.health = health ;
         this.damage = damage;
         this.laserCount = laserCount;
         this.critOdds = criticalStrikeOdds;
@@ -982,8 +1043,13 @@ function determineQuarter(value1, value2) {
         return 4;
     }
     // Calculate which quarter it's in
-    var quarter = Math.floor(value1 / (value2 / 4)) + 1;
+    var quarter = Math.floor(value1 / (value2 / 4));
+    
     return quarter;
+}
+
+function hardMode(){
+
 }
 
 
