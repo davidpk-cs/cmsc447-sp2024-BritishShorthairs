@@ -54,6 +54,8 @@ towerPrice = 140; //the range is 120 to 220
 
 towerDamage = 3;
 
+enemySizeOdds = 25;
+
 function generateEconomy(){
 
     var currentSkew = randomInt(1, 10);
@@ -71,11 +73,37 @@ function generateEconomy(){
     currentSkew = newSkew(20, 30, enemyWaves);
     towerRange = randomSkew(90, 140, currentSkew);
     currentSkew = newSkew(90, 140, towerRange);
-    towerPrice = randomSkew(120, 220, currentSkew);
+    towerPrice = randomSkew(120, 160, currentSkew);
+}
+
+function chooseDifficulty(){
+
+    coverScreenWithTranslucentDiv();
+
+    cover = document.getElementById(coverName);
+
+    cover.innerHTML = `<div class = "difficultyContainer">
+        <button class = "difficultyButton" onclick="endDifficultyScreen(1)">Normal - Better Luck, Smaller Asteroids</button>
+        <button class = "difficultyButton" onclick="endDifficultyScreen(2)">Hard - Slightly Less Luck, Larger Asteroids</button>
+    </div>`;
+    
+}
+
+function endDifficultyScreen(difficulty = 1){
+
+    if(difficulty == 2){
+        hardMode();
+    }
+
+    endBriefing();
+
+    setup();
 }
 
 
+
 function setup(){
+
 
     //get the target object
     var target = document.getElementById("homeBase");
@@ -335,7 +363,6 @@ function runRound() {
 
             if(enemyWaves && enemies.length < maxEnemyCount){
                 sendEnemyWave();
-                enemyCount++;
                 enemyWaves--;
             }
 
@@ -419,6 +446,11 @@ function sendEnemyWave(){
             newRock.style.top = randomInt(3, 97).toString() + "%";
             newRock.style.left = "3%";
         }
+
+        if(randomInt(0, 100) < enemySizeOdds){
+            newRock.style.width = '100px';
+            newRock.style.height = '100px';
+        }
     
 
 
@@ -427,6 +459,12 @@ function sendEnemyWave(){
         enemyHolder.appendChild(newRock);
 
         var enemyToPush = new enemy(newRock, enemyHP, enemyDamage);
+
+        if(randomInt(0, 100) < enemySizeOdds){
+            newRock.style.width = '100px';
+            newRock.style.height = '100px';
+            enemyToPush.health *= 2;
+        }
 
         enemies.push(enemyToPush);
     }
@@ -865,6 +903,10 @@ const fixers = [
 ];
 
 const chosenFixersIndexes = [];
+
+function hardMode(){
+
+}
 
 
 //---------------------------------------

@@ -48,14 +48,38 @@ var lives = 300000; //lives
 
 var enemyDamage = 1; //the range is 6-9
 var enemyHP = 3; //range is 4-5
-var enemyCount = 5; //the range is 20-35 number of enemies per wave
-var enemyWaves = 60; 
+var enemyCount = 1; //the range is 20-35 number of enemies per wave
+var enemyWaves = 100; 
 var maxEnemyWaves = enemyWaves;
 var maxEnemyCount = 10;
 towerPrice = 140; //the range is 120 to 220
 
 towerDamage = 3;
 
+
+function chooseDifficulty(){
+
+    coverScreenWithTranslucentDiv();
+
+    cover = document.getElementById(coverName);
+
+    cover.innerHTML = `<div class = "difficultyContainer">
+        <button class = "difficultyButton" onclick="endDifficultyScreen(1)">Normal - Not too Hard</button>
+        <button class = "difficultyButton" onclick="endDifficultyScreen(2)">Hard - Tougher Enemies</button>
+    </div>`;
+    
+}
+
+function endDifficultyScreen(difficulty = 1){
+
+    if(difficulty == 2){
+        hardMode();
+    }
+
+    endUpgrade();
+
+    setup();
+}
 
 function setup(){
 
@@ -398,8 +422,8 @@ function runRound() {
         if (currentFunction === 1) {
 
             if(enemyWaves && enemies.length < maxEnemyCount){
+                
                 sendEnemyWave();
-                enemyCount++;
                 enemyWaves--;
             }
 
@@ -1022,6 +1046,10 @@ function determineQuarter(value1, value2) {
     var quarter = Math.floor(value1 / (value2 / 4));
     
     return quarter;
+}
+
+function hardMode(){
+
 }
 
 
