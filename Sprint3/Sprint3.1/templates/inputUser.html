@@ -90,7 +90,8 @@
 <body>
     <h1 id="pageTitle">New Player Alert !
     </h1>
-    <h2> Directions: Please Enter Username once status updates the game will start</h2>
+    <h2> NEW GAMERS :Directions: Please Enter Username and hit "Add Player" once status updates the game will start <br>
+         RETURNING PLAYERS: Directions: Please Enter Username and hit "Returning Player"</h2>
     <h5 id="status" style="font-size:20px;color:rgb(247, 128, 49);">Status: No Operation Implemented Yet</h5>
     
     <div id="fullContent">
@@ -102,14 +103,12 @@
         <div class = "field"><label for="createName">Username:</label>
             <input type="text" id="createName"></div>
 
-        <!--<div class = "field"><label for="createID">Id&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</label>
-            <input type="text" id="createID"></div> -->
-
-        <!--<div class = "field"><label for="createScore">Score:</label>
-            <input type="text" id="createScore"></div>-->
-
         <button onclick="addEntry()" class = "fieldButton">Add Player</button> 
-    
+
+        <div class = "field"><label for="returningName">Returning Username:</label>
+            <input type="text" id="returningName"></div>
+
+        <button onclick="returningPlayer()" class = "returningButton">Returning Player</button> 
     </div>
 
     </div>

@@ -49,6 +49,12 @@ def levelEndless():
 def input():
     return render_template('inputUser.html')
 
+#this will be a route to return players to their levels
+@app.route('/returnPlayer',methods=['GET'])
+def returnPlayer():
+    return render_template('grid.html')
+
+
 #shows all the highscores in the database
 @app.route('/request', methods=['GET'])
 def giveData():

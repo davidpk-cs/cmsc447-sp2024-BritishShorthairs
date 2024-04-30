@@ -1,3 +1,7 @@
+//global to hold players
+curr_users = []; //will hold all players 
+ i = 0; //index of the array
+
 function newGame() {
     // testing purposes
     console.log("newGame has started");
@@ -76,6 +80,25 @@ function deleteEntry(){
     });
 
 }
+function returningPlayer(){
+    var nameField = document.getElementById("createName");
+    var name = nameField.value;
+
+    fetch('/returnPlayer', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            name: name,
+        }),
+    }).then(response => {
+        
+    }).catch(error => {
+        console.error('Error:', error);
+    });
+    
+}
 
 function addEntry(){
     var nameField = document.getElementById("createName");
@@ -91,7 +114,6 @@ function addEntry(){
     }
 
 
-
     var fullTuple = [name,score1,score2,score3,final];
 
     updateStatus("Added New Student If ID Is Unique and Entry Sizes do not Exceed the Set Max: Update Page to See New Table");
@@ -105,6 +127,10 @@ function addEntry(){
         data: fullTuple,
     })
     });
+
+    //update the curr_user arrays and index
+    curr_users[i] = name;
+    i++; //increase index for next addition
     //after player is added they will be redirected to start the game
     newGame();
     
@@ -159,6 +185,7 @@ function search(){
 }
 
 function reset(){
+    curr_users = []; //clear the database
 
     return fetch('/reset', { method: 'GET'})
     .then(response => {
