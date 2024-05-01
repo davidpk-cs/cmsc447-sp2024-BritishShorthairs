@@ -80,24 +80,28 @@ function deleteEntry(){
     });
 
 }
-function returningPlayer(){
-    var nameField = document.getElementById("createName");
-    var name = nameField.value;
+function returningPlayer() {
+    //grab value
+    let username = document.getElementById('returningName').value;
 
     fetch('/returnPlayer', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-            name: name,
-        }),
-    }).then(response => {
-        
-    }).catch(error => {
+        body: JSON.stringify({ username: username })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if ('redirect' in data) {
+            window.location.href = data.redirect; //redirect server based on repsosne
+        } else {
+            console.log(data); // Handle other responses or errors
+        }
+    })
+    .catch(error => {
         console.error('Error:', error);
     });
-    
 }
 
 function addEntry(){

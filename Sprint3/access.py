@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request,redirect
 import sqlite3
 
 app = Flask(__name__)
@@ -50,9 +50,33 @@ def input():
     return render_template('inputUser.html')
 
 #this will be a route to return players to their levels
-@app.route('/returnPlayer',methods=['GET'])
+@app.route('/returnPlayer', methods=['POST'])
 def returnPlayer():
-    return render_template('grid.html')
+    data = request.json
+    name = data.get('username')
+
+    connection = sqlite3.connect('highscores.db')
+    cursor = connection.cursor()
+
+    #grab the values at each level
+    cursor.execute("SELECT level1, level2, level3, final FROM scoreTable WHERE name=?", (name,))
+    player_data = cursor.fetchone() #row data
+    
+    #if player exists then it should go here
+    if player_data:
+        level1, level2, level3 = player_data[0], player_data[1], player_data[2]
+        
+        if level1 == 0:
+            return jsonify({'redirect': '/newGame'}) #level 1
+        elif level2 == 0:
+            return jsonify({'redirect': '/level2'}) #level 2
+        elif level3 == 0:
+            return jsonify({'redirect': '/level3'}) #level 3
+        else:
+            return jsonify({'redirect': '/levelEndess'}) #ROUTE IS CALLED levelEndess i think its supposed to be levelEndless
+    else:
+        return jsonify({'error': 'Player not found'})
+    
 
 
 #shows all the highscores in the database
@@ -150,7 +174,7 @@ def reset():
     )')
 
     #the defaults specified in hw2
-    defaultData = [("Alien Invader", 10,20,30,40), ("Jabba the hutt ",95,97,98,100), ("Darth Vader",91,91,91,91)]
+    defaultData = [("Alien Invader", 10,20,30,40), ("Jabba the hutt ",95,97,98,100), ("Darth Vader",91,0,0,0)]
 
     for i in defaultData:
         cursor.execute(f'INSERT INTO {scoreTable} (name, level1,level2,level3,final) VALUES (?, ?, ?, ?,?)', i)
