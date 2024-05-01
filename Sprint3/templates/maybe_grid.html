@@ -23,7 +23,7 @@
     #interface {
       display: none; /* hide by default */
       width: 200px;
-      height: 150px;
+      height: 200px;
       background-color: rgb(255, 245, 172);
       position: absolute;
       top: 50%;
@@ -84,9 +84,9 @@
         ctx.fillRect(building.x * gridSize, building.y * gridSize, gridSize, gridSize);
         ctx.fillStyle = 'white';
         ctx.fillText(`${building.type} (${building.inventory})`, building.x * gridSize + 2, building.y * gridSize + 8);
-        console.log(building.type)
-        console.log(building.inventory)
-        //console.log(buildings.length);
+        //console.log(building.type)
+        //console.log(building.inventory)
+        console.log(building);
       });
     }
 
@@ -242,13 +242,8 @@
             invText += `<br>&nbsp;${item} &#x21E8; ${get_building.inventory[item]}`; // added special stuff for HTML conversion
           }
 
-          if (get_building.type === 'constructor') { // show menu to choose recipe for constructor
-            var dropdownHTML = '<select id="dropdown">';
-            // once dropdown chosen, make it the recipe
-            console.log(Recipe_dict);
-            get_building.recipe = "super galactic thing";
-            console.log(get_building.recipe);
-            document.getElementById('interface').innerHTML = get_building.type.toUpperCase() + "<br><br>Inventory<br>&nbsp;&nbsp;" + invText;
+          if (get_building.type === 'constructor') {
+            disp_constructor(get_building, invText);
           } else {
             // display text using HTML assistance
             document.getElementById('interface').innerHTML = get_building.type.toUpperCase() + "<br><br>Inventory<br>&nbsp;&nbsp;" + invText;
@@ -281,6 +276,37 @@
 
       draw(); // Redraw the canvas
     });
+
+    function disp_constructor(c, invT) {
+      if (c.recipe) { // show menu to choose recipe for constructor if recipe not chosen
+        document.getElementById('interface').innerHTML = c.type.toUpperCase() + "<br><br>Inventory<br>&nbsp;&nbsp;" + invT + "<br><br>Recipe<br><br>&nbsp;&nbsp;" + c.recipe.name;
+        return;
+      }
+
+      // creating drop down menu to select recipe
+      var dropdownHTML = '<select id="dropdown">';
+      var dropdownOptions = [];
+      
+      for(var key in Recipe_dict) {
+        dropdownOptions.push(key)
+      }
+      dropdownHTML += '<option value=" "</option>';
+      dropdownOptions.forEach(function(option) {
+          dropdownHTML += '<option value="' + option + '">' + option + '</option>';
+      });
+      dropdownHTML += '</select>';      
+      document.getElementById('interface').innerHTML = c.type.toUpperCase() + "<br><br>Inventory<br>&nbsp;&nbsp;" + invT + "<br><br>Recipe<br>" + dropdownHTML;
+
+      // once dropdown chosen, make it the recipe (call event listener to see what's chosen)
+      var dropdown = document.getElementById('dropdown');
+      dropdown.addEventListener('change', function() {
+          c.recipe = {
+            name: this.value, 
+            recipe: Recipe_dict[this.value]
+          };
+          console.log(c.recipe);
+      });
+    }
 
     // Draw the canvas (grid, buildings, belts, and moving items)
     function draw() {
