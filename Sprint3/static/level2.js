@@ -378,7 +378,7 @@ function selfDestructEnemy(enemyIndex, destroy=false){
 
     if(enemies[enemyIndex].health == 0 || destroy){
 
-        deadEnemyObjects.push(enemies.splice(enemyIndex, 1)[0])
+        deadEnemyObjects.push(enemies.splice(enemyIndex, 1)[0].object)
         deadEnemyObjects[deadEnemyObjects.length - 1].src = assetsPath + "explosions/tile001.png";
 
         score++;
@@ -743,44 +743,44 @@ class enemy{
     } 
 
     level1(){
-        this.health += 2;
-        this.damage += 0;
-        this.range += 10;
+        this.health = 3;
+        this.damage = 1;
+        this.range = 80;
 
         this.object.src = assetsPath + "enemies/ufo8.png";
     }
     level2(){
-        this.health += 3;
-        this.damage += 1;
-        this.range += 30;
+        this.health = 6;
+        this.damage = 2;
+        this.range = 90;
 
         this.object.src = assetsPath + "enemies/ufo9.png";
     }
     level3(){
-        this.health += 4;
-        this.damage += 2;
-        this.range += 50;
+        this.health = 10;
+        this.damage = 3;
+        this.range = 100;
         this.object.src = assetsPath + "enemies/ufo10.png";
     }
     level4(){
-        this.halth += 7;
-        this.damage += 5;
-        this.range += 60;
+        this.health = 15;
+        this.damage = 5;
+        this.range = 80;
         this.object.src = assetsPath + "enemies/ufo11.png";
     }
     killerAsteroid(){
-        this.health += 25;
-        this.damage = 1;
-        this.range = 20;
+        this.health = 25;
+        this.damage = 10;
+        this.range = 10;
 
         this.selfDestruct = true;
 
         this.object.src = assetsPath + "projectiles/asteroid 01 - base.png"
     }
     boss1(){
-        this.health += 15;
-        this.damage += 8;
-        this.range += 65;
+        this.health = 35;
+        this.damage = 8;
+        this.range = 60;
         this.object.src = assetsPath + "enemies/ufo3.png";
     }
 

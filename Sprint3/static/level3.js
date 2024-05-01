@@ -45,16 +45,21 @@ var homeBaseLeft = 0;
 var homeBaseObject = "";
 
 
-var credits = 2800; //money
+var credits = 60000; //money
 
-var lives = 300000; //lives
+var lives = 600; //lives
 
 var enemyDamage = 1; //the range is 6-9
 var enemyHP = 3; //range is 4-5
-var enemyCount = 1; //the range is 20-35 number of enemies per wave
-var enemyWaves = 100; 
+
+var enemyCount = 3; //the range is 20-35 number of enemies per wave
+var enemyWaves = 60; 
+var phase1 = 15;
+var phase2 = 30;
+var phase3 = 45; 
+var phase4 = 60;
 var maxEnemyWaves = enemyWaves;
-var maxEnemyCount = 10;
+var maxEnemyCount = 15;
 towerPrice = 140; //the range is 120 to 220
 
 towerDamage = 3;
@@ -125,6 +130,11 @@ function findTarget(){
 
 
     for(var i = 0; i < enemies.length; i++){
+
+        if(enemies[i].selfDestruct){
+            enemies[i].target = -1;
+            continue;
+        }
 
         enemies[i].hasAttacked = false;
 
@@ -277,7 +287,6 @@ function attackTower(enemyIndex){
     towers[towerIndex].health -= enemies[enemyIndex].damage;
 
     if(towers[towerIndex].health <= 0){
-
         towers[towerIndex].object.src = assetsPath + "explosions/tile002.png";
         deadTowers.push(towerIndex);
     }
@@ -381,7 +390,7 @@ function selfDestructEnemy(enemyIndex, destroy=false){
 
     if(enemies[enemyIndex].health == 0 || destroy){
 
-        deadEnemyObjects.push(enemies.splice(enemyIndex, 1)[0])
+        deadEnemyObjects.push(enemies.splice(enemyIndex, 1)[0].object)
         deadEnemyObjects[deadEnemyObjects.length - 1].src = assetsPath + "explosions/tile001.png";
 
         score++;
@@ -524,26 +533,40 @@ function sendEnemyWave(){
         phase = randomInt(1, phase); 
 
         if(phase <= 1){
-            enemyToPush.level1();
+            var roll = randomInt(0, 5);
+            if (roll == 0){enemyToPush.level1();}
+            else if(roll == 1){enemyToPush.level2();}
+            else if(roll == 2){enemyToPush.level3();}
+            else if(roll == 3){enemyToPush.level4();}
+            else if(roll == 4){enemyToPush.killerAsteroid();}
+            else if(roll = 5){enemyToPush.boss1()};
         }
         else if (phase == 2){
-            enemyToPush.level2();
+            var roll = randomInt(0, 5);
+            if (roll == 0){enemyToPush.level3();}
+            else if(roll == 1){enemyToPush.level4();}
+            else if(roll == 2){enemyToPush.level5();}
+            else if(roll == 3){enemyToPush.level6();}
+            else if(roll == 4){enemyToPush.killerAsteroid();}
+            else if(roll = 5){enemyToPush.boss1()};
         }
         else if (phase == 3){
-            if(randomInt(1, 4) < 4){
-                enemyToPush.level3();
-            }
-            else{
-                enemyToPush.killerAsteroid();
-            }
+            var roll = randomInt(0, 5);
+            if (roll == 0){enemyToPush.level5();}
+            else if(roll == 1){enemyToPush.level6();}
+            else if(roll == 2){enemyToPush.level7();}
+            else if(roll == 3){enemyToPush.level8();}
+            else if(roll == 4){enemyToPush.superAsteroid();}
+            else if(roll = 5){enemyToPush.boss1()};
         }
         else if(phase == 4){
-            if(randomInt(1, 4) < 4){
-                enemyToPush.level4();
-            }
-            else{
-                enemyToPush.boss1();
-            }
+            var roll = randomInt(0, 5);
+            if (roll == 0){enemyToPush.level5();}
+            else if(roll == 1){enemyToPush.level6();}
+            else if(roll == 2){enemyToPush.level7();}
+            else if(roll == 3){enemyToPush.level8();}
+            else if(roll == 4){enemyToPush.superAsteroid();}
+            else if(roll = 5){enemyToPush.boss2()};
         }
 
         enemies.push(enemyToPush);
@@ -742,51 +765,90 @@ class enemy{
         this.selfDestruct = false;
 
         this.hasAttacked = false; //if the enemy already dished an attack in a cycle
-    } 
+    }
 
     level1(){
-        this.health += 2;
-        this.damage += 0;
-        this.range += 10;
+        this.health = 15;
+        this.damage = 1;
+        this.range = 120;
 
         this.object.src = assetsPath + "enemies/ufo8.png";
     }
     level2(){
-        this.health += 3;
-        this.damage += 1;
-        this.range += 30;
+        this.health = 20;
+        this.damage = 2;
+        this.range = 120;
 
         this.object.src = assetsPath + "enemies/ufo9.png";
     }
     level3(){
-        this.health += 4;
-        this.damage += 2;
-        this.range += 50;
+        this.health = 25;
+        this.damage = 3;
+        this.range = 120;
         this.object.src = assetsPath + "enemies/ufo10.png";
     }
     level4(){
-        this.halth += 7;
-        this.damage += 5;
-        this.range += 60;
+        this.health = 30;
+        this.damage = 5;
+        this.range = 120;
         this.object.src = assetsPath + "enemies/ufo11.png";
     }
     killerAsteroid(){
-        this.health += 25;
-        this.damage = 1;
-        this.range = 20;
+        this.health = 120;
+        this.damage = 10;
+        this.range = 10;
 
         this.selfDestruct = true;
 
         this.object.src = assetsPath + "projectiles/asteroid 01 - base.png"
     }
+    superAsteroid(){
+        this.health = 250;
+        this.damage = 15;
+        this.range = 10;
+
+        this.selfDestruct = true;
+
+        this.object.src = assetsPath + "projectiles/asteroid 01 - base.png"
+        this.object.style.height="100px";
+        this.object.style.width = "100px";
+    }
     boss1(){
-        this.health += 15;
-        this.damage += 8;
-        this.range += 65;
+        this.health = 75;
+        this.damage = 8;
+        this.range = 120;
         this.object.src = assetsPath + "enemies/ufo3.png";
     }
-
-
+    level5(){
+        this.health = 35;
+        this.damage = 6;
+        this.range = 120;
+        this.object.src = assetsPath + "enemies/ufo4.png";
+    }
+    level6(){
+        this.health = 45;
+        this.damage = 10;
+        this.range = 120;
+        this.object.src = assetsPath + "enemies/ufo5.png";
+    }
+    level7(){
+        this.health = 52;
+        this.damage = 15;
+        this.range = 120;
+        this.object.src = assetsPath + "enemies/ufo6.png";
+    }
+    level8(){
+        this.health = 80;
+        this.damage = 16;
+        this.range = 120;
+        this.object.src = assetsPath + "enemies/ufo7.png";
+    }
+    boss2(){
+        this.health = 200;
+        this.damage = 25;
+        this.range = 120;
+        this.object.src = assetsPath + "enemies/ufo2.png";
+    }
 
 }
 
@@ -795,7 +857,7 @@ class tower{
     constructor(object, xPos, yPos, health = 60, damage = towerDamage, laserCount = 1, criticalStrikeOdds = 25, range = 120){
 
         this.object = object;
-        this.health = health ;
+        this.health = health;
         this.damage = damage;
         this.laserCount = laserCount;
         this.critOdds = criticalStrikeOdds;
@@ -803,13 +865,6 @@ class tower{
 
         this.top = xPos;
         this.left = yPos;
-
-
-        this.healthUpgradesLeft = 3;
-        this.damageUpgradesLeft = 3;
-        this.laserCountUpgradesLeft = 1;
-        this.critUpgradesLeft = 3;
-        this.rangeUpgradesLeft = 2;
 
     }
 }
@@ -883,26 +938,27 @@ function deployTower(index){
     }
     credits -= towerOptions[index][5];
     pendingTower.health = setHealth(towerOptions[index][0]);
-    pendingTower.damage = setDamage(towerOptions[index[1]]);
+    pendingTower.damage = setDamage(towerOptions[index][1]);
     pendingTower.critOdds = setCrit(towerOptions[index][2]);
-    pendingTower.setLasers = setLasers(towerOptions[index][3]);
-    pendingTower.setRange = setRange(towerOptions[index][4]);
+    pendingTower.laserCount = setLasers(towerOptions[index][3]);
+    pendingTower.range = setRange(towerOptions[index][4]);
+
+    console.log(pendingTower);
 
     towerOptions.splice(index, 1);
-    console.log(towerOptions);
 
     endUpgrade();
     placeTower();
 }
 
 function setHealth(level){
-    health = 70;
-    health += level * 20;
+    health = 150;
+    health += level * 40;
     return health;
 }
 function setDamage(level){
-    damage = 8;
-    damage += level * 3;
+    damage = 3;
+    damage += level * 1;
     return damage;
 }
 function setCrit(level){
@@ -916,8 +972,9 @@ function setLasers(level){
     return lasers;
 }
 function setRange(level){
-    range = 140;
-    range += level * 40;
+    range = 150;
+    range += level * 15;
+    return range;
 }
 
 function initiatePurchase(){
@@ -987,13 +1044,15 @@ const defaultBrief = `
 
 //this will let me see how much progress of the round has been
 function determineQuarter(value1, value2) {
-    if (value2 === 0) {
-        return 4;
-    }
-    // Calculate which quarter it's in
-    var quarter = Math.floor(value1 / (value2 / 4));
-    
-    return quarter;
+    currWave = maxEnemyWaves - enemyWaves;
+
+    if(currWave <= phase1){
+        return 1;}
+    else if(currWave <= phase2){
+        return 2;}
+    else if(currWave <= phase3){
+        return 3;}
+    return 4;
 }
 
 function hardMode(){
@@ -1012,7 +1071,7 @@ function generateTower(){
     var laserCount = randomInt(0, 3);
     price += (320 * laserCount);
     var range = randomInt(0, 5);
-    price += (200 * range);
+    price += (350 * range);
 
     return [health, damage, crit, laserCount, range, price];
 }
