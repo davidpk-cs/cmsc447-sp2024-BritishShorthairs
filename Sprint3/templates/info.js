@@ -26,7 +26,23 @@ Cannon_Ship_Recipe=    {Engine: 0,     Plating: 0,         Cannon_Weapon: 0    }
 Laser_Ship_Recipe=     {Engine: 0,     Plating: 0,         Laser_Weapon: 0     }
 
 Resources = [Steel, Copper, Plating_Recipe, Wire_Recipe, Battery_Recipe, Motor_Recipe, Circuit_Recipe, Laser_Optics_Recipe, 
-             Engine_Recipe, Battery_Recipe, Gunnery_Weapon_Recipe, Cannon_Weapon_Recipe, Laser_Weapon_Recipe]
+             Engine_Recipe, Gunnery_Weapon_Recipe, Cannon_Weapon_Recipe, Laser_Weapon_Recipe]
 
-Recipes = [Plating_Recipe, Wire_Recipe, Battery_Recipe, Motor_Recipe, Circuit_Recipe, Laser_Optics_Recipe, Engine_Recipe, Battery_Recipe, 
+Recipes = [Plating_Recipe, Wire_Recipe, Battery_Recipe, Motor_Recipe, Circuit_Recipe, Laser_Optics_Recipe, Engine_Recipe, 
            Gunnery_Weapon_Recipe, Cannon_Weapon_Recipe, Laser_Weapon_Recipe, Gunnery_Ship_Recipe, Cannon_Ship_Recipe, Laser_Ship_Recipe]
+
+Recipe_dict = {
+    "Plating": Plating_Recipe,
+    "Wire": Wire_Recipe,
+    "Battery": Battery_Recipe,
+    "Motor": Motor_Recipe,
+    "Circuit": Circuit_Recipe,
+    "Laser Optics": Laser_Optics_Recipe,
+    "Engine": Engine_Recipe,
+    "Gunnery Weapon": Gunnery_Weapon_Recipe,
+    "Cannon Weapon": Cannon_Weapon_Recipe,
+    "Laser Weapon": Laser_Weapon_Recipe,
+    "Gunnery Ship": Gunnery_Ship_Recipe,
+    "Cannon Ship": Cannon_Ship_Recipe,
+    "Laser Ship": Laser_Ship_Recipe
+};

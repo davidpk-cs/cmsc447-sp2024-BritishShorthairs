@@ -24,7 +24,7 @@
       display: none; /* hide by default */
       width: 200px;
       height: 150px;
-      background-color: rgb(203, 177, 132);
+      background-color: rgb(255, 245, 172);
       position: absolute;
       top: 50%;
       left: 50%;
@@ -205,7 +205,9 @@
           break;
         case 'constructor':
           color = 'green';
-          break;
+          // add a recipe field
+          buildings.push({ type, x, y, color, inventory: inv , recipe: null});
+          return;
       }
 
       buildings.push({ type, x, y, color, inventory: inv });
@@ -228,25 +230,34 @@
       const y = event.clientY - rect.top;
       const gridX = Math.floor(x / gridSize);
       const gridY = Math.floor(y / gridSize);
-
+      
+      // MOUSE
       if (currentTool === 'mouse') {
         get_building = placement_conflict(gridX, gridY);
         if (get_building) { // if we hit a building, show prompt
           document.getElementById('interface').style.display = 'block';
-
+          
           var invText = ''; // add inventory to display
           for (const item in get_building.inventory) {
-            console.log(get_building.inventory[item]);
-            invText += `\n\t${item}: ${get_building.inventory[item]}`;
+            invText += `<br>&nbsp;${item} &#x21E8; ${get_building.inventory[item]}`; // added special stuff for HTML conversion
           }
-          // display text
-          document.getElementById('interface').textContent = 'Building Name:\n\t' + get_building.type + "\nInventory:\n\t" + invText;
+
+          if (get_building.type === 'constructor') { // show menu to choose recipe for constructor
+            var dropdownHTML = '<select id="dropdown">';
+            // once dropdown chosen, make it the recipe
+            console.log(Recipe_dict);
+            get_building.recipe = "super galactic thing";
+            console.log(get_building.recipe);
+            document.getElementById('interface').innerHTML = get_building.type.toUpperCase() + "<br><br>Inventory<br>&nbsp;&nbsp;" + invText;
+          } else {
+            // display text using HTML assistance
+            document.getElementById('interface').innerHTML = get_building.type.toUpperCase() + "<br><br>Inventory<br>&nbsp;&nbsp;" + invText;
+          }
         } else {
           document.getElementById('interface').style.display = 'none';
         }
-      }
-
-      else if (currentTool === 'conveyor') {
+      // CONVEYOR
+      } else if (currentTool === 'conveyor') {
         if (!firstClick) {
           firstClick = { x: gridX, y: gridY };
         } else {
@@ -284,7 +295,6 @@
       conflict = false;
 
       buildings.forEach(building => {    
-        console.log(building.x, x, building.y, y);
         if (building.x == x && building.y == y) {
           conflict = building;
         }
