@@ -22,8 +22,8 @@
     }
     #interface {
       display: none; /* hide by default */
-      width: 200px;
-      height: 200px;
+      width: 150px;
+      height: 225px;
       background-color: rgb(255, 245, 172);
       position: absolute;
       top: 50%;
@@ -47,6 +47,7 @@
     <button onclick="setCurrentTool('constructor')">Constructor</button>
     <button onclick="setCurrentTool('conveyor')">Conveyor Belt</button>
     <button onclick="setCurrentTool('mouse')">Mouse</button>
+    <button onclick="setCurrentTool('delete')">Delete Building</button>
   </div>
 
   <!-- Interface elements -->
@@ -190,21 +191,30 @@
     // Function to place a building
     function placeBuilding(type, x, y) {
       let color;
-      let inv = {steel: 0, copper:0, circuit:0};
+      let inv = {}; // steel: 0, copper:0, circuit:0
       switch (type) {
         case 'steel':
           color = 'blue';
+          inv["steel"] = 0;
           inv.steel = Infinity;
           break;
         case 'copper':
           color = 'orange';
+          inv["copper"] = 0;
           inv.copper = Infinity;
           break;
         case 'storage':
           color = 'lightblue';
+          inv["Gunnery Ship"] = 0;
+          inv["Cannon Ship"] = 0;
+          inv["Laser Ship"] = 0;
           break;
         case 'constructor':
           color = 'green';
+          // lots of inv for constructor ig (add more...)?
+          inv["steel"] = 0;
+          inv["copper"] = 0;
+          inv["circuit"] = 0;
           // add a recipe field
           buildings.push({ type, x, y, color, inventory: inv , recipe: null});
           return;
@@ -268,6 +278,20 @@
 
           firstClick = null;
         }
+      // DELETE
+      } else if (currentTool === 'delete' && buildings) {
+        del_building = placement_conflict(gridX, gridY);
+        if (del_building) {
+          // del conveyors attached to building
+          conveyorBelts.forEach((belt, idx) => {
+            if (belt.start.x === del_building.x && belt.start.y === del_building.y || belt.end.x === del_building.x && belt.end.y === del_building.y) {
+              conveyorBelts.splice(idx, 1);
+            }
+          });
+          // del building
+          let b_idx = buildings.indexOf(del_building);
+          buildings.splice(b_idx, 1);
+        }
       } else {
         if (currentTool && !(placement_conflict(gridX, gridY))) { // make sure new building doesn't conflict with others
           placeBuilding(currentTool, gridX, gridY);
@@ -305,6 +329,7 @@
             recipe: Recipe_dict[this.value]
           };
           console.log(c.recipe);
+          c.inventory[c.recipe.name] = 0;
       });
     }
 
