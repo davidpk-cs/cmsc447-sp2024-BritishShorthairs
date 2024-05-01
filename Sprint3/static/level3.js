@@ -5,8 +5,7 @@ var deadTowers = []; //indexes of towers that have been destroyed
 
 var deadEnemyObjects = [];
 
-var towerOptions = [[3, 3, 4, 5, 6, 0],[2, 2, 2, 3, 1, 0],[0, 1, 4, 2, 5, 0],[2, 3, 1, 1, 0, 287],
-[2, 2, 3, 0, 4, 420]];
+var towerOptions = [[3, 3, 4, 5, 6, 0],[2, 2, 2, 3, 1, 0],[0, 1, 4, 2, 5, 0]];
 //health,damage, crit chance, laser count, range
 
 var lasersActive = false; //indicating that lasers are present on the screen, so we know to clean
@@ -866,7 +865,7 @@ function setUpPurchase(){
         toAppend += "<div class=\"contractOffer\">";;
         toAppend += "<p>Health: " + towerOptions[i][0] + "<p>";
         toAppend += "<p>Damage: " + towerOptions[i][1] + "<p>";
-        toAppend += "<p>Crit: " + towerOptions[i][2] + "<p>";
+        toAppend += "<p>Crit Chance: " + towerOptions[i][2] + "<p>";
         toAppend += "<p>Lasers: " + towerOptions[i][3] + "<p>";
         toAppend += "<p>Range: " + towerOptions[i][4] + "<p>";
         toAppend += "<button onclick = \"" +  "deployTower(" + j.toString() + ")\">" + buttonMsg + "</button>";
@@ -889,11 +888,11 @@ function deployTower(index){
     pendingTower.setLasers = setLasers(towerOptions[index][3]);
     pendingTower.setRange = setRange(towerOptions[index][4]);
 
+    towerOptions.splice(index, 1);
+    console.log(towerOptions);
+
     endUpgrade();
     placeTower();
-
-    towerOptions.splice(index, 0);
-
 }
 
 function setHealth(level){
@@ -926,6 +925,10 @@ function initiatePurchase(){
 
     if(activeTowerPlacement){
         return;
+    }
+
+    while(towerOptions.length < 20){
+        towerOptions.push(generateTower());
     }
 
     var newTower = document.createElement("img");
@@ -995,6 +998,23 @@ function determineQuarter(value1, value2) {
 
 function hardMode(){
 
+}
+
+function generateTower(){
+    var price = 200;
+
+    var health = randomInt(0, 4);
+    price += (150 * health);
+    var damage = randomInt(0, 4);
+    price += (150 * damage);
+    var crit = randomInt(0, 4);
+    price += (200 * crit);
+    var laserCount = randomInt(0, 3);
+    price += (320 * laserCount);
+    var range = randomInt(0, 5);
+    price += (200 * range);
+
+    return [health, damage, crit, laserCount, range, price];
 }
 
 
