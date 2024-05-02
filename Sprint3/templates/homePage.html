@@ -59,6 +59,11 @@ NOTES: must use static url method to reference photos
                 transform: scale(0.98);  /* Scaling button to 0.98 to its original size */ 
                 box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24); /* Lowering the shadow */   
             }
+            .pokemon {
+                width: 50px; 
+                height: auto; 
+                margin-left: 49%;
+            }
         </style>
     </head>
     <body>
@@ -81,6 +86,9 @@ NOTES: must use static url method to reference photos
                 <button class="btn" type="button" onclick="window.location.href='/grid';"
                 style="background-color:rgb(219, 223, 222); border-radius:5px; border-width:2.5px; font-size:30px;">Temporary Grid</button>
             </div>
+        </p>
+        <p>
+            <img class="pokemon" src="{{ url_for('static', filename='img/pokemon.png') }}">
         </p>
     </body>
 </html>
