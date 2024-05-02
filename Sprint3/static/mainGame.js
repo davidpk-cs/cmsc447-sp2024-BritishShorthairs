@@ -57,6 +57,7 @@ towerDamage = 3;
 enemySizeOdds = 25;
 
 var curr_user = " ";
+
 function generateEconomy(){
 
     var currentSkew = randomInt(1, 10);
@@ -936,11 +937,13 @@ function mainGetUser(){
     var nameField = document.getElementById("createName");
     var name = nameField.value;
     curr_user = name;
-    console.log(curr_user);
+    localStorage.setItem('curr_user', name); //saves into local storage and should be retreivable in other .js files
+    sendHighScores(curr_user,99,"level1");
 }
 function sendHighScores(username,score,level = "level1"){
     //this takes in a  username and a score and posts updates the score to the 
     //specified username (works kind of like add and delete)
+    console.log("sendHighScores called");
     fetch('/updateScore', {
         method: 'POST',
         headers: {

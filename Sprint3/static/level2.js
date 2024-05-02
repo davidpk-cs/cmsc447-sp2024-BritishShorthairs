@@ -59,6 +59,9 @@ var phase3 = 35;
 var phase4 = 50;
 var maxEnemyWaves = enemyWaves;
 var maxEnemyCount = 10;
+
+var curr_user = localStorage.getItem('curr_user'); //stores the current user from mainGame.js
+
 towerPrice = 140; //the range is 120 to 220
 
 towerDamage = 3;
@@ -1162,8 +1165,32 @@ document.addEventListener('DOMContentLoaded', function() {
 //One should take a high score and pass it into flask to be put in the database for level 1
 //
 
-function sendHighScores(score){
-    //please get something to send high scores, I'll call it once it is done
+function sendHighScores(username,score,level = "level2"){
+    //this takes in a  username and a score and posts updates the score to the 
+    //specified username (works kind of like add and delete)
+    fetch('/updateScore', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            username: username,
+            score: score,
+            level: level
+        })
+    })
+    .then(response => {
+        if (response.ok) {
+            updateStatus("Score Updated Successfully");
+        } else {
+            updateStatus("sendHighScores Failed");
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        updateStatus("sendHighScores Failed");
+    });
+
 }
 
 function sendLoot(lootInfo){

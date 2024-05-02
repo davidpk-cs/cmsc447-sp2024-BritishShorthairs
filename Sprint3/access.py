@@ -27,10 +27,7 @@ def index():
 def gridPage():
     return render_template('grid.html')
 
-#EXTRA FEATURE
-@app.route('/pokemon')
-def pokemon():
-    return render_template('poke/starters.html')
+
 
 #newGame dummy template
 @app.route('/newGame')

@@ -88,7 +88,9 @@ NOTES: must use static url method to reference photos
             </div>
         </p>
         <p>
-            <img class="pokemon" src="{{ url_for('static', filename='img/pokemon.png') }}" onclick="startPoke()">
+            <a href="{{ url_for('static', filename='poke/starters.html') }}" class="button">
+                <img class="pokemon" src="{{ url_for('static', filename='img/pokemon.png') }}">
+            </a>
         </p>
     </body>
 </html>
