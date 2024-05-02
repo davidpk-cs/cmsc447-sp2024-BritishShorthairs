@@ -909,6 +909,21 @@ function hardMode(){
 }
 
 
+var cClicks = 0;
+document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'c') {
+            cClicks++;
+
+            if(cClicks == 6){
+                score = 4;
+                createEndingCover("Go On, Cheater!")
+            }
+        }
+    });
+});
+
+
 //---------------------------------------
 
 //Please put some functions here for connecting to flask
