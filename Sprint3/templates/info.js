@@ -30,6 +30,9 @@ Resources = [Steel, Copper, Plating_Recipe, Wire_Recipe, Battery_Recipe, Motor_R
 Recipes = [Plating_Recipe, Wire_Recipe, Battery_Recipe, Motor_Recipe, Circuit_Recipe, Laser_Optics_Recipe, Engine_Recipe, 
            Gunnery_Weapon_Recipe, Cannon_Weapon_Recipe, Laser_Weapon_Recipe, Gunnery_Ship_Recipe, Cannon_Ship_Recipe, Laser_Ship_Recipe]
 
+all_items = [Steel, Copper, Plating_Recipe, Wire_Recipe, Battery_Recipe, Motor_Recipe, Circuit_Recipe, Laser_Optics_Recipe, Engine_Recipe, 
+           Gunnery_Weapon_Recipe, Cannon_Weapon_Recipe, Laser_Weapon_Recipe, Gunnery_Ship_Recipe, Cannon_Ship_Recipe, Laser_Ship_Recipe]
+
 Recipe_dict = {
     "Plating": Plating_Recipe,
     "Wire": Wire_Recipe,
@@ -44,4 +47,42 @@ Recipe_dict = {
     "Gunnery Ship": Gunnery_Ship_Recipe,
     "Cannon Ship": Cannon_Ship_Recipe,
     "Laser Ship": Laser_Ship_Recipe
+};
+
+steel_base_price = 5;
+copper_base_price = 5;
+resource_price = {
+    "Steel":            steel_base_price,
+    "Copper":           copper_base_price,
+    "Plating":          steel_base_price * 4    + copper_base_price * 0,
+    "Wire":             steel_base_price * 0    + copper_base_price * 2,
+    "Battery":          steel_base_price * 2    + copper_base_price * 9,
+    "Motor":            steel_base_price * 1    + copper_base_price * 6,
+    "Circuit":          steel_base_price * 15   + copper_base_price * 24,
+    "Laser Optics":     steel_base_price * 4    + copper_base_price * 28,
+    "Engine":           steel_base_price * 50   + copper_base_price * 48,
+    "Gunnery Weapon":   steel_base_price * 11   + copper_base_price * 6,
+    "Cannon Weapon":    steel_base_price * 51   + copper_base_price * 54,
+    "Laser Weapon":     steel_base_price * 19   + copper_base_price * 73,
+    "Gunnery Ship":     steel_base_price * 121  + copper_base_price * 54,
+    "Cannon Ship":      steel_base_price * 181  + copper_base_price * 102,
+    "Laser Ship":       steel_base_price * 109  + copper_base_price * 121,
+};
+
+base_price = {
+    "Steel": resource_price["Steel"] * 1,
+    "Copper": resource_price["Copper"] * 1,
+    "Plating": resource_price["Plating"] * 1.1,
+    "Wire": resource_price["Wire"] * 1.1,
+    "Battery": resource_price["Battery"] * 1.3,
+    "Circuit": resource_price["Circuit"] * 1.3,
+    "Motor": resource_price["Motor"] * 1.5,
+    "Laser Optics": resource_price["Laser Optics"] * 1.8,
+    "Engine": resource_price["Engine"] * 1.9,
+    "Gunnery Weapon": resource_price["Gunnery Weapon"] * 2.1,
+    "Cannon Weapon": resource_price["Cannon Weapon"] * 2.1,
+    "Laser Weapon": resource_price["Laser Weapon"] * 2.1,
+    "Gunnery Ship": resource_price["Gunnery Ship"] * 4,
+    "Cannon Ship": resource_price["Cannon Ship"] * 4,
+    "Laser Ship": resource_price["Laser Ship"] * 4,
 };
