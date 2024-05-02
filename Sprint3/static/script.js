@@ -11,6 +11,10 @@ function newGame() {
    window.location.href = '/newGame'; //this works 
 }
 
+function startPoke(){
+    window.location.href = '/pokemon'; //this works 
+}
+
 function inputUser() {
     // testing purposes
     console.log("username has started");
