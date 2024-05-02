@@ -11,7 +11,7 @@
 * __Disclaimer:__ This current state of the game is meant to be run in fullscreen as it has not yet been tested in a crunched screen.
 
 # How to run
-* 1
+* 1.
     * a.   Create a .venv (if not already done so) 1a go to the top of VScode / your IDE and click the "View" tab
     * b.   Click "Command Palette" *scroll until you see "Python:Create Environment" and click it, it will ask Environment type so choose "Venv" and for Python installation just pick the latest version you have installed
     * c.   You will see it loading at the bottom, be patient, when done a static and .venv file will appear
@@ -20,7 +20,7 @@
     * f.   You should now see a (.venv) on the front of your command line and you are ready to run the program
 * 2.    Open the tabs on your side bar in order to see the file named "access.py"
 * 4.    Right-click and hit "Open new integrated terminal"
-* 5     Make sure in your terminal there is a (.venv) at the beginning. Also for mac users turn off your airplay reciver or else it will not let you access app using routing number
+* 5.    Make sure in your terminal there is a (.venv) at the beginning. Also for mac users turn off your airplay reciver or else it will not let you access app using routing number
 * 6.   Run our game by typing "python access.py" You will see a WARNING message and an IP and port number
    * or mac (Command +click) for others (ctrl + click)
 * 7.   When done close the app on your web server and hit CTRL c to end program
