@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Arena</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+        body {
+            background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDd_glhtKlVuHuNWoVKzvHvFH74RnU2IerSA&usqp=CAU');
+            background-size: 100% auto;
+            background-repeat: no-repeat;
+            background-position: center center;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+        }
+        
+        h1 {
+            color: white;
+            font-family: 'Press Start 2P', cursive;
+            margin-top: 30px;
+        }
+        
+        form {
+            background-color: #4CAF50; /* Green */
+            border: none;
+            color: white;
+            width: 500px;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 12px; /* Rounded corners */
+        }
+        .control-group {
+            max-height: 400px; /* Set a maximum height for the form */
+            overflow-y: auto; /* Enable vertical scrolling */
+
+        }
+        
+        .control-label {
+            position: relative;
+            padding-right: 30px; /* Adjust the padding as needed */
+        }
+
+        .control-label img {
+            position: absolute;
+            top: 0;
+            right: 0;
+        }
+        
+        .control {
+            font-family: 'Press Start 2P', cursive;
+            display: block;
+            color: #4CAF50;
+            background-color: #fff;
+            position: relative;
+            padding-left: 35px;
+            margin-bottom: 6px;
+            padding-top: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 20px;
+        }
+            .control input {
+                position: absolute;
+                z-index: -1;
+                opacity: 0;
+            }
+        .control_indicator {
+            position: absolute;
+            top: 10px;
+            margin-left: 20px;
+            margin-top: 4px;
+            left: 0;
+            height: 10px;
+            width: 20px;
+            background: #e6e6e6;
+            border: 0px solid #000000;
+            border-radius: undefinedpx;
+        }
+        .control:hover input ~ .control_indicator,
+        .control input:focus ~ .control_indicator {
+            background: #cccccc;
+        }
+
+        .control input:checked ~ .control_indicator {
+            background: #4caf50;
+        }
+        .control:hover input:not([disabled]):checked ~ .control_indicator,
+        .control input:checked:focus ~ .control_indicator {
+            background: #e6647d;
+        }
+        .control input:disabled ~ .control_indicator {
+            background: #e6e6e6;
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        .control_indicator:after {
+            box-sizing: unset;
+            content: '';
+            position: absolute;
+            display: none;
+        }
+        .control input:checked ~ .control_indicator:after {
+            display: block;
+        }
+        .control-radio .control_indicator {
+            border-radius: 50%;
+        }
+
+        .control-radio .control_indicator:after {
+            left: 7px;
+            top: 7px;
+            height: 6px;
+            width: 6px;
+            border-radius: 50%;
+            background: #ffffff;
+            transition: background 250ms;
+        }
+        .control-radio input:disabled ~ .control_indicator:after {
+            background: #7b7b7b;
+        }
+        
+        .btn {
+            -webkit-border-radius: 28;
+            -moz-border-radius: 28;
+            border-radius: 28px;
+            font-family: 'Press Start 2P', cursive;
+            color: #ffffff;
+            font-size: 20px;
+            background: #4CAF50;
+            padding: 10px 20px 10px 20px;
+            border: solid #ffffff 2px;
+            text-decoration: none;
+        }
+        
+        .btn:hover {
+            background: #aae3ac;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <script src="pokedex.js"></script>
+    <script src="inventory_managment.js"></script>
+    <div>
+        <h1>Please choose your starter Pokémon</h1>
+    </div>
+    <form id="big_form" action="map.html" method="GET">
+        <p style="font-family: 'Press Start 2P', cursive;"></p>
+        <div id="controls" type="radio">
+        </div>
+        <script>
+            function deleteAllCookies() {
+                const cookies = document.cookie.split(";");
+
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i];
+                    const eqPos = cookie.indexOf("=");
+                    const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+                    document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+                }
+            }
+
+            deleteAllCookies();
+            inventory.clear();
+
+            starters = []
+            starters.push(pokedex[0])
+            starters.push(pokedex[3])
+            starters.push(pokedex[6])
+
+            for (var i = 0; i < starters.length; i++) {
+                control_group = document.getElementById('controls');
+                
+                full_label = document.createElement("label");
+                full_label.setAttribute("class", "control control-checkbox");
+                full_label.innerHTML = starters[i].name
+
+                input_label = document.createElement("input");
+                input_label.setAttribute("id", starters[i].name);
+                input_label.setAttribute("name", "pokemonChoice");
+                input_label.setAttribute("type", "checkbox");
+                input_label.setAttribute("onclick", "getSelectedPokemon(this)");
+                input_label.setAttribute("value", starters[i].id);
+
+                control_indicator = document.createElement("div");
+                control_indicator.setAttribute("class", "control-indicator");
+
+                image = document.createElement("img");
+                image.setAttribute("src", "https://img.pokemondb.net/sprites/black-white/anim/normal/"+starters[i].name.toLowerCase()+".gif");
+
+                control_group.appendChild(full_label);
+                full_label.appendChild(input_label);
+                full_label.appendChild(control_indicator);
+                full_label.appendChild(image)
+            }
+            var your_pokemon = null;
+            function getSelectedPokemon(element) {
+                if (element.checked) {
+                    for (var i = 0; i < pokedex.length; i++) {
+                        if (pokedex[i].id == element.value) { 
+                            your_pokemon = pokedex[i];
+                            break;
+                        }
+                    }
+
+                    selectedPokemonName = your_pokemon.name;
+                    console.log(selectedPokemonName);
+                    
+                    image = document.createElement("img");
+                    image.setAttribute("src", "https://img.pokemondb.net/sprites/black-white/anim/normal/"+your_pokemon.name.toLowerCase()+".gif");
+                    image.setAttribute("width", "200px");
+                    image.setAttribute("height", "200px");
+
+                    img_container = document.getElementById("img_container");
+                    child = img_container.lastElementChild;
+                    if (child) {
+                        img_container.removeChild(child);
+                    }
+                    img_container.appendChild(image);
+                }
+            }
+
+            function startAdventure() {
+                if (your_pokemon !== null) {
+                    var start_time = new Date().getTime();
+                    var date = new Date();
+                    date.setHours(23,59,59,999);
+                    var expires = "expires=" + date.toGMTString();
+                    document.cookie = "start_time="+JSON.stringify(start_time)+"; "+expires;
+
+                    inventory.add(your_pokemon)
+                    document.getElementById("big_form").submit();
+                    //OVERWRITE INVENTORY
+                } else {
+                    alert('Please select a Pokemon first');
+                }
+            }
+         </script>
+        <br>
+        <input class="btn" id="btn" type="button" onclick="startAdventure()" value="Start Your Adventure!">
+    </form>
+    <br><br><br><br>
+    <div id="img_container"> </div>
+
+    
+</body>
+</html>

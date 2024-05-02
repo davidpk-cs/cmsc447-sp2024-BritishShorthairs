@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>Encounter</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+        body {
+            background-image: url('encounter.png');
+            background-size: 100% auto;
+            background-repeat: no-repeat;
+            background-position: center center;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+        }
+        
+        h1 {
+            color: white;
+            font-family: 'Press Start 2P', cursive;
+            margin-top: 30px;
+        }
+        
+        form {
+            background-color: #4CAF50; /* Green */
+            border: none;
+            color: white;
+            width: 500px;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 12px; /* Rounded corners */
+        }
+        .control-group {
+            max-height: 500px; /* Set a maximum height for the form */
+            overflow-y: auto; /* Enable vertical scrolling */
+
+        }
+        
+        .control-label {
+            position: relative;
+            padding-right: 40px; /* Adjust the padding as needed */
+        }
+
+        .control-label img {
+            position: absolute;
+            top: 0;
+            right: 0;
+        }
+        
+        .control {
+            font-family: 'Press Start 2P', cursive;
+            display: block;
+            position: relative;
+            padding-left: 35px;
+            padding-bottom: 23px;
+            margin-bottom: 10px;
+            padding-top: 30px;
+            background: #fff;
+            color: #4CAF50;
+            cursor: pointer;
+            font-size: 18px;
+            text-align: center;
+            border-radius: 20px;
+        }
+        
+        .control input {
+            position: absolute;
+            z-index: -1;
+            opacity: 0;
+        }
+        
+        .control_indicator {
+            position: absolute;
+            top: 26px;
+            left: 15px;
+            height: 20px;
+            width: 20px;
+            background: #e6e6e6;
+            border: 0px solid #000000;
+            border-radius: 20px;
+        }
+        
+        .control:hover input ~ .control_indicator,
+        .control input:focus ~ .control_indicator {
+            background: #a6e5a8;
+        }
+        
+        .control input:checked ~ .control_indicator {
+            background: #4caf50;
+        }
+        
+        .control:hover input:not([disabled]):checked ~ .control_indicator,
+        .control input:checked:focus ~ .control_indicator {
+            background: #e6647d;
+        }
+        
+        .control input:disabled ~ .control_indicator {
+            background: #e6e6e6;
+            opacity: 3;
+            pointer-events: none;
+        }
+        
+        .control_indicator:after {
+            box-sizing: unset;
+            content: '';
+            position: absolute;
+            display: none;
+        }
+        
+        .control input:checked ~ .control_indicator:after {
+            display: block;
+        }
+        
+        .control-checkbox .control_indicator:after {
+            left: 8px;
+            top: 5px;
+            width: 3px;
+            height: 8px;
+            border: solid #ffffff;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+        
+        .control-checkbox input:disabled ~ .control_indicator:after {
+            border-color: #7b7b7b;
+        }
+        
+        .btn {
+            -webkit-border-radius: 28;
+            -moz-border-radius: 28;
+            border-radius: 28px;
+            font-family: Courier New;
+            color: #ffffff;
+            font-size: 20px;
+            background: #4CAF50;
+            padding: 10px 20px 10px 20px;
+            border: solid #ffffff 2px;
+            text-decoration: none;
+        }
+        
+        .btn:hover {
+            background: #aae3ac;
+            text-decoration: none;
+        }
+        
+        .options {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .controls {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .result-text {
+            width: 300px;
+            height: 100px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 16px;
+            margin-top: 20px;
+            display: none;
+            text-align: center;
+            border: 1px solid #000;
+            padding: 10px;
+        }
+    </style>
+    <script src="pokedex.js"></script>
+    <script src="inventory_managment.js"></script>
+</head>
+
+<body>
+    <div>
+        <h1>Encounter in the Wild</h1>
+    </div>
+
+    <div id="options">
+        <button class="btn" onclick="showOptions()">Fight</button>
+        <button class="btn" onclick="showPokeball()">Pokeball</button>
+        <button class="btn" onclick="switchToMap()">Run</button>
+    </div>
+    <div id="battleActions" style="display: none; position: fixed; bottom: 0; width: 100%; text-align: center; padding: 20px;">
+        <button id="attack_btn" class="btn" onclick="attack()">Attack</button>
+            <button id="special_attack_btn" class="btn" onclick="specialAttack()">Special Attack</button>
+    </div>
+    <div id="log" style="display: none; position: fixed; top: 100px; left: 0; width: 25%; padding: 10px;">
+        <h2 style="text-align: center; font-family:'Press Start 2P', cursive; color: white">Battle Log</h2>
+        <textarea id="battleLog" style="width: 100%; height: 200px; font-family: 'Press Start 2P', cursive;"></textarea>
+    </div>
+<div id="controls">
+    <p style="font-family: 'Press Start 2P', cursive;">Select your Pokémon:</p>
+    <div class="control-group">
+    </div>
+    <script>
+        var inv = inventory.dump()
+        for (var i = 0; i < inv.length; i++) {
+            control_group = document.getElementById('controls');
+            full_label = document.createElement("label");
+            full_label.setAttribute("class", "control control-checkbox");
+            full_label.innerHTML = inv[i].name
+
+            input_label = document.createElement("input");
+            input_label.setAttribute("id", inv[i].name);
+            input_label.setAttribute("name", "pokemonChoice");
+            input_label.setAttribute("type", "checkbox");
+            input_label.setAttribute("onclick", "getSelectedPokemon(this)");
+            input_label.setAttribute("value", inv[i].id);
+
+            control_indicator = document.createElement("div");
+            control_indicator.setAttribute("class", "control-indicator");
+
+            image = document.createElement("img");
+            image.setAttribute("src", "https://img.pokemondb.net/sprites/black-white/anim/normal/"+inv[i].name.toLowerCase()+".gif");
+            image.setAttribute("style", "position: absolute; top: 10%; left: 10%;")
+
+            control_group.appendChild(full_label);
+            full_label.appendChild(input_label);
+            full_label.appendChild(control_indicator);
+            full_label.appendChild(image)
+        }
+        // <label class="control control-checkbox">
+        //     {{ your_pokemon.name }}
+        //     <input id="{{ your_pokemon.name }}" name="pokemonChoice" type="checkbox" onclick="getSelectedPokemon(this)" value="{{ your_pokemon.name }}" />
+        //     <div class="control_indicator"></div>
+        //     <img src="https://img.pokemondb.net/sprites/black-white/anim/normal/{{ your_pokemon.name|lower }}.gif" alt="{{ poke }}">
+        // </label>
+     </script>
+     <br>
+    <input class="btn" type="button" value="Start Battle" onclick="startBattle()">
+</div>
+</div>
+<div style="text-align: center; margin-top: 20px;">
+    <h1 id="encounter_msg">You encountered a wild pokemon!</h1>
+</div>
+<div id="selectedPokemon" style="position: fixed; bottom: 0; left: 0; padding: 10px; margin-left: 20%; margin-top: 200px; ">
+</div>
+<div id="result-text"></div>
+<div style="display: flex; justify-content: flex-start; margin-left: 50%; margin-top: 17%;">
+    <img id="enemy_img" src="https://img.pokemondb.net/sprites/black-white/anim/normal/bulbasaur.gif" alt="{{ enemy_pokemon.name }}" style="position: absolute; top: 45%; left: 70%; width: 200px; height: 200px;">
+</div>
+<div id="pokeballContainer" style="position: fixed; bottom: 0; left: 0; padding-left: 300px; display: none;">
+    <img id="pokeball" src="" alt="pokeball" style="width: 200px; height: 200px;">
+</div>
+<script src="type_advantage.js"></script>
+<script>
+    function getRandomInt(min, max) {
+        return Math.floor(Math.random() * (max - min) + min); 
+    }
+
+    var inv = inventory.dump()
+        console.log(inventory.dump());
+        var enemy_pokemon = pokedex[getRandomInt(0, pokedex.length)];
+        console.log(enemy_pokemon)
+        enemy_pokemon["level"] = getRandomInt(5, 50)
+        var your_pokemon = inv[0];
+
+        var selectedPokemonHealth;
+        var randomPokemonHealth;
+        var attackValue;
+        var randomAttackValue;
+        var specialAttackValue;
+        function update_all_pokemon() {
+            selectedPokemonHealth = (Math.floor((2 * your_pokemon.base.HP * your_pokemon["level"])/100) + your_pokemon["level"] + 10);
+            randomPokemonHealth = (Math.floor((2 * enemy_pokemon.base.HP * enemy_pokemon["level"])/100) + enemy_pokemon["level"] + 10);
+            attackValue = (Math.floor((2 * your_pokemon["base"]["Attack"] * your_pokemon["level"])/100) + 5);
+            randomAttackValue = (Math.floor((2 * enemy_pokemon["base"]["Attack"] * enemy_pokemon["level"])/100) + 5);
+            specialAttackValue = (Math.floor((2 * your_pokemon["base"]["Sp. Attack"] * your_pokemon["level"])/100) + 5)
+
+            document.getElementById("encounter_msg").innerHTML = "You encountered a wild " + enemy_pokemon.name
+            document.getElementById("enemy_img").setAttribute("src", "https://img.pokemondb.net/sprites/black-white/anim/normal/"+enemy_pokemon.name.toLowerCase()+".gif")
+        }
+
+        update_all_pokemon();        
+
+        var encounterTheme = new Audio('encounter-theme.mp3');
+        encounterTheme.loop = true;
+        encounterTheme.volume = 0.1;
+        encounterTheme.play();
+
+        function limitSelection() {
+            var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            var checkedCount = 0;
+
+            for (var i = 0; i < checkboxes.length; i++) {
+                if (checkboxes[i].checked) {
+                    checkedCount++;
+                }
+
+                if (checkedCount >= 1) {
+                    for (var j = 0; j < checkboxes.length; j++) {
+                        if (!checkboxes[j].checked) {
+                            checkboxes[j].disabled = true;
+                        }
+                    }
+                } else {
+                    checkboxes[i].disabled = false;
+                }
+            }
+        }
+
+        function switchToMap() {
+            setTimeout(function(){ window.location.href = "map.html"; }, 7000); 
+        }
+        
+        function removeElements() {
+            document.getElementById('controls').remove();
+            document.querySelector('h1').remove();
+        }
+    
+        var attempts = 0;  
+
+        function throwPokeball() {
+            return Math.random() * 100 <= 33;
+        }
+
+    function displayThrowResult() {
+        var resultText = document.getElementById('result-text');
+        // Apply inline CSS
+        resultText.style.color = "white";
+        resultText.style.fontFamily = "'Press Start 2P', cursive";
+        resultText.style.fontSize = "16px";
+        resultText.style.textAlign = "center";
+        resultText.style.padding = "10px";
+        resultText.style.width = "300px";
+        resultText.style.height = "100px";
+        resultText.style.position = "fixed"; 
+        resultText.style.top = "50%"; 
+        resultText.style.left = "25%"; 
+        resultText.style.transform = "translate(-50%, -50%)"; 
+
+        if (throwPokeball()) {
+            inventory.add(enemy_pokemon)
+            var inv = inventory.dump()
+            var pokemon_deleted = false;
+            if (inv.length > 4) {
+                pokemon_deleted = inv[Math.floor(Math.random() * inv.length)]
+                inventory.kill(pokemon_deleted.id);
+            }
+            console.log(inv.length)
+            console.log(pokemon_deleted);
+            
+            if (pokemon_deleted) {
+                resultText.textContent = 'Success! You caught the Pokemon! But '+pokemon_deleted.name+" ran away!!";
+            } else {
+                resultText.textContent = 'Success! You caught the Pokemon!';
+            }
+            document.getElementById('throwButton').style.display = 'none'; 
+            setTimeout(function(){ window.location.href = "map.html?starter=0&new_id="+enemy_pokemon.id+"&level="+enemy_pokemon.level; }, 3000);
+        } else {
+            attempts += 1;  
+            if (attempts < 3) {
+                resultText.textContent = 'Oh no! The you missed! Try again!';
+            } else {
+                resultText.textContent = 'Oh no! The Pokemon escaped! You\'ve run out of attempts.';
+                document.getElementById('throwButton').style.display = 'none';
+                setTimeout(function(){ window.location.href = "map.html?starter=0&new_id=0&level=0"; }, 3000);
+            }
+        }
+        resultText.style.display = 'block';
+    }
+
+    function showPokeball() {
+        document.getElementById('pokeball').src = "ball.png";
+        document.getElementById('pokeballContainer').style.display = "block";
+        removeElements();
+
+        // Create throw button
+        var throwButton = document.createElement('button');
+        throwButton.textContent = 'Throw Pokeball';
+        throwButton.onclick = displayThrowResult;
+        throwButton.className = 'btn';
+        throwButton.id = 'throwButton';
+
+        document.body.appendChild(throwButton);
+    }
+
+
+    var selectedPokemonName = null;    
+    function getSelectedPokemon(element) {
+        if (element.checked) {
+            for (var i = 0; i < inv.length; i++) {
+                if (inv[i].id == element.value) { 
+                    your_pokemon = inv[i];
+                }
+            }
+
+            selectedPokemonName = your_pokemon.name;
+            console.log(selectedPokemonName);
+            // Insert the selected Pokemon's details into the div at the bottom left
+            $('#selectedPokemon').html(`
+                <img src="https://img.pokemondb.net/sprites/black-white/anim/back-normal/${selectedPokemonName.toLowerCase()}.gif" alt="${selectedPokemonName}" style="position: fixed; bottom: 5%; left: 15%; width: 400px; height: 400px;">
+            `);
+            update_all_pokemon();
+        }
+    }
+    
+    function logMessage(message) {
+        var logBox = document.getElementById('battleLog');
+        logBox.value += message + "\n";
+        logBox.scrollTop = logBox.scrollHeight;
+    }
+
+    function attack() {
+        var adv = type_advantage(your_pokemon, enemy_pokemon)
+        var effective_msg;
+        console.log(adv);
+        randomPokemonHealth -= attackValue * adv; 
+        
+        if (adv == 0) {
+            effective_msg = "It was ineffective."
+        } else if (adv < 1) {
+            effective_msg = "It wasn't very effective."
+        } else if (adv >= 2) {
+            effective_msg = "It was super effective."
+        } else {
+            effective_msg = ""
+        }
+
+        console.log(randomPokemonHealth)
+        logMessage("You attacked the "+enemy_pokemon.name+"! "+effective_msg+"It has "+randomPokemonHealth+" HP left.");
+        if(randomPokemonHealth <= 0) {
+            // Random pokemon is defeated
+
+            document.getElementById("attack_btn").disabled = true;
+            document.getElementById("special_attack_btn").disabled = true;
+
+            logMessage(enemy_pokemon.name+" has been defeated! You won!");
+            logMessage(your_pokemon.name+" has leveled up!");
+            inventory.levelup(your_pokemon.id, your_pokemon.level + 10)
+
+            setTimeout(function(){ window.location.href = "map.html?starter=0&new_id=0&level=0"; }, 3000);
+            return;
+        }
+        randomPokemonAttacks(); // random Pokemon's turn to attack
+    }
+
+    function specialAttack() {
+        var adv = type_advantage(your_pokemon, enemy_pokemon)
+        var effective_msg;
+        randomPokemonHealth -= specialAttackValue * adv; 
+        
+        if (adv == 0) {
+            effective_msg = "It was ineffective."
+        } else if (adv < 1) {
+            effective_msg = "It wasn't very effective."
+        } else if (adv >= 2) {
+            effective_msg = "It was super effective."
+        } else {
+            effective_msg = ""
+        }
+
+        logMessage("You attacked the "+enemy_pokemon.name+" with a special attack! "+effective_msg+"\n It has "+randomPokemonHealth+" HP left.");
+        if(randomPokemonHealth <= 0) {
+            // Random pokemon is defeated
+
+            document.getElementById("attack_btn").disabled = true;
+            document.getElementById("special_attack_btn").disabled = true;
+
+            logMessage(enemy_pokemon.name +" has been defeated! You won!");
+            logMessage(your_pokemon.name+" has leveled up!");
+            inventory.levelup(your_pokemon.id, your_pokemon.level + 10)
+
+            setTimeout(function(){ window.location.href = "map.html?starter=0&new_id=0&level=0"; }, 3000);
+            return;
+        }
+        randomPokemonAttacks(); // random Pokemon's turn to attack
+    }
+
+function randomPokemonAttacks() {
+    var adv = type_advantage(enemy_pokemon, your_pokemon)
+    var effective_msg;
+    selectedPokemonHealth -= randomAttackValue * adv;
+    if (adv == 0) {
+        effective_msg = "It was ineffective."
+    } else if (adv < 1) {
+        effective_msg = "It wasn't very effective."
+    } else if (adv >= 2) {
+        effective_msg = "It was super effective."
+    } else {
+        effective_msg = ""
+    }
+
+    logMessage(enemy_pokemon.name+" attacked you!  "+effective_msg+"\nYour Pokemon has "+selectedPokemonHealth+" HP left. \n");
+    if(selectedPokemonHealth <= 0) {
+        // Your pokemon is defeated
+
+        document.getElementById("attack_btn").disabled = true;
+        document.getElementById("special_attack_btn").disabled = true;
+
+        logMessage('Your Pokemon has been defeated! You run away clutching your unconscious '+your_pokemon.name+'!');
+        setTimeout(function(){ window.location.href = "map.html?starter=0&new_id=0&level=0"; }, 3000);
+        return;
+    }
+    }
+
+    function startBattle() {
+        if (selectedPokemonName !== null) {
+            removeElements();
+            document.getElementById('selectedPokemon').style.display = 'block';
+            document.getElementById('battleActions').style.display = 'block'; // show attack buttons
+            document.getElementById('log').style.display = 'block'; // show battle log
+        } else {
+            alert('Please select a Pokemon first');
+        }
+    }
+    
+    var maxLogLines = 10; 
+
+    function logMessage(message) {
+        var logBox = document.getElementById('battleLog');
+        var logLines = logBox.value.split("\n");
+
+        // Add the new message to the log
+        logLines.push(message);
+
+        // If we've exceeded the max number of lines, remove the oldest lines
+        while (logLines.length > maxLogLines) {
+            logLines.shift();
+        }
+
+        // Update the log box with the new set of lines
+        logBox.value = logLines.join("\n");
+
+        // Scroll to the bottom of the log box
+        logBox.scrollTop = logBox.scrollHeight;
+    }
+</script>
+</body>
+</html>
