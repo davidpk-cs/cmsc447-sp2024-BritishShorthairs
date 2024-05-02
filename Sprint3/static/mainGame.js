@@ -936,7 +936,7 @@ function mainGetUser(){
     var nameField = document.getElementById("createName");
     var name = nameField.value;
     curr_user = name;
-    console.log("In main GetUser");
+    console.log(curr_user);
 }
 function sendHighScores(username,score,level = "level1"){
     //this takes in a  username and a score and posts updates the score to the 
