@@ -4,6 +4,10 @@
   <meta charset="UTF-8">
   <title>Production Side</title>
   <style>
+    body {
+      background-image: url('../static/Assets/manufacturing_buildings/grass2.png');
+    }
+
     canvas {
       border: 1px solid black;
     }
@@ -48,8 +52,9 @@
   </style>
 </head>
 <body>
+
   <p id="money">Money: 100000</p>
-  <canvas id="canvas" width="720" height="600"></canvas>
+  <canvas id="canvas" style="background: url('../static/Assets/manufacturing_buildings/grass.png')" width="720" height="600"></canvas>
   <div class="toolbox">
     <button onclick="setCurrentTool('steel')">Steel Source</button>
     <button onclick="setCurrentTool('copper')">Copper Source</button>
