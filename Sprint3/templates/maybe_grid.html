@@ -59,9 +59,9 @@
   <script>
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
-    const gridSize = 40; // Size of each grid cell in pixels
-    const width = 18;  // Number of columns
-    const height = 15; // Number of rows
+    const gridSize = 40; //20 // Size of each grid cell in pixels
+    const width = 18;  //36 // Number of columns
+    const height = 15; //30 // Number of rows
 
     const buildings = [];
     const conveyorBelts = [];
@@ -360,7 +360,13 @@
 
     function disp_constructor(c, invT) {
       if (c.recipe) { // show menu to choose recipe for constructor if recipe not chosen
-        document.getElementById('interface').innerHTML = c.type.toUpperCase() + "<br><br>Inventory<br>&nbsp;&nbsp;" + invT + "<br><br>Recipe<br><br>&nbsp;&nbsp;" + c.recipe.name;
+        var ingredients = '';
+        for(var key in c.recipe.recipe) {
+          ingredients += `<br>&nbsp;&#2022;&nbsp;${key} &#x21E8;${c.recipe.recipe[key]}`;
+        }
+
+        document.getElementById('interface').innerHTML = c.type.toUpperCase() + "<br><br>Inventory<br>&nbsp;&nbsp;" + 
+          invT + "<br><br>Recipe (" + c.recipe.name + ")<br>&nbsp;&nbsp;" + ingredients;
         return;
       }
 
@@ -385,7 +391,6 @@
             name: this.value, 
             recipe: Recipe_dict[this.value]
           };
-          console.log(c.recipe);
           autocraft_buildings.push(c)
       });
     }
