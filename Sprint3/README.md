@@ -12,18 +12,18 @@
 
 # How to run
 * 1
-    * a create a .venv (if not already done so) 1a go to the top of VScode / your IDE and click the "View" tab
-    * b click "Command Palette" *scroll until you see "Python:Create Environment" and click it, it will ask Environment type so choose "Venv" and for Python installation just pick the latest version you have installed
-    * c You will see it loading at the bottom, be patient, when done a static and .venv file will appear
-    * d Repeat steps a and b, but this time click "Terminal Create New Terminal"
-    * e in terminal type "python -m pip install flask", this takes a minute or so
-    * f you should now see a (.venv) on the front of your command line and you are ready to run the program
-* 2 open the tabs on your side bar in order to see the file named "access.py"
-* 4 right-click and hit "Open new integrated terminal"
-* 5 make sure in your terminal there is a (.venv) at the beginning. Also for mac users turn off your airplay reciver or else it will not let you access app using routing number
-* 6 run our game by typing "python access.py" You will see a WARNING message and an IP and port number
-* 7 for mac (Command +click) for others (ctrl + click)
-* 8 when done close the app on your web server and hit CTRL c to end program
+    * a.   Create a .venv (if not already done so) 1a go to the top of VScode / your IDE and click the "View" tab
+    * b.   Click "Command Palette" *scroll until you see "Python:Create Environment" and click it, it will ask Environment type so choose "Venv" and for Python installation just pick the latest version you have installed
+    * c.   You will see it loading at the bottom, be patient, when done a static and .venv file will appear
+    * d.   Repeat steps a and b, but this time click "Terminal Create New Terminal"
+    * e.   In terminal type "python -m pip install flask", this takes a minute or so
+    * f.   You should now see a (.venv) on the front of your command line and you are ready to run the program
+* 2.    Open the tabs on your side bar in order to see the file named "access.py"
+* 4.    Right-click and hit "Open new integrated terminal"
+* 5     Make sure in your terminal there is a (.venv) at the beginning. Also for mac users turn off your airplay reciver or else it will not let you access app using routing number
+* 6.   Run our game by typing "python access.py" You will see a WARNING message and an IP and port number
+   * or mac (Command +click) for others (ctrl + click)
+* 7.   When done close the app on your web server and hit CTRL c to end program
 
 # Misc
 ### How to Play Tower Defense
