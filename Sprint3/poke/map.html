@@ -1,0 +1,107 @@
+<html>
+<head>
+<script src="inventory_managment.js"></script>
+<script src="map.js" async></script>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+
+  body {
+    background-image: url('trees.png');
+  }
+  canvas {
+    padding-left: 0;
+    padding-right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    height: 700px;
+  }
+
+  .clock {
+    position: absolute;
+    font-family: 'Press Start 2P', cursive;
+    font-weight: bold;
+    background-color: black;
+    color: Green;
+    font-size: 40px;
+    top: 0;
+    left: 0;
+    z-index: 999; 
+  }
+  .background-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+  }
+</style>
+</head>
+<body>
+<!-- Display the countdown timer in an element -->
+<div class="clock" id="clock"></div>
+<script>
+//main sound
+var mainTheme = new Audio('main-theme.mp3');
+mainTheme.loop = true;
+mainTheme.volume = 0.1;
+mainTheme.play();
+// Set the date we're counting down to
+var result = document.cookie.match(new RegExp("start_time" + '=([^;]+)'));
+var start_time; 
+if (result)
+  start_time = JSON.parse(result[1]);
+else {
+  var start_time = new Date().getTime();
+  var date = new Date();
+  date.setHours(23,59,59,999);
+  var expires = "expires=" + date.toGMTString();
+  document.cookie = "start_time="+JSON.stringify(start_time)+"; "+expires;
+}
+// Update the count down every 1 second
+var x = setInterval(function() {
+
+  // Get today's date and time
+  var now = new Date().getTime();
+
+  // Find the distance between now and the count down date
+  var distance = now - start_time;
+
+  // Time calculations for days, hours, minutes and seconds
+  var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+  var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+  var milliseconds = Math.floor((distance % (1000)) / 10);
+  //var milliseconds = distance;
+  if (minutes < 10) {
+    minutes = "0" + minutes;
+  }
+  if (seconds < 10) {
+    seconds = "0" + seconds;
+  }
+  if (milliseconds < 10) {
+    milliseconds = "0" + milliseconds;
+  }
+  clock_read_out = minutes + ":" + seconds + "." + milliseconds;
+  if (hours > 0) {
+    clock_read_out = hours + clock_read_out;
+  }
+
+  // Display the result in the element with id="clock"
+  document.getElementById("clock").innerHTML = clock_read_out;
+}, 10);
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        .encounter-style {
+            font-family: 'Press Start 2P', cursive;
+            background-color: #000000;
+            color: #00FF00;
+            border: 5px solid #00FF00;
+            border-radius: 10px;
+        }
+    </style>
+<canvas width="615" height="700" style="background: url('walkbackground.png');"></canvas>
+</body>
+</html>

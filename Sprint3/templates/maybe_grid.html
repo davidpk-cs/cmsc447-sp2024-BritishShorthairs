@@ -89,6 +89,8 @@
     let autobuy_buildings = [];
     let autosell_buildings = [];
     let autocraft_buildings = [];
+
+    let should_show = "";
     // Draw the grid
     function drawGrid() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -152,6 +154,16 @@
 
     //game_loop
     setInterval(() => {
+      if (should_show !== "") {
+        menu_inv = document.getElementById('menu_inv')
+        var invText = ''; // add inventory to display
+          for (const item in should_show.inventory) {
+            if (!item){continue;}
+            invText += `<br>&nbsp;${item} &#x21E8; ${should_show.inventory[item]}`; // added special stuff for HTML conversion
+          }
+          menu_inv.innerHTML = invText
+      }
+
       money_elem.innerHTML = "Money: " + money.toString();
 
       autobuy_buildings.forEach(building => {
@@ -175,7 +187,7 @@
             flag = false;
           }
         };
-        if (flag) {
+        if (flag && building["recipe"]["name"] !== undefined) {
           for (const material in building["recipe"]["recipe"]) {
             building["inventory"][material] -= building["recipe"]["recipe"][material];
           };
@@ -224,32 +236,37 @@
             currentY: belt.start.y,
             progress: 0 // Represents progress along the belt
           };
-
-          movingItems.push(item);
+          if (startBuilding["inventory"][item] || startBuilding["inventory"][item] !== NaN) {
+            movingItems.push(item);
+          }
         }
       });
 
-      const step = 0.05; // Smaller values make the animation smoother
+      const step = 0.01; // Smaller values make the animation smoother
 
-      movingItems.forEach(item => {
-        if (item.progress < 1) {
-          item.progress += step;
-          item.currentX = item.startX + item.progress * (item.endX - item.startX);
-          item.currentY = item.startY + item.progress * (item.endY - item.startY);
-        } else {
-          // Remove completed items from the array
-          item.endBuilding.inventory[item.type]++;
-          movingItems.splice(movingItems.indexOf(item), 1)
-        }
-      });
-
+      for (let i = 0; i < 5; i++) {
+        movingItems.forEach(item => {
+          if (item.progress < 1) {
+            item.progress += step;
+            item.currentX = item.startX + item.progress * (item.endX - item.startX);
+            item.currentY = item.startY + item.progress * (item.endY - item.startY);
+          } else {
+            // Remove completed items from the array
+            if (item.type) {
+              item.endBuilding.inventory[item.type]++;
+              movingItems.splice(movingItems.indexOf(item), 1)
+            }
+          }
+        });
+      }
       draw(); // Redraw the canvas
-    }, 1000); // Adjust time interval to control movement frequency
+    }, 200); // Adjust time interval to control movement frequency
 
 
     // Function to place a building
     function placeBuilding(type, x, y) {
       let color;
+      let img_id;
       let inv = {
         "Steel": 0,
         "Copper": 0,
@@ -272,6 +289,7 @@
           color = 'blue';
           inv = {}
           inv["Steel"] = Infinity;
+          // img_id = url('../static/Assets/materials/steel.png');
           break;
         case 'copper':
           color = 'orange';
@@ -291,7 +309,7 @@
           return;
       }
 
-      buildings.push({ type, x, y, color, inventory: inv });
+      buildings.push({ type, x, y, color, inventory: inv, img_id});
     }
 
     // Function to add conveyor belts
@@ -315,13 +333,13 @@
       // MOUSE
       if (currentTool === 'mouse') {
         get_building = placement_conflict(gridX, gridY);
+        should_show = get_building;
+        console.log(get_building)
         if (get_building) { // if we hit a building, show prompt
           document.getElementById('interface').style.display = 'block';
           
-          var invText = ''; // add inventory to display
-          for (const item in get_building.inventory) {
-            invText += `<br>&nbsp;${item} &#x21E8; ${get_building.inventory[item]}`; // added special stuff for HTML conversion
-          }
+          var invText = '<p id="menu_inv"></p>'; // add inventory to display
+          
 
           if (get_building.type === 'constructor') {
             disp_constructor(get_building, invText);
@@ -498,6 +516,7 @@
 
     function check_conveyor_rules(start_obj, end_obj) {
       //let valid = true;
+      return true;
       
       const startBuilding = buildings.find(b => b.x === start_obj.x && b.y === start_obj.y);
       const endBuilding = buildings.find(b => b.x === end_obj.x && b.y === end_obj.y);
