@@ -73,7 +73,8 @@
     let money = 100000
 
     let autobuy_buildings = [];
-
+    let autosell_buildings = [];
+    let autocraft_buildings = [];
     // Draw the grid
     function drawGrid() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -94,7 +95,7 @@
         ctx.fillText(`${building.type} (${building.inventory})`, building.x * gridSize + 2, building.y * gridSize + 8);
         //console.log(building.type)
         //console.log(building.inventory)
-        console.log(building);
+        //console.log(building);
       });
     }
 
@@ -146,6 +147,30 @@
         }
       });
 
+      autosell_buildings.forEach(building => {
+        if (building["inventory"][building["recipe"]["name"]] > 0) {
+          building["inventory"][building["recipe"]["name"]]--;
+          money += building["recipe"]["price"]
+        }
+      });
+
+      autocraft_buildings.forEach(building => {
+        flag = true;
+        for (const material in building["recipe"]["recipe"]) {
+          if (building["inventory"][material] < building["recipe"]["recipe"][material]) {
+            flag = false;
+          }
+        };
+        if (flag) {
+          for (const material in building["recipe"]["recipe"]) {
+            building["inventory"][material] -= building["recipe"]["recipe"][material];
+          };
+
+          building["inventory"][building["recipe"]["name"]]++;
+        }
+      });
+
+
       //Check Belts to put items on and take out of buildings
       conveyorBelts.forEach(belt => {
         const startBuilding = buildings.find(b => b.x === belt.start.x && b.y === belt.start.y);
@@ -153,14 +178,19 @@
         let item_type;
         if (startBuilding && endBuilding && has_inventory(startBuilding)) {
           // Move one item from start to end
-          for (const item in startBuilding.inventory) {
-            if (startBuilding.inventory[item] > 0) {
-              item_type = item;
-              startBuilding.inventory[item]--;
-
+          if (startBuilding["type"] === "constructor") {
+            if (startBuilding.inventory[startBuilding["recipe"]["name"]] > 0) {
+              item_type = startBuilding["recipe"]["name"];
+              startBuilding.inventory[startBuilding["recipe"]["name"]]--;
             }
-          };
-
+          } else {
+            for (const item in startBuilding.inventory) {
+              if (startBuilding.inventory[item] > 0) {
+                item_type = item;
+                startBuilding.inventory[item]--;
+              }
+            };
+          }
           // Create a moving item to represent the transfer
           const item = {
             startBuilding: startBuilding,
@@ -356,7 +386,7 @@
             recipe: Recipe_dict[this.value]
           };
           console.log(c.recipe);
-          c.inventory[c.recipe.name] = 0;
+          autocraft_buildings.push(c)
       });
     }
 
@@ -397,6 +427,8 @@
         building.buy_or_sell = this.value;
         if (this.value === "buy") {
           autobuy_buildings.push(building)
+        } else {
+          autosell_buildings.push(building)
         }
         console.log(building.state);
       });
@@ -441,14 +473,17 @@
       
       // (1) cannot connect 2 buildings of same type by conveyor unless they are both constructors
       if (startBuilding.type === endBuilding.type && (startBuilding.type != 'constructor' && endBuilding.type != 'constructor')) {
+        console.log("cannot connect 2 buildings of same type by conveyor unless they are both constructors")
         return false;
       }
       // (2) cannot make copper or steel landing pads an endpoint for a conveyor belt
       if (endBuilding.type === 'copper' || endBuilding.type === 'steel') {
+        console.log("cannot make copper or steel landing pads an endpoint for a conveyor belt")
         return false;
       }
       // (3) cannot make a storage (placeholder for shops and launch pads) be a starting point for a conveyor
       if (startBuilding.type === 'storage') {
+        console.log("cannot make a storage (placeholder for shops and launch pads) be a starting point for a conveyor")
         return false;
       }
 
