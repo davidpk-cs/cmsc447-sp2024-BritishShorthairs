@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Factorio-like Game with Moving Items</title>
+  <title>Production Side</title>
   <style>
     canvas {
       border: 1px solid black;
@@ -23,7 +23,7 @@
     #interface {
       display: none; /* hide by default */
       width: 150px;
-      height: 225px;
+      height: 500px;
       background-color: rgb(255, 245, 172);
       position: absolute;
       top: 50%;
@@ -33,18 +33,20 @@
       border-radius: 10px;
       border-top: 5px solid #000;
       /* init pos */
-      top: 200px; 
-      left: 700px; 
+      top: 300px; 
+      left: 900px; 
     }
   </style>
 </head>
 <body>
-  <canvas id="canvas" width="500" height="500"></canvas>
+  <p id="money">Money: 100000</p>
+  <canvas id="canvas" width="720" height="600"></canvas>
   <div class="toolbox">
     <button onclick="setCurrentTool('steel')">Steel Source</button>
     <button onclick="setCurrentTool('copper')">Copper Source</button>
     <button onclick="setCurrentTool('storage')">Storage</button>
     <button onclick="setCurrentTool('constructor')">Constructor</button>
+    <button onclick="setCurrentTool('autoshop')">Autoshop</button>
     <button onclick="setCurrentTool('conveyor')">Conveyor Belt</button>
     <button onclick="setCurrentTool('mouse')">Mouse</button>
     <button onclick="setCurrentTool('delete')">Delete Building</button>
@@ -57,15 +59,20 @@
   <script>
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
-    const gridSize = 20; // Size of each grid cell in pixels
-    const width = 25;  // Number of columns
-    const height = 25; // Number of rows
+    const gridSize = 40; // Size of each grid cell in pixels
+    const width = 18;  // Number of columns
+    const height = 15; // Number of rows
 
     const buildings = [];
     const conveyorBelts = [];
     const movingItems = []; // Tracks items moving along conveyors
     let currentTool = null; // Current tool/building selected
     let firstClick = null; // Used for conveyor belt placement
+
+    const money_elem = document.getElementById('money');
+    let money = 100000
+
+    let autobuy_buildings = [];
 
     // Draw the grid
     function drawGrid() {
@@ -130,6 +137,14 @@
 
     //game_loop
     setInterval(() => {
+      money_elem.innerHTML = "Money: " + money.toString();
+
+      autobuy_buildings.forEach(building => {
+        if (money > building["recipe"]["price"]) {
+          money -= building["recipe"]["price"]
+          building["inventory"][building["recipe"]["name"]] += 1
+        }
+      });
 
       //Check Belts to put items on and take out of buildings
       conveyorBelts.forEach(belt => {
@@ -191,31 +206,41 @@
     // Function to place a building
     function placeBuilding(type, x, y) {
       let color;
-      let inv = {}; // steel: 0, copper:0, circuit:0
+      let inv = {
+        "Steel": 0,
+        "Copper": 0,
+        "Plating": 0,
+        "Wire": 0,
+        "Battery": 0,
+        "Motor": 0,
+        "Circuit": 0,
+        "Laser Optics": 0,
+        "Engine": 0,
+        "Gunnery Weapon": 0,
+        "Cannon Weapon": 0,
+        "Laser Weapon": 0,
+        "Gunnery Ship": 0,
+        "Cannon Ship": 0,
+        "Laser Ship": 0,
+      };
       switch (type) {
         case 'steel':
           color = 'blue';
-          inv["steel"] = 0;
-          inv.steel = Infinity;
+          inv["Steel"] = Infinity;
           break;
         case 'copper':
           color = 'orange';
-          inv["copper"] = 0;
-          inv.copper = Infinity;
+          inv["Copper"] = Infinity;
           break;
         case 'storage':
           color = 'lightblue';
-          inv["Gunnery Ship"] = 0;
-          inv["Cannon Ship"] = 0;
-          inv["Laser Ship"] = 0;
           break;
-        case 'constructor':
+        case 'autoshop':
           color = 'green';
-          // lots of inv for constructor ig (add more...)?
-          inv["steel"] = 0;
-          inv["copper"] = 0;
-          inv["circuit"] = 0;
-          // add a recipe field
+          buildings.push({ type, x, y, color, inventory: inv , buy_or_sell: null});
+          return;
+        case 'constructor':
+          color = 'grey';
           buildings.push({ type, x, y, color, inventory: inv , recipe: null});
           return;
       }
@@ -254,6 +279,8 @@
 
           if (get_building.type === 'constructor') {
             disp_constructor(get_building, invText);
+          } else if (get_building.type === 'autoshop') {
+            disp_shop(get_building, invText);
           } else {
             // display text using HTML assistance
             document.getElementById('interface').innerHTML = get_building.type.toUpperCase() + "<br><br>Inventory<br>&nbsp;&nbsp;" + invText;
@@ -330,6 +357,58 @@
           };
           console.log(c.recipe);
           c.inventory[c.recipe.name] = 0;
+      });
+    }
+
+    function disp_shop(building, invT) {
+      if (building.buy_or_sell && building.recipe) { 
+        document.getElementById('interface').innerHTML = building.type.toUpperCase() + "<br><br>Inventory<br>&nbsp;&nbsp;" + invT + "<br><br>Buy or Sell<br><br>&nbsp;&nbsp;" + building.buy_or_sell + "<br><br>Recipe<br><br>&nbsp;&nbsp;" + building.recipe.name;
+        return;
+      }
+      
+      // creating drop down menu to select state
+      var shopdropdownHTML = '<select id="shopdropdown">';
+      var shopdropdownOptions = ["sell", "buy"];
+      
+      shopdropdownHTML += '<option value=" "</option>';
+      shopdropdownOptions.forEach(function(option) {
+        shopdropdownHTML += '<option value="' + option + '">' + option + '</option>';
+      });
+      shopdropdownHTML += '</select>';      
+      
+
+      var recipedropdownHTML = '<select id="recipedropdown">';
+      var recipedropdownOptions = [];
+      
+      for(var key in Recipe_dict) {
+        recipedropdownOptions.push(key)
+      }
+      recipedropdownHTML += '<option value=" "</option>';
+      recipedropdownOptions.forEach(function(option) {
+        recipedropdownHTML += '<option value="' + option + '">' + option + '</option>';
+      });
+      recipedropdownHTML += '</select>';      
+      
+      document.getElementById('interface').innerHTML = building.type.toUpperCase() + "<br><br>Inventory<br>&nbsp;&nbsp;" + invT + "<br><br>Buy or Sell?<br>" + shopdropdownHTML + "<br><br>recipe<br>" + recipedropdownHTML;
+
+      // once dropdown chosen, make it the state (call event listener to see what's chosen)
+      var dropdown = document.getElementById('shopdropdown');
+      dropdown.addEventListener('change', function() {
+        building.buy_or_sell = this.value;
+        if (this.value === "buy") {
+          autobuy_buildings.push(building)
+        }
+        console.log(building.state);
+      });
+
+      var dropdown = document.getElementById('recipedropdown');
+      dropdown.addEventListener('change', function() {
+        building.recipe = {
+          name: this.value, 
+          price: base_price[this.value]
+        };
+        console.log(building.recipe);
+        building.inventory[building.recipe.name] = 0;
       });
     }
 
