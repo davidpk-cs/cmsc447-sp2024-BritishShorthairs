@@ -5,7 +5,7 @@
   <title>Production Side</title>
   <style>
     body {
-      background-image: url('../static/Assets/manufacturing_buildings/grass2.png');
+      background-image: url('../static/Assets/manufacturing_buildings/grass.png');
     }
 
     canvas {
@@ -41,6 +41,24 @@
       left: 900px; 
     }
 
+    #interface2 {
+      display: none; /* let this be game + crafting help menu */
+      width: 375px;
+      height: 500px;
+      background-color: rgba(45, 18, 69, 0.8);
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 20px;
+      border-radius: 10px;
+      border-top: 5px solid #000;
+      overflow: auto;
+      /* init pos */
+      top: 325px; 
+      left: 1250px; 
+    }
+
     .robotic-text {
       color: white;
       font-family: 'Roboto Mono', monospace;
@@ -64,13 +82,70 @@
     <button onclick="setCurrentTool('conveyor')">Conveyor Belt</button>
     <button onclick="setCurrentTool('mouse')">Mouse</button>
     <button onclick="setCurrentTool('delete')">Delete Building</button>
+    <button onclick="help_click()" id="btn">Help!</button>
   </div>
-
+  
   <!-- Interface elements -->
   <div id="interface"></div>
+  <div id="interface2">
+    <span class='robotic-text'>
+      <h3>How To Play</h3> <!--Get into gameplay -->
+      <br>
+      <h4>Landing Pads</h4>
+      <p>Landing pads include your valuable resources copper and steel, which can be connected to constructors to craft new items</p>
+      
+      <h4>Conveyors</h4>
+      <p>Conveyors are used to connect different buildings to one another, allow users to transfer products from one building to another to aid in crafting and selling</p>
+      
+      <h4>Constructors</h4>
+      <p>Constructors take in raw materials and crafted products to craft advanced items from both raw resources and other items</p>
+      
+      <h4>Shops</h4>
+      <p>Shops allow users to buy products for $ or funnel in products to sell for $</p>
+      
+      <h4>Launch Pads</h4>
+      <p>When users connect their finished products to launch pads, these products become available to them in the space defenders defense game!</p>
+      
+      <br> <!--Get into the recipes-->
+      <h3>Recipes</h3>
+      <br>
+      <p> Plating &#x21E8; (Steel: 4)</p>
+      <p> Wire &#x21E8; (Copper: 2) </p>
+      <p> Battery &#x21E8; (Wire: 2, Copper: 3) </p>
+      <p> Circuit &#x21E8; (Plating: 1, Wire: 3) </p>
+      <p> Motor &#x21E8; (Steel: 10, Circuit: 1, Battery: 4) </p>
+      <p> Laser Optics &#x21E8; (Copper: 10, Battery: 2) </p>
+      <p> Tracking Unit &#x21E8; (Steel: 10, Circuit: 2, Battery: 1) </p>
+      <p> Engine &#x21E8; (Steel: 20, Motor: 2) </p>
+      <p> Gunnery Weapon &#x21E8; (Steel: 10, Circuit: 1) </p>
+      <p> Sniper Weapon &#x21E8; (Steel: 10, Tracking Unit: 1) </p>
+      <p> Cannon Weapon &#x21E8; (Steel: 20, Motor: 2, Circuit: 1) </p>
+      <p> Laser Weapon &#x21E8; (Battery: 5, Steel: 5, Laser Optics: 1) </p>
+
+      <h4>Finished Products</h4>
+      <p> Gunnery Ship &#x21E8; (Engine: 1, Plating: 15, Gunnery Weapon: 1) </p>
+      <p> Sniper Ship &#x21E8; (Engine: 1, Plating: 10, Sniper Weapon: 1) </p>
+      <p> Cannon Ship &#x21E8; (Engine: 1, Plating: 20, Cannon Weapon: 1) </p>
+      <p> Laser Ship &#x21E8; (Engine: 1, Plating: 10, Laser Weapon: 1) </p>
+    </span>
+  </div>
+  
 
   <script src="info.js"></script>
   <script>
+    // button things
+    var btn = document.getElementById("btn");
+    // When the user clicks the button, open the modal 
+    function help_click() {
+      if (help_active) {
+        document.getElementById('interface2').style.display = 'none';
+        help_active = false;
+      } else {
+        document.getElementById('interface2').style.display = 'block';
+        help_active = true;
+      }
+    }
+
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
     const gridSize = 40; //20 // Size of each grid cell in pixels
@@ -82,6 +157,7 @@
     const movingItems = []; // Tracks items moving along conveyors
     let currentTool = null; // Current tool/building selected
     let firstClick = null; // Used for conveyor belt placement
+    let help_active = false;
 
     const money_elem = document.getElementById('money');
     let money = 100000
