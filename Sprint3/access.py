@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, request,redirect
+from flask import Flask, render_template, jsonify, request
 import sqlite3
 
 app = Flask(__name__)
@@ -226,6 +226,40 @@ def sendTopScores():
     cursor.execute("SELECT name, final FROM scoreTable ORDER BY final DESC LIMIT 5")
     top_scores = cursor.fetchall()
     connection.close()
+    player_data_list = []
+    for i, score in enumerate(top_scores):
+        player_data = {
+            f"{i+1} Name": score[0],
+            f"{i+1} Score": score[1]
+        }
+        player_data_list.append(player_data)
+
+    data = {
+        "data": [
+            {
+                "Group": "British Shorthairs", 
+                "Title": "Top 5 Scores",
+                "1 Name": player_data_list[0]["1 Name"],
+                "1 Score": player_data_list[0]["1 Score"],
+                "2 Name": player_data_list[1]["2 Name"],
+                "2 Score": player_data_list[1]["2 Score"],
+                "3 Name": player_data_list[2]["3 Name"],
+                "3 Score": player_data_list[2]["3 Score"],
+                "4 Name": player_data_list[3]["4 Name"],
+                "4 Score": player_data_list[3]["4 Score"],
+                "5 Name": player_data_list[4]["5 Name"],
+                "5 Score": player_data_list[4]["5 Score"],
+            }
+        ]
+    }
+    try:
+        #try to send response
+        response = request.post("https://eope3o6d7z7e2cc.m.pipedream.net", json=data)
+        response.raise_for_status()  
+        return jsonify( "Top scores sent successfully."), 200
+    #o.w. throw an error
+    except request.RequestException as e:
+        return jsonify({"error": str(e)}), 500
 '''
 
 ############# Beyond this point are functions for materials.db ###################
