@@ -56,6 +56,7 @@ towerDamage = 3;
 
 enemySizeOdds = 25;
 
+var curr_user = " ";
 function generateEconomy(){
 
     var currentSkew = randomInt(1, 10);
@@ -934,8 +935,8 @@ function mainGetUser(){
     //should get the name of the user 
     var nameField = document.getElementById("createName");
     var name = nameField.value;
+    curr_user = name;
     console.log("In main GetUser");
-    return name;
 }
 function sendHighScores(username,score,level = "level1"){
     //this takes in a  username and a score and posts updates the score to the 
