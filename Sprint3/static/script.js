@@ -199,7 +199,25 @@ function reset(){
         updateStatus("Reset the Database: Update to See Default");
     });
 }
-
+/*
+function sendTopScores(){
+    //call the route that handles this database
+    fetch('/sendTopScores', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({})  
+    })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);  
+        })
+        .catch(error => {
+            console.error('Error sending top scores:', error);
+        });
+}
+*/
 function createMaterialDB(){
     //this fxn  inits the materials DB
     return fetch('/createMaterial', { method: 'GET'})

@@ -215,6 +215,18 @@ def updateScore():
 
     return jsonify("Score Updated Successfully")
 
+'''#for the URI call
+@app.route('/sendTopScores',methods=['POST'])
+def sendTopScores():
+    #connect to db 
+    connection = sqlite3.connect('highscores.db')
+    cursor = connection.cursor()
+
+    #get the scores of players and sort them in descending order 
+    cursor.execute("SELECT name, final FROM scoreTable ORDER BY final DESC LIMIT 5")
+    top_scores = cursor.fetchall()
+    connection.close()
+'''
 
 ############# Beyond this point are functions for materials.db ###################
 
