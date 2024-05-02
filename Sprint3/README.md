@@ -1,67 +1,36 @@
-Welcome to My HW2 Submission!
+# Space Defenders - CMSC447
+* Group - David Premkumar, Shianne Marbley, Kevin Rippy, Matthew Makila, Justin Quedit
+* JIRA - https://umbc-mmakila1.atlassian.net/jira/software/projects/SCRUM/boards/1
 
-Who: David Premkumar's Work. Professor Allgood's Class!
+# IMPORTANT NOTE
+* This project has many components, and currently two of these components are seperated.
+* We plan to merge these components into one flask application in Sprint 3
+* In the homepage folder, there is our homepage as well as the start of the Production side of the game.
+* In the Space Defender Demo folder, there is a demo of the Tower Defense side of the game.
+* Both of these are important aspects of the game, and need to be run seperately.
+* __Disclaimer:__ This current state of the game is meant to be run in fullscreen as it has not yet been tested in a crunched screen.
 
-What: A Flask Application that allows users to interact with a database of student
-names, id's and scores on a webpage.
+# How to run
+## FOR SPACE DEFENDERS DEMO
+* Go to Code/src/Space Defenders Demo
+* Open main.html in a browser
+## FOR HOMEPAGE
+* Go to Code/src/Homepage
+* run in terminal: pip install requirements.txt
+* run in terminal: python -m flask run
 
-When: Submitted 2/29/2024
-
-Where: UMBC - CMSC447
-
-How: 
-
-    HOW TO RUN: 
-
-        I made it very simple. If you can see this, you've already extracted it (and if you haven't,
-        please do it). In the same directory as this readme (cmsc447-hw2-sp2024-premkumar-david),
-        
-        You have 4 choices for starting the File
-        
-        1. just click and run the
-        "runHW2.bat" File in file explorer
-        2. If in command prompt, run the "runHW2.bat" file instead
-        
-        Those 2 ways will automatically actuate the virtual environment I put in this folder and run it with the
-        python installation in that venv.
-
-        But, if you have a new python version installed in your machine and pip installed sqlite3 and flask,
-        you should also be able to ...
-
-        3. Just run access.py with python.
-
-        This might be needed if grading on Linux. But otherwise option 1 (and 2) are there to make it easy on 
-        windows.
-
-        If you want to Do it the long way
-
-        4. Go into the same directory as the read me in command prompt then enter the following
-            ->venv\Scripts\activate
-            ->python access.py
-
-           This is exactly what the bat script does.
-
-    AFTER DOING 1 OF THE 4 ABOVE - Go to "http://localhost:5000/" on your browser and the application should be there!
-
-    HOW TO USE: 
-        Let's Do this One by One. The database starts out with default data in a table.
-
-        Add a Student: Enter Their Name, Id and Score (Id and Score must be all digits) into their
-        respective fields into the box with the add button. Hit 'Add Student' to initate the operation.
-        Hit update to see the result, which will succeed unless you reuse an id or enter a 
-        non-numerical id or score.
-
-        Delete a Student: Enter their Id into the field in the box with the delete button. Hit 'Delete Student'
-        to initiate the operation. Hit update to see the result, which will succeed unless the id you enter is 
-        non-numerical or not the id of an existing student.
-
-        Search for a Student: Enter either the Id, Name, or Score into the Search Field, make sure you specify
-        which of the attributes you are searching for in the drop box to the right of the search button. Hit search
-        to search. The table will update automatically with the results. To clear the results hit update.
-
-        Update Table: Hit Update
-
-
-        Bonus: Hit the Reset Button at the Bottom to Restore the Database to the Default 3 Students
-
-
+# Misc
+### How to Play Tower Defense
+* When the game loads, you can place towers down by hitting the place tower button and then clicking on the viewport (the box with a space background) to put the tower down.
+* That will use up one credit (you have a total count displayed).
+* You can continue to use credits to place more towers down (hit place tower again and click on the viewport). 
+* Hit play game to start the game, and see how long you last.
+### What is the Production side?
+* Currently the production side is showcasing a grid based system where you can place buildings (right now just boxes)
+* You cannot place a building that would collide with another, and you cannot place them off screen
+* Next sprint, we will add functionality to these buildings allowing resources to flow in or from these buildings using conveyor belts
+### Production Side Building Desc + Rules
+* __Landing Pads:__ Objects that have collected raw materials from the Space Defenders Defense game. They output these raw materials to constructors and auto-selling shops; they cannot connect to launch pads
+* __Launching Pads:__ Objects that only take input from a constructor of finished products. They send these finished products to the Space Defenders Defense game
+* __Constructors:__ Objects that take inputs of raw materials from landing pads or intermediate products from other constructors. They are set to craft 1 type of item using a recipe comprised of other items. For instance, a constructor set to craft wire only takes 1 input of raw copper and produces wire as an output object to send to another constructor or an auto-sell shop. In another instance, a constructor set to build a motor takes 3 inputs of steel, circuits, and batteries. Constructors have a maximum of 3 inputs (can be a mix of raw materials from a launch or intermediate products from a constructor) and a minimum of 1 input to function
+* __Auto-selling Shop:__ Objects that take inputs from constructors or landing pads to sell them for a fixed price dependent on the input items. They do not output any items
