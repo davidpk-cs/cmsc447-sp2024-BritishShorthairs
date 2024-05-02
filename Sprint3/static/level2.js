@@ -9,6 +9,8 @@ var lasersActive = false; //indicating that lasers are present on the screen, so
 
 var score = 0; //number of points
 
+var isHardMode = false;
+
 
 const coverName = "coverDiv";
 const endingCoverName = "endingDiv";
@@ -42,14 +44,19 @@ var homeBaseLeft = 0;
 var homeBaseObject = "";
 
 
-var credits = 2800; //money
+var credits = 3200; //money
+var hardModeCredits = 4000;
 
-var lives = 300000; //lives
+var lives = 100; //lives
 
 var enemyDamage = 1; //the range is 6-9
 var enemyHP = 3; //range is 4-5
-var enemyCount = 1; //the range is 20-35 number of enemies per wave
-var enemyWaves = 100; 
+var enemyCount = 2; //the range is 20-35 number of enemies per wave
+var enemyWaves = 50; 
+var phase1 = 10;
+var phase2 = 20;
+var phase3 = 35; 
+var phase4 = 50;
 var maxEnemyWaves = enemyWaves;
 var maxEnemyCount = 10;
 towerPrice = 140; //the range is 120 to 220
@@ -745,33 +752,57 @@ class enemy{
     level1(){
         this.health = 3;
         this.damage = 1;
-        this.range = 80;
+        this.range = 70;
+
+        if(isHardMode){
+            this.health = 10;
+        }
 
         this.object.src = assetsPath + "enemies/ufo8.png";
     }
     level2(){
         this.health = 6;
         this.damage = 2;
-        this.range = 90;
+        this.range = 70;
+
+        if(isHardMode){
+            this.damage = 3;
+            this.health = 10;
+        }
 
         this.object.src = assetsPath + "enemies/ufo9.png";
     }
     level3(){
         this.health = 10;
         this.damage = 3;
-        this.range = 100;
+        this.range = 70;
+
+        if(isHardMode){
+            this.damage = 5;
+            this.health = 20;
+        }
         this.object.src = assetsPath + "enemies/ufo10.png";
     }
     level4(){
         this.health = 15;
         this.damage = 5;
-        this.range = 80;
+        this.range = 70;
+
+        if(isHardMode){
+            this.health = 30;
+            this.damage = 8;
+        }
         this.object.src = assetsPath + "enemies/ufo11.png";
     }
     killerAsteroid(){
         this.health = 25;
         this.damage = 10;
         this.range = 10;
+
+        if(isHardMode){
+            this.health = 100;
+            this.damage = 25;
+        }
 
         this.selfDestruct = true;
 
@@ -781,6 +812,12 @@ class enemy{
         this.health = 35;
         this.damage = 8;
         this.range = 60;
+
+        if(isHardMode){
+            this.health = 65;
+            this.damage = 12;
+            this.range = 70;
+        }
         this.object.src = assetsPath + "enemies/ufo3.png";
     }
 
@@ -793,11 +830,18 @@ class tower{
     constructor(object, xPos, yPos, health = 60, damage = towerDamage, laserCount = 1, criticalStrikeOdds = 25, range = 120){
 
         this.object = object;
-        this.health = health ;
-        this.damage = damage;
-        this.laserCount = laserCount;
-        this.critOdds = criticalStrikeOdds;
-        this.range = range;
+        this.health = 40;
+        this.damage = 2;
+        this.laserCount = 1;
+        this.critOdds = 25;
+        this.range = 135;
+
+
+        if(isHardMode){
+            this.critOdds = 5;
+            this.health = 50;
+            this.range = 125;
+        }
 
         this.top = xPos;
         this.left = yPos;
@@ -808,6 +852,14 @@ class tower{
         this.laserCountUpgradesLeft = 1;
         this.critUpgradesLeft = 3;
         this.rangeUpgradesLeft = 2;
+
+        if(isHardMode){
+            this.healthUpgradesLeft = 8;
+            this.damageUpgradesLeft = 5;
+            this.laserCountUpgradesLeft = 2;
+            this.critUpgradesLeft = 6;
+            this.rangeUpgradesLeft = 4;
+        }
 
     }
 }
@@ -954,6 +1006,9 @@ const defaultBrief = `
 class healthUpgrade{
     constructor(){
         this.price = 50;
+        if(isHardMode){
+            this.price = 100;
+        }
         this.message = "Upgrade Health";
     }
     purchase(){
@@ -962,6 +1017,10 @@ class healthUpgrade{
         }
         credits -= this.price;
         pendingTower.health += 25;
+
+        if(isHardMode){
+            pendingTower.health += 15;
+        }
         pendingTower.healthUpgradesLeft -= 1;
         return true;
     }
@@ -970,6 +1029,9 @@ class healthUpgrade{
 class damageUpgrade{
     constructor(){
         this.price = 50;
+        if(isHardMode){
+            this.price = 100;
+        }
         this.message = "Upgrade Damage";
     }
     purchase(){
@@ -985,7 +1047,10 @@ class damageUpgrade{
 
 class laserCountUpgrade{
     constructor(){
-        this.price = 150;
+        this.price = 200;
+        if(isHardMode){
+            this.price = 300;
+        }
         this.message = "Add another Laser";
     }
     purchase(){
@@ -1010,6 +1075,10 @@ class criticalStrikeUpgrade{
         }
         credits -= this.price;
         pendingTower.critOdds += 15;
+
+        if(isHardMode){
+            pendingTower.critOdds -= 5;
+        }
         pendingTower.critUpgradesLeft -= 1;
         return true;
     }
@@ -1018,6 +1087,9 @@ class criticalStrikeUpgrade{
 class rangeUpgrade{
     constructor(){
         this.price = 100;
+        if(isHardMode){
+            this.price = 250;
+        }
         this.message = "Upgrade Range";
     }
     purchase(){
@@ -1026,6 +1098,9 @@ class rangeUpgrade{
         }
         credits -= this.price;
         pendingTower.range += 75;
+        if(isHardMode){
+            pendingTower.range += 125;
+        }
         pendingTower.rangeUpgradesLeft -= 1;
         return true;
     }
@@ -1041,17 +1116,27 @@ upgradeOptions = [new healthUpgrade(),
 
 //this will let me see how much progress of the round has been
 function determineQuarter(value1, value2) {
-    if (value2 === 0) {
-        return 4;
-    }
-    // Calculate which quarter it's in
-    var quarter = Math.floor(value1 / (value2 / 4));
     
-    return quarter;
+    currWave = maxEnemyWaves - enemyWaves;
+
+    if(currWave <= phase1){
+        return 1;}
+    else if(currWave <= phase2){
+        return 2;}
+    else if(currWave <= phase3){
+        return 3;}
+    return 4;
 }
 
 function hardMode(){
+    isHardMode = true;
+    credits = hardModeCredits;
 
+    upgradeOptions = [new healthUpgrade(), 
+        new damageUpgrade(), 
+        new laserCountUpgrade(),
+        new criticalStrikeUpgrade(),
+        new rangeUpgrade()];
 }
 
 
