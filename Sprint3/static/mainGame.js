@@ -930,6 +930,13 @@ document.addEventListener('DOMContentLoaded', function() {
 //One should take a high score and pass it into flask to be put in the database for level 1
 //
 
+function mainGetUser(){
+    //should get the name of the user 
+    var nameField = document.getElementById("createName");
+    var name = nameField.value;
+    console.log("In main GetUser");
+    return name;
+}
 function sendHighScores(username,score,level = "level1"){
     //this takes in a  username and a score and posts updates the score to the 
     //specified username (works kind of like add and delete)

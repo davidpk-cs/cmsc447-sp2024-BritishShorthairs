@@ -4,7 +4,7 @@ curr_users = []; //will hold all players
 
 function newGame() {
     // testing purposes
-    console.log("newGame has started");
+    //console.log("newGame has started");
     createMaterialDB(); //init materials DB
     createProductDB(); //initialize products DB
     //should render newGame 
