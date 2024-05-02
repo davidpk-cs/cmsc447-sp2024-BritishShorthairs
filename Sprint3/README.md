@@ -15,7 +15,7 @@
     * a create a .venv (if not already done so) 1a go to the top of VScode / your IDE and click the "View" tab
     * b click "Command Palette" *scroll until you see "Python:Create Environment" and click it, it will ask Environment type so choose "Venv" and for Python installation just pick the latest version you have installed
     * c You will see it loading at the bottom, be patient, when done a static and .venv file will appear
-    * d Repeat steps 1a and 2a, but this time click "Terminal Create New Terminal"
+    * d Repeat steps a and b, but this time click "Terminal Create New Terminal"
     * e in terminal type "python -m pip install flask", this takes a minute or so
     * f you should now see a (.venv) on the front of your command line and you are ready to run the program
 * 2 open the tabs on your side bar in order to see the file named "access.py"
