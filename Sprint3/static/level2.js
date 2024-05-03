@@ -30,6 +30,7 @@ var currentFunction = 0; //so we know what func to run
 var currentFrame = 0; //current frame we are on, for tracking frames.
 //--------------
 
+sniperOdds = 2;
 
 var canPlace = true; 
 var activeTowerPlacement = false; 
@@ -43,16 +44,20 @@ var homeBaseLeft = 0;
 
 var homeBaseObject = "";
 
+const enemyHealthOffset = 3;
+const towerHealthOffset = 2;
 
-var credits = 3200; //money
-var hardModeCredits = 4000;
 
-var lives = 100; //lives
+var credits = 4600; //money
+var hardModeCredits = 6000;
+
+var lives = 300; //lives
 
 var enemyDamage = 1; //the range is 6-9
 var enemyHP = 3; //range is 4-5
 var enemyCount = 2; //the range is 20-35 number of enemies per wave
 var enemyWaves = 50; 
+var bossesLeft = 3;
 var phase1 = 10;
 var phase2 = 20;
 var phase3 = 35; 
@@ -66,6 +71,20 @@ towerPrice = 140; //the range is 120 to 220
 
 towerDamage = 3;
 
+sides = ["sniper", "tank","nuke", "balanced"];
+
+sidesMessages =  [
+    `Snipers Are Coming! They Are Brittle and Not Super Accurate, But they have the Ability to 
+    poke down our planet and wreak havoc without getting near!`,
+    `The tankiest kind of UFOs Are Coming! They can withstand a lot of hits!`,
+    `Regular Towers Implemented With a Module to Maximize Their Damage! They seem like easy targets, but they are
+    often accompanied by asteroids who grab and hold the attention of your towers!`,
+    `A wave of the most powerful UFOs out there! Make sure to maxmize your defenses here, any enemy commanders
+    would definitely come this side!`
+]
+
+
+
 
 function chooseDifficulty(){
 
@@ -78,6 +97,51 @@ function chooseDifficulty(){
         <button class = "difficultyButton" onclick="endDifficultyScreen(2)">Hard - Tougher Enemies</button>
     </div>`;
     
+}
+
+function viewBriefing(){
+
+    var BriefingText = `<div id="briefingContainer">
+    <div id="missionInfo">
+    <p>`
+    
+    var BriefingText3 = `</p>
+        <button id="exitBriefing" onclick="endUpgrade()">Exit</button>
+    </div>
+</div>`
+
+    var BriefingText2 = `UFO's are coming at us! Fortunately we have a top of the line UFO dealer 
+    that will get you all the UFOs you need exactly as YOU need them to be!`
+
+
+    var textTypes = ["<br>From the North -",
+    "<br>From the East -",
+    "<br>From the South -",
+    "<br>From the West -"];
+
+    for(var i = 0; i < textTypes.length; i++){
+        if(sides[i] == "sniper"){
+            BriefingText2 += textTypes[i] + sidesMessages[0];
+        }
+        else if(sides[i] == "tank"){
+            BriefingText2 += textTypes[i] + sidesMessages[1];
+        }
+        else if(sides[i] == "nuke"){
+            BriefingText2 += textTypes[i] + sidesMessages[2];
+        }
+        else if(sides[i] == "balanced"){
+            BriefingText2 += textTypes[i] + sidesMessages[3];
+        }
+    }
+
+    BriefingText += BriefingText2 + BriefingText3;
+
+    coverScreenWithTranslucentDiv();
+
+    cover = document.getElementById(coverName);
+
+    cover.innerHTML = BriefingText;
+
 }
 
 function endDifficultyScreen(difficulty = 1){
@@ -105,8 +169,16 @@ function setup(){
     homeBaseTop = parseFloat(targetStyles.top) - (parseFloat(targetStyles.height) / 4);
     homeBaseLeft = parseFloat(targetStyles.left) - (parseFloat(targetStyles.width) / 4);
 
-
+    sides = shuffleArray(sides);
 }
+
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  }
 
 
 //enemies select a target here
@@ -134,6 +206,11 @@ function findTarget(){
     for(var i = 0; i < enemies.length; i++){
 
         enemies[i].hasAttacked = false;
+
+        if(enemies[i].homeBound || enemies[i].selfDestruct){
+            enemies[i].target = -1;
+            continue;
+        }
 
         enemyStyles = window.getComputedStyle(enemies[i].object);
         var top = parseFloat(enemyStyles.top) - (parseFloat(enemyStyles.height));
@@ -171,7 +248,7 @@ function moveEnemies() {
     canvas.height = canvasRect.height;
 
     for (var i = 0; i < enemies.length; i++) {
-
+    
         var contactThreshold = enemies[i].target < 0 ? enemies[i].range + 40: enemies[i].range; // pixels you need to be close enough to count as a touch
 
         if(deadTowers.includes(enemies[i].target)){
@@ -234,9 +311,26 @@ function moveEnemies() {
             enemyX = newX + (width / 2);
             enemyY = newY + (height / 2);
         }
+
+        if(enemies[i].homeBound){
+            if(sniperOdds < randomInt(1, 100)){
+                continue;
+            }
+        }
         
         if (Math.abs(enemyX - targetX) <= contactThreshold && Math.abs(enemyY - targetY) <= contactThreshold) {
-            
+
+
+            if(enemies[i].homeBound){
+                enemies[i].attacksLeft--;
+
+                if(enemies[i].attacksLeft == 0){
+                    enemies[i].damage = 40;
+                    enemies[i].health = 1000;
+                    enemies[i].selfDestruct == true;
+                }
+            }
+
             //if targetting homebase
             if(enemies[i].target < 0){
 
@@ -365,6 +459,10 @@ function attackEnemy(enemyIndex, towerIndex, destroy=false){
 
     enemies[enemyIndex].health -= towers[towerIndex].damage;
 
+    if(enemyIndex == 0){
+        console.log(enemies[enemyIndex].health);
+    }
+
     //double damage if it is a critical strike
     if(randomInt(0, 100) < towers[towerIndex].critOdds){
         enemies[enemyIndex].health -= towers[towerIndex].damage;
@@ -469,6 +567,12 @@ function runRound() {
 
 function mainFunc(){
 
+    for(var i = 0; i < towers.length; i++){
+
+        towers[i].health *= towerHealthOffset;
+    }
+    
+
     //starting wave
     sendEnemyWave();
 
@@ -537,21 +641,40 @@ function sendEnemyWave(){
             enemyToPush.level2();
         }
         else if (phase == 3){
-            if(randomInt(1, 4) < 4){
-                enemyToPush.level3();
+            enemyToPush.level3();
+        }
+        else if(phase == 4){
+            enemyToPush.level4();
+        }
+
+
+        var type = sides[spawnSide - 1];
+        if(type == "sniper"){
+            if(25 < randomInt(1, 100)){
+                enemyToPush.sniperAugment();
             }
-            else{
+        }
+        else if(type == "tank"){
+            enemyToPush.tankAugment();
+        }
+        else if(type == "nuke"){
+            if(40 < randomInt(1, 100)){
+                enemyToPush.nukeAugment();
+            }
+            else if(15 < randomInt(1, 100)){
                 enemyToPush.killerAsteroid();
             }
         }
-        else if(phase == 4){
-            if(randomInt(1, 4) < 4){
-                enemyToPush.level4();
-            }
-            else{
+        else if(type == "balanced"){
+            enemyToPush.balancedAugment();
+
+            if(bossesLeft && phase == 4){
                 enemyToPush.boss1();
+                bossesLeft--;
             }
         }
+
+        enemyToPush.health *= enemyHealthOffset;
 
         enemies.push(enemyToPush);
     }
@@ -749,61 +872,65 @@ class enemy{
 
         this.selfDestruct = false;
 
+        this.homeBound = false;
+
         this.hasAttacked = false; //if the enemy already dished an attack in a cycle
+
+        this.attacksLeft = -1;
     } 
 
     level1(){
-        this.health = 3;
+        this.health = 16;
         this.damage = 1;
         this.range = 70;
 
         if(isHardMode){
-            this.health = 10;
+            this.health = 25;
         }
 
         this.object.src = assetsPath + "enemies/ufo8.png";
     }
     level2(){
-        this.health = 6;
+        this.health = 23;
         this.damage = 2;
         this.range = 70;
 
         if(isHardMode){
             this.damage = 3;
-            this.health = 10;
+            this.health = 36;
         }
 
         this.object.src = assetsPath + "enemies/ufo9.png";
     }
     level3(){
-        this.health = 10;
+        this.health = 32;
         this.damage = 3;
         this.range = 70;
 
         if(isHardMode){
             this.damage = 5;
-            this.health = 20;
+            this.health = 42;
         }
         this.object.src = assetsPath + "enemies/ufo10.png";
     }
     level4(){
-        this.health = 15;
-        this.damage = 5;
+        this.health = 40;
+        this.damage = 4;
         this.range = 70;
 
         if(isHardMode){
-            this.health = 30;
+            this.health = 60;
             this.damage = 8;
         }
         this.object.src = assetsPath + "enemies/ufo11.png";
     }
     killerAsteroid(){
-        this.health = 25;
+        this.health = 85;
         this.damage = 10;
         this.range = 10;
 
         if(isHardMode){
-            this.health = 100;
+            this.health = 150;
             this.damage = 25;
         }
 
@@ -812,17 +939,39 @@ class enemy{
         this.object.src = assetsPath + "projectiles/asteroid 01 - base.png"
     }
     boss1(){
-        this.health = 35;
+        this.health = 90;
         this.damage = 8;
-        this.range = 60;
+        this.range = 65;
 
         if(isHardMode){
-            this.health = 65;
+            this.health = 140;
             this.damage = 12;
             this.range = 70;
         }
         this.object.src = assetsPath + "enemies/ufo3.png";
     }
+
+    sniperAugment(){
+        this.damage /= 2;
+        this.health /= 2;
+        this.range += 160;
+        this.attacksLeft = 10;
+        this.homeBound = true;
+    }
+    tankAugment(){
+        this.health *= 2;
+    }
+    nukeAugment(){
+        this.damage += 5;
+    }
+    balancedAugment(){
+        this.damage += 2;
+        this.health += 5;
+    }
+
+
+
+
 
 
 
@@ -833,7 +982,7 @@ class tower{
     constructor(object, xPos, yPos, health = 60, damage = towerDamage, laserCount = 1, criticalStrikeOdds = 25, range = 120){
 
         this.object = object;
-        this.health = 40;
+        this.health = 80;
         this.damage = 2;
         this.laserCount = 1;
         this.critOdds = 25;
@@ -842,7 +991,7 @@ class tower{
 
         if(isHardMode){
             this.critOdds = 5;
-            this.health = 50;
+            this.health = 60;
             this.range = 125;
         }
 
@@ -1134,6 +1283,8 @@ function determineQuarter(value1, value2) {
 function hardMode(){
     isHardMode = true;
     credits = hardModeCredits;
+
+    bossesLeft *= 2;
 
     upgradeOptions = [new healthUpgrade(), 
         new damageUpgrade(), 

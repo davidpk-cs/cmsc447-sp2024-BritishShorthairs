@@ -248,6 +248,36 @@
             border-color: #003366; /* Deep blue */
             color: #003366; /* Deep blue text */
         }
+
+        #briefingContainer {
+        position:absolute;
+        top:50%;
+        left:50%;
+        transform: translate(-50%, -50%);
+        max-width: 50%;
+        }
+        #missionInfo {
+            background-color: #333;
+            color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width:400px;
+            height:400px;
+        }
+        #exitBriefing {
+            background-color: goldenrod;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
     </style>
 
 
@@ -258,6 +288,7 @@
 
         <button class="topBarItem" onclick="mainFunc()">Play Game</button>
         <button class="topBarItem" onclick="initiatePurchase()">Purchase Tower</button>
+        <button class="topBarItem" onclick="viewBriefing()">View Briefing!</button>
 
         <p class="topBarItem" id="scoreBoard">Score: 0</p>
         <p class = "topBarItem" id="creditBoard">Total Credits Remaining: 10</p>
