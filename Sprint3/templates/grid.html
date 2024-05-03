@@ -270,7 +270,7 @@ function drawMovingItems() {
         }
       });
 
-      shuffleArray(conveyorBelts);
+      shuffleArray(conveyorBelts); // helps us spread our seeds
       //Check Belts to put items on and take out of buildings
       conveyorBelts.forEach(belt => {
         const startBuilding = buildings.find(b => b.x === belt.start.x && b.y === belt.start.y);
@@ -366,7 +366,6 @@ function drawMovingItems() {
           color = 'blue';
           inv = {}
           inv["Steel"] = Infinity;
-          // img_id = url('../static/Assets/materials/steel.png');
           break;
         case 'copper':
           color = 'orange';
