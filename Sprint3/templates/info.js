@@ -36,6 +36,38 @@ Recipes = [Plating_Recipe, Wire_Recipe, Battery_Recipe, Motor_Recipe, Circuit_Re
 all_items = [Steel, Copper, Plating_Recipe, Wire_Recipe, Battery_Recipe, Motor_Recipe, Circuit_Recipe, Laser_Optics_Recipe, Engine_Recipe, 
            Gunnery_Weapon_Recipe, Cannon_Weapon_Recipe, Laser_Weapon_Recipe, Gunnery_Ship_Recipe, Cannon_Ship_Recipe, Laser_Ship_Recipe]
 
+
+images_links = {
+    "Steel":            "{{ url_for('static', filename='/Assets/materials/steel.png') }}",
+    "Copper":           "{{ url_for('static', filename='/Assets/materials/copper.png') }}",
+    "Plating":          "{{ url_for('static', filename='/Assets/materials/plating.png') }}",
+    "Wire":             "{{ url_for('static', filename='/Assets/materials/wire.png') }}",
+    "Battery":          "{{ url_for('static', filename='/Assets/materials/battery.png') }}",
+    "Motor":            "{{ url_for('static', filename='/Assets/materials/motor.png') }}",
+    "Circuit":          "{{ url_for('static', filename='/Assets/materials/circuit.png') }}",
+    "Laser Optics":     "{{ url_for('static', filename='/Assets/materials/laser_optics.png') }}",
+    "Tracking Unit":    "{{ url_for('static', filename='/Assets/materials/tracking_unit.png') }}",
+    "Engine":           "{{ url_for('static', filename='/Assets/materials/engine.png') }}",
+    "Gunnery Weapon":   "{{ url_for('static', filename='/Assets/materials/gunnery_weapon.png') }}",
+    "Sniper Weapon":    "{{ url_for('static', filename='/Assets/materials/sniper_weapon.png') }}",
+    "Cannon Weapon":    "{{ url_for('static', filename='/Assets/materials/cannon_weapon.png') }}",
+    "Laser Weapon":     "{{ url_for('static', filename='/Assets/materials/laser_weapon.png') }}",
+    "Gunnery Ship":     "{{ url_for('static', filename='/Assets/materials/gunnery_ship.png') }}",
+    "Sniper Ship":      "{{ url_for('static', filename='/Assets/materials/sniper_ship.png') }}",
+    "Cannon Ship":      "{{ url_for('static', filename='/Assets/materials/cannon_ship.png') }}",
+    "Laser Ship":       "{{ url_for('static', filename='/Assets/materials/laser_ship.png') }}",
+}
+
+const loadedImages = {};
+for (const key in images_links) {
+  console.log(key);
+  const img = new Image();
+  img.onload = () => {
+    loadedImages[key] = img;
+  };
+  img.src = images_links[key];
+}
+
 Recipe_dict = {
     "Plating": Plating_Recipe,
     "Wire": Wire_Recipe,
