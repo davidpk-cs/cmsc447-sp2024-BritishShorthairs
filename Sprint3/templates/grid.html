@@ -131,7 +131,7 @@
   </div>
   
 
-  <script src="info.js"></script>
+  <script src="{{ url_for('info_js') }}"></script>
   <script>
     // button things
     var btn = document.getElementById("btn");
@@ -203,21 +203,31 @@
       });
     }
 
-    // Draw moving items along conveyor belts
-    function drawMovingItems() {
-      movingItems.forEach(item => {
-        ctx.fillStyle = item.color;
-        ctx.beginPath();
-        ctx.arc(
-          item.currentX * gridSize,
-          item.currentY * gridSize,
-          gridSize / 4, // Radius of the circle
-          0,
-          2 * Math.PI
-        );
-        ctx.fill();
-      });
+// Draw moving items along conveyor belts
+function drawMovingItems() {
+  movingItems.forEach(item => {
+    const img = loadedImages[item.type];
+    console.log(img);
+    if (img) {
+      const imageSize = gridSize / 2; 
+      const x = item.currentX * gridSize + (gridSize / 2) - (imageSize / 2);
+      const y = item.currentY * gridSize + (gridSize / 2) - (imageSize / 2);
+      ctx.drawImage(img, x, y, imageSize, imageSize);
+    } else {
+      // Fallback to drawing circles if image not available
+      ctx.fillStyle = item.color;
+      ctx.beginPath();
+      ctx.arc(
+        item.currentX * gridSize,
+        item.currentY * gridSize,
+        gridSize / 4, 
+        0,
+        2 * Math.PI
+      );
+      ctx.fill();
     }
+  });
+}
 
     function has_inventory(building) {
       for (const item in building.inventory) {
@@ -319,7 +329,6 @@
       });
 
       const step = 0.01; // Smaller values make the animation smoother
-
       for (let i = 0; i < 5; i++) {
         movingItems.forEach(item => {
           if (item.progress < 1) {
