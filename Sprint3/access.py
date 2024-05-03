@@ -211,7 +211,10 @@ def updateScore():
     elif level == 'final':
         cursor.execute("SELECT level1, level2, level3 FROM scoreTable WHERE name = ?", (username,))
         scores = cursor.fetchone()
-        finalScore = sum(scores) + newScore
+        if scores:
+            finalScore = sum(scores) + newScore
+        else:
+            finalScore = newScore
         cursor.execute("UPDATE scoreTable SET final = ? WHERE name = ?", (finalScore, username))
 
     else:

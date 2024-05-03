@@ -958,7 +958,6 @@ function mainGetUser(){
     var name = nameField.value;
     curr_user = name;
     localStorage.setItem('curr_user', name); //saves into local storage and should be retreivable in other .js files
-    sendHighScores(curr_user,99,"level1");
 }
 function sendHighScores(username,score,level = "level1"){
     //this takes in a  username and a score and posts updates the score to the 
