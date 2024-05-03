@@ -87,8 +87,8 @@ Recipe_dict = {
     "Laser Ship": Laser_Ship_Recipe
 };
 
-steel_base_price = 5;
-copper_base_price = 5;
+steel_base_price = 3;
+copper_base_price = 4;
 resource_price = {
     "Steel":            steel_base_price,
     "Copper":           copper_base_price,
