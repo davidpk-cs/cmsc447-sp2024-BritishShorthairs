@@ -714,10 +714,10 @@ function drawMovingItems() {
     }
 
     function go_away() {
-      num_Gunnery_Ship = 0;
-      num_Sniper_Ship = 0;
-      num_Cannon_Ship = 0;
-      num_Laser_Ship = 0;
+      let num_Gunnery_Ship = 0;
+      let num_Sniper_Ship = 0;
+      let num_Cannon_Ship = 0;
+      let num_Laser_Ship = 0;
       launchpad_buildings.forEach(building => {
         num_Gunnery_Ship += launchpad_buildings["inventory"]["Gunnery Ship"];
         num_Sniper_Ship += launchpad_buildings["inventory"]["Sniper Ship"];
@@ -725,7 +725,9 @@ function drawMovingItems() {
         num_Laser_Ship += launchpad_buildings["inventory"]["Laser Ship"];
       });
 
-      saveShipInventory(numGunneryShip, numSniperShip, numCannonShip, numLaserShip);
+      saveShipInventory(num_Gunnery_Ship, num_Sniper_Ship, num_Cannon_Ship, num_Laser_Ship);
+      setTimeout(function(){ window.location.href = "/level3"; }, 100);
+
     }
 
   </script>
