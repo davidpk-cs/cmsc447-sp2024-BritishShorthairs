@@ -164,6 +164,7 @@
     let autobuy_buildings = [];
     let autosell_buildings = [];
     let autocraft_buildings = [];
+    let launchpad_buildings = [];
 
     let should_show = "";
     // Draw the grid
@@ -236,8 +237,8 @@ function drawMovingItems() {
       return false
     }
 
-    placeBuilding("CopperLandingPad", 5, 13)
-    placeBuilding("SteelLandingPad", 12, 13)
+    placeBuilding("CopperLandingPad", 3, 8)
+    placeBuilding("SteelLandingPad", 8, 8)
 
     //game_loop
     setInterval(() => {
@@ -388,6 +389,9 @@ function drawMovingItems() {
           break;
         case 'LaunchPad':
           color = 'lightblue';
+          tmp = { type, x, y, color, inventory: inv}
+          launchpad_buildings.push(tmp);
+          buildings.push(tmp);
           break;
         case 'Autoshop':
           color = 'green';
@@ -399,7 +403,7 @@ function drawMovingItems() {
           return;
       }
 
-      buildings.push({ type, x, y, color, inventory: inv, img_id});
+      buildings.push({ type, x, y, color, inventory: inv});
     }
 
     // Function to add conveyor belts
@@ -666,9 +670,36 @@ function drawMovingItems() {
 
     // Initial draw
     draw();
+    function setCookie(name, value, days) {
+      var expires = "";
+      if (days) {
+          var date = new Date();
+          date.setTime(date.getTime() + (days*24*60*60*1000));
+          expires = "; expires=" + date.toUTCString();
+      }
+      document.cookie = name + "=" + (value || "") + expires + "; path=/";
+    }
+
+    function saveShipInventory(numGunneryShip, numSniperShip, numCannonShip, numLaserShip) {
+      setCookie("Ship_Inventory_Gunnery_Ship", numGunneryShip, 7); // Expires in 7 days
+      setCookie("Ship_Inventory_Sniper_Ship", numSniperShip, 7); // Expires in 7 days
+      setCookie("Ship_Inventory_Cannon_Ship", numCannonShip, 7); // Expires in 7 days
+      setCookie("Ship_Inventory_Laser_Ship", numLaserShip, 7); // Expires in 7 days
+    }
 
     function go_away() {
-      
+      num_Gunnery_Ship = 0;
+      num_Sniper_Ship = 0;
+      num_Cannon_Ship = 0;
+      num_Laser_Ship = 0;
+      launchpad_buildings.forEach(building => {
+        num_Gunnery_Ship += launchpad_buildings["inventory"]["Gunnery Ship"];
+        num_Sniper_Ship += launchpad_buildings["inventory"]["Sniper Ship"];
+        num_Cannon_Ship += launchpad_buildings["inventory"]["Cannon Ship"];
+        num_Laser_Ship += launchpad_buildings["inventory"]["Laser Ship"];
+      });
+
+      saveShipInventory(numGunneryShip, numSniperShip, numCannonShip, numLaserShip);
     }
 
   </script>
