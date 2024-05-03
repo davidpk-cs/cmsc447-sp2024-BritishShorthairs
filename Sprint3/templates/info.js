@@ -42,7 +42,7 @@ images_links = {
     "CopperLandingPad": "{{ url_for('static', filename='/Assets/manufacturing_buildings/copper_landing_pad.png') }}",
     "LaunchPad":        "{{ url_for('static', filename='/Assets/manufacturing_buildings/launchpad.png') }}",
     "Constructor":      "{{ url_for('static', filename='/Assets/manufacturing_buildings/constructor.png') }}",
-    "Autoshop":             "{{ url_for('static', filename='/Assets/manufacturing_buildings/shop.png') }}",
+    "Autoshop":         "{{ url_for('static', filename='/Assets/manufacturing_buildings/shop.png') }}",
 
 
     "Steel":            "{{ url_for('static', filename='/Assets/materials/steel.png') }}",
