@@ -209,7 +209,11 @@ def updateScore():
     elif level == 'level3':
         cursor.execute("UPDATE scoreTable SET level3 = ? WHERE name = ?", (newScore, username))
     elif level == 'final':
-        cursor.execute("UPDATE scoreTable SET final = ? WHERE name = ?", (newScore, username))
+        cursor.execute("SELECT level1, level2, level3 FROM scoreTable WHERE name = ?", (username,))
+        scores = cursor.fetchone()
+        finalScore = sum(scores) + newScore
+        cursor.execute("UPDATE scoreTable SET final = ? WHERE name = ?", (finalScore, username))
+
     else:
         return jsonify("Invalid level specified")
     connection.commit()
