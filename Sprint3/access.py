@@ -27,13 +27,14 @@ def index():
 def gridPage():
     return render_template('grid.html')
 
-
-
 #newGame dummy template
 @app.route('/newGame')
 def newGame():
     return render_template('main.html')
 
+@app.route('/info.js')
+def info_js():
+    return render_template('info.js')
 
 @app.route('/level2')
 def level2():
