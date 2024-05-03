@@ -71,18 +71,17 @@
 </head>
 <body>
 
-  <p id="money">Money: 100000</p>
+  <p id="money">Money: 60000</p>
   <canvas id="canvas" style="background: url('../static/Assets/manufacturing_buildings/grass.png')" width="720" height="600"></canvas>
   <div class="toolbox">
-    <button onclick="setCurrentTool('steel')">Steel Source</button>
-    <button onclick="setCurrentTool('copper')">Copper Source</button>
-    <button onclick="setCurrentTool('storage')">Storage</button>
-    <button onclick="setCurrentTool('constructor')">Constructor</button>
-    <button onclick="setCurrentTool('autoshop')">Autoshop</button>
-    <button onclick="setCurrentTool('conveyor')">Conveyor Belt</button>
-    <button onclick="setCurrentTool('mouse')">Mouse</button>
+    <button onclick="setCurrentTool('LaunchPad')">Landing Pad</button>
+    <button onclick="setCurrentTool('Constructor')">Constructor</button>
+    <button onclick="setCurrentTool('Autoshop')">Autoshop</button>
+    <button onclick="setCurrentTool('Conveyor')">Conveyor Belt</button>
     <button onclick="setCurrentTool('delete')">Delete Building</button>
     <button onclick="help_click()" id="btn">Help!</button>
+    <button onclick="go_away()" id="btn">Proceed to wave</button>
+    <button onclick="setCurrentTool('mouse')">Mouse</button>
   </div>
   
   <!-- Interface elements -->
@@ -148,9 +147,9 @@
 
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
-    const gridSize = 40; //20 // Size of each grid cell in pixels
-    const width = 18;  //36 // Number of columns
-    const height = 15; //30 // Number of rows
+    const gridSize = 60; //20 // Size of each grid cell in pixels
+    const width = 12;  //36 // Number of columns
+    const height = 10; //30 // Number of rows
 
     const buildings = [];
     const conveyorBelts = [];
@@ -160,7 +159,7 @@
     let help_active = false;
 
     const money_elem = document.getElementById('money');
-    let money = 100000
+    let money = 60000
 
     let autobuy_buildings = [];
     let autosell_buildings = [];
@@ -180,16 +179,27 @@
 
     // Draw buildings with inventory
     function drawBuildings() {
-      buildings.forEach(building => {
-        ctx.fillStyle = building.color;
-        ctx.fillRect(building.x * gridSize, building.y * gridSize, gridSize, gridSize);
-        ctx.fillStyle = 'white';
-        ctx.fillText(`${building.type} (${building.inventory})`, building.x * gridSize + 2, building.y * gridSize + 8);
-        //console.log(building.type)
-        //console.log(building.inventory)
-        //console.log(building);
-      });
+  buildings.forEach(building => {
+    const image = loadedImages[building.type];
+    if (image) {
+      // Draw the image if it exists
+      const x = building.x * gridSize;
+      const y = building.y * gridSize;
+      const width = gridSize;   // Assuming the image should fill the grid cell
+      const height = gridSize;  // Assuming the image should fill the grid cell
+      ctx.drawImage(image, x, y, width, height);
+    } else {
+      // Fallback to drawing a solid color rectangle if no image is available
+      ctx.fillStyle = building.color;
+      ctx.fillRect(building.x * gridSize, building.y * gridSize, gridSize, gridSize);
     }
+
+    // Always draw the text label
+    ctx.fillStyle = 'white';
+    ctx.fillText(`${building.type} (${building.inventory})`, building.x * gridSize + 2, building.y * gridSize + 20);
+  });
+}
+
 
     // Draw conveyor belts
     function drawConveyorBelts() {
@@ -225,6 +235,9 @@ function drawMovingItems() {
       }
       return false
     }
+
+    placeBuilding("CopperLandingPad", 5, 13)
+    placeBuilding("SteelLandingPad", 12, 13)
 
     //game_loop
     setInterval(() => {
@@ -270,7 +283,7 @@ function drawMovingItems() {
         }
       });
 
-      shuffleArray(conveyorBelts); // helps us spread our seeds
+      shuffleArray(conveyorBelts);
       //Check Belts to put items on and take out of buildings
       conveyorBelts.forEach(belt => {
         const startBuilding = buildings.find(b => b.x === belt.start.x && b.y === belt.start.y);
@@ -278,7 +291,7 @@ function drawMovingItems() {
         let item_type;
         if (startBuilding && endBuilding && has_inventory(startBuilding)) {
           // Move one item from start to end
-          if (startBuilding["type"] === "constructor") {
+          if (startBuilding["type"] === "Constructor") {
             if (startBuilding.inventory[startBuilding["recipe"]["name"]] > 0) {
               item_type = startBuilding["recipe"]["name"];
               startBuilding.inventory[startBuilding["recipe"]["name"]]--;
@@ -297,9 +310,9 @@ function drawMovingItems() {
             endBuilding: endBuilding,
             type: item_type,
             color:
-              item_type === 'steel'
+              item_type === 'Steel'
                 ? 'blue'
-                : item_type === 'copper'
+                : item_type === 'Copper'
                 ? 'orange'
                 : 'green',
             startX: belt.start.x,
@@ -362,24 +375,25 @@ function drawMovingItems() {
         "Laser Ship": 0,
       };
       switch (type) {
-        case 'steel':
+        case 'SteelLandingPad':
           color = 'blue';
           inv = {}
-          inv["Steel"] = Infinity;
+          inv["Steel"] = 4000;
+          // img_id = url('../static/Assets/materials/steel.png');
           break;
-        case 'copper':
+        case 'CopperLandingPad':
           color = 'orange';
           inv = {}
-          inv["Copper"] = Infinity;
+          inv["Copper"] = 3000;
           break;
-        case 'storage':
+        case 'LaunchPad':
           color = 'lightblue';
           break;
-        case 'autoshop':
+        case 'Autoshop':
           color = 'green';
           buildings.push({ type, x, y, color, inventory: inv , buy_or_sell: null});
           return;
-        case 'constructor':
+        case 'Constructor':
           color = 'grey';
           buildings.push({ type, x, y, color, inventory: inv , recipe: null});
           return;
@@ -417,7 +431,7 @@ function drawMovingItems() {
           var invText = '<p id="menu_inv"></p>'; // add inventory to display
           
 
-          if (get_building.type === 'constructor') {
+          if (get_building.type === 'Constructor') {
             disp_constructor(get_building, invText);
           } else if (get_building.type === 'autoshop') {
             disp_shop(get_building, invText);
@@ -431,7 +445,7 @@ function drawMovingItems() {
           document.getElementById('interface').style.display = 'none';
         }
       // CONVEYOR
-      } else if (currentTool === 'conveyor') {
+      } else if (currentTool === 'Conveyor') {
         if (!firstClick) {
           firstClick = { x: gridX, y: gridY };
         } else {
@@ -592,39 +606,41 @@ function drawMovingItems() {
 
     function check_conveyor_rules(start_obj, end_obj) {
       //let valid = true;
-      return true;
       
       const startBuilding = buildings.find(b => b.x === start_obj.x && b.y === start_obj.y);
       const endBuilding = buildings.find(b => b.x === end_obj.x && b.y === end_obj.y);
       
-      // (1) cannot connect 2 buildings of same type by conveyor unless they are both constructors
-      if (startBuilding.type === endBuilding.type && (startBuilding.type != 'constructor' && endBuilding.type != 'constructor')) {
-        console.log("cannot connect 2 buildings of same type by conveyor unless they are both constructors");
-        return false;
-      }
       // (2) cannot make copper or steel landing pads an endpoint for a conveyor belt
-      if (endBuilding.type === 'copper' || endBuilding.type === 'steel') {
+      if (endBuilding.type === 'CopperLandingPad' || endBuilding.type === 'steel') {
         console.log("cannot make copper or steel landing pads an endpoint for a conveyor belt");
         return false;
       }
-      // (3) cannot make a storage (placeholder for shops and launch pads) be a starting point for a conveyor
-      if (startBuilding.type === 'storage') {
-        console.log("cannot make a storage (placeholder for shops and launch pads) be a starting point for a conveyor");
+      return true;
+
+      // (1) cannot connect 2 buildings of same type by conveyor unless they are both constructors
+      if (startBuilding.type === endBuilding.type && (startBuilding.type != 'Constructor' && endBuilding.type != 'Constructor')) {
+        console.log("cannot connect 2 buildings of same type by conveyor unless they are both constructors");
+        return false;
+      }
+
+      // (3) cannot make a LaunchPad (placeholder for shops and launch pads) be a starting point for a conveyor
+      if (startBuilding.type === 'LaunchPad') {
+        console.log("cannot make a LaunchPad (placeholder for shops and launch pads) be a starting point for a conveyor");
         return false;
       }
       // (4) prevent conveyor to a constructor that has no recipe
-      if (endBuilding.type === 'constructor' && (!(endBuilding.recipe))) {
+      if (endBuilding.type === 'Constructor' && (!(endBuilding.recipe))) {
         console.log("cannot make a conveyor to a constructor that has no recipe");
         return false;
       }
       // (4) only let a constructor-constructor if [end constructor] recipe requires [start constructor] item
-      if (endBuilding.type === 'constructor' && endBuilding.recipe) {
+      if (endBuilding.type === 'Constructor' && endBuilding.recipe) {
         // do check for if start building is a constructor (compare their recipes and see if compatibility)
-        if (startBuilding.type === 'constructor' && (!(startBuilding.recipe))) {
+        if (startBuilding.type === 'Constructor' && (!(startBuilding.recipe))) {
           console.log("failure: cannot make conveyor if starting constructor has no recipe");
           return false;
         }
-        if (startBuilding.type === 'constructor' && startBuilding.recipe) {
+        if (startBuilding.type === 'Constructor' && startBuilding.recipe) {
           // make sure recipes match
           for (var key in endBuilding.recipe.recipe) {
             if (key === startBuilding.recipe.name) {
@@ -643,13 +659,17 @@ function drawMovingItems() {
         console.log("cannot make conveyor to a constructor that doesn't meet recipe requirements");
         return false; // no recipe match was found 
       }
-      // (5) only allow storage to connect to constructor of a finished product (for launching to David)
+      // (5) only allow LaunchPad to connect to constructor of a finished product (for launching to David)
       
       return true;
     }
 
     // Initial draw
     draw();
+
+    function go_away() {
+      
+    }
 
   </script>
 </body>
