@@ -38,6 +38,13 @@ all_items = [Steel, Copper, Plating_Recipe, Wire_Recipe, Battery_Recipe, Motor_R
 
 
 images_links = {
+    "SteelLandingPad":  "{{ url_for('static', filename='/Assets/manufacturing_buildings/steel_landing_pad.png') }}",
+    "CopperLandingPad": "{{ url_for('static', filename='/Assets/manufacturing_buildings/copper_landing_pad.png') }}",
+    "LaunchPad":        "{{ url_for('static', filename='/Assets/manufacturing_buildings/launchpad.png') }}",
+    "Constructor":      "{{ url_for('static', filename='/Assets/manufacturing_buildings/constructor.png') }}",
+    "Autoshop":             "{{ url_for('static', filename='/Assets/manufacturing_buildings/shop.png') }}",
+
+
     "Steel":            "{{ url_for('static', filename='/Assets/materials/steel.png') }}",
     "Copper":           "{{ url_for('static', filename='/Assets/materials/copper.png') }}",
     "Plating":          "{{ url_for('static', filename='/Assets/materials/plating.png') }}",
