@@ -3,6 +3,8 @@ var enemies = []; //enemy objects
 var towers = []; //tower objects
 var deadTowers = []; //indexes of towers that have been destroyed
 
+var curr_user = localStorage.getItem('curr_user'); //stores the current user from mainGame.js PUT THIS WITH YOUR OTHER VARS
+
 var deadEnemyObjects = [];
 
 var towerOptions = [[3, 3, 4, 5, 6, 0],[2, 2, 2, 3, 1, 0],[0, 1, 4, 2, 5, 0]];
@@ -451,6 +453,7 @@ function runRound() {
     if(lives == 0 || (enemies.length == 0 && enemyWaves == 0)){
 
         if(enemies.length == 0 && lives > 0){
+            sendHighScores(curr_user, score, "level3");
             createEndingCover("Mission Success! Total Score: " + score.toString());
         }
         else{
@@ -1089,6 +1092,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if(cClicks == 6){
                 score = 4;
+                sendHighScores(curr_user, score, "level3");
                 createEndingCover("Go On, Cheater!")
             }
         }

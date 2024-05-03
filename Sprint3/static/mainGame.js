@@ -7,6 +7,8 @@ var lasersActive = false; //indicating that lasers are present on the screen, so
 
 var score = 0; //number of points
 
+var curr_user = localStorage.getItem('curr_user'); //stores the current user from mainGame.js PUT THIS WITH YOUR OTHER VARS
+
 
 const coverName = "coverDiv";
 const endingCoverName = "endingDiv";
@@ -380,6 +382,7 @@ function runRound() {
         if(enemies.length == 0 && lives > 0){
         
             //sendHighScores(score)
+            endHighScores(curr_user, score, "level1");
             createEndingCover("Mission Success! Total Score: " + score.toString());
         }
         else{
