@@ -70,6 +70,8 @@ towerDamage = 3;
 
 var curr_user = localStorage.getItem('curr_user'); //stores the current user from mainGame.js
 
+
+
 function chooseDifficulty(){
 
     coverScreenWithTranslucentDiv();
@@ -94,7 +96,33 @@ function endDifficultyScreen(difficulty = 1){
     setup();
 }
 
+function getCookie(name) {
+    var nameEQ = name + "=";
+    var ca = document.cookie.split(';');
+    for(var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+    }
+    return null;
+}
+
 function setup(){
+
+
+    for(var i = 0; i < numGunneryShip; i++){
+        towerOptions.push([1, 1, 2, 4, 1, 0]);
+    }
+    for(var i = 0; i < numSniperShip; i++){
+        towerOptions.push([1, 2, 3, 1, 5, 0]);
+    }
+    for(var i = 0; i < numCannonShip; i++){
+        towerOptions.push([4, 4, 1, 1, 2, 0]);
+    }
+    for(var i = 0; i < numLaserShip; i++){
+        towerOptions.push([3, 3, 3, 3, 3, 0]);
+    }
+    
 
     homeBaseObject = document.getElementById("homeBase");
 
