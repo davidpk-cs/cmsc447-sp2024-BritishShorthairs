@@ -213,19 +213,7 @@ function drawMovingItems() {
       const x = item.currentX * gridSize + (gridSize / 2) - (imageSize / 2);
       const y = item.currentY * gridSize + (gridSize / 2) - (imageSize / 2);
       ctx.drawImage(img, x, y, imageSize, imageSize);
-    } else {
-      // Fallback to drawing circles if image not available
-      ctx.fillStyle = item.color;
-      ctx.beginPath();
-      ctx.arc(
-        item.currentX * gridSize,
-        item.currentY * gridSize,
-        gridSize / 4, 
-        0,
-        2 * Math.PI
-      );
-      ctx.fill();
-    }
+    } 
   });
 }
 
@@ -284,8 +272,6 @@ function drawMovingItems() {
 
 
       //Check Belts to put items on and take out of buildings
-      shuffleArray(conveyorBelts);
-
       conveyorBelts.forEach(belt => {
         const startBuilding = buildings.find(b => b.x === belt.start.x && b.y === belt.start.y);
         const endBuilding = buildings.find(b => b.x === belt.end.x && b.y === belt.end.y);
@@ -330,8 +316,8 @@ function drawMovingItems() {
         }
       });
 
-      const step = 0.01; // Smaller values make the animation smoother
-      for (let i = 0; i < 5; i++) {
+      const step = 0.001; // Smaller values make the animation smoother
+      for (let i = 0; i < 50; i++) {
         movingItems.forEach(item => {
           if (item.progress < 1) {
             item.progress += step;
@@ -349,10 +335,6 @@ function drawMovingItems() {
       draw(); // Redraw the canvas
     }, 200); // Adjust time interval to control movement frequency
 
-    // shuffle array
-    function shuffleArray(array) {
-        return array.sort(() => Math.random() - 0.5);
-    }
 
     // Function to place a building
     function placeBuilding(type, x, y) {
@@ -380,6 +362,7 @@ function drawMovingItems() {
           color = 'blue';
           inv = {}
           inv["Steel"] = Infinity;
+          // img_id = url('../static/Assets/materials/steel.png');
           break;
         case 'copper':
           color = 'orange';
