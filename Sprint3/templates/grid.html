@@ -9,7 +9,7 @@
     }
 
     canvas {
-      border: 1px solid black;
+      border: 0px solid black;
     }
     .toolbox {
       position: fixed;
@@ -67,21 +67,47 @@
       letter-spacing: 1px;
       text-shadow: 1px 1px 2px #000;
     }
+
+.game-button {
+    background-color: #4CAF50; 
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background-color 0.3s, transform 0.3s; 
+}
+
+/* Hover effect */
+.game-button:hover {
+    background-color: #45a049; 
+    transform: scale(1.1); 
+}
+
+.game-button:active {
+    transform: scale(0.95); 
+}
+
   </style>
 </head>
 <body>
 
-  <p id="money">Money: 60000</p>
+  <p id="money">Money: 20000</p>
   <canvas id="canvas" style="background: url('../static/Assets/manufacturing_buildings/grass.png')" width="720" height="600"></canvas>
   <div class="toolbox">
-    <button onclick="setCurrentTool('LaunchPad')">Launch Pad</button>
-    <button onclick="setCurrentTool('Constructor')">Constructor</button>
-    <button onclick="setCurrentTool('Autoshop')">Autoshop</button>
-    <button onclick="setCurrentTool('Conveyor')">Conveyor Belt</button>
-    <button onclick="setCurrentTool('delete')">Delete Building</button>
-    <button onclick="help_click()" id="btn">Help!</button>
-    <button onclick="go_away()" id="btn">Proceed to wave</button>
-    <button onclick="setCurrentTool('mouse')">Mouse</button>
+    <button onclick="setCurrentTool('LaunchPad')" class="game-button">Launch Pad</button>
+    <button onclick="setCurrentTool('Constructor')" class="game-button">Constructor</button>
+    <button onclick="setCurrentTool('Autoshop')" class="game-button">Autoshop</button>
+    <button onclick="setCurrentTool('Conveyor')" class="game-button">Conveyor Belt</button>
+    <button onclick="setCurrentTool('delete')" class="game-button">Delete Building</button>
+    <button onclick="help_click()" id="btn-help" class="game-button">Help!</button>
+    <button onclick="go_away()" id="btn-proceed" class="game-button">Proceed to wave</button>
+    <button onclick="setCurrentTool('mouse')" class="game-button">Mouse</button>    
   </div>
   
   <!-- Interface elements -->
@@ -149,7 +175,7 @@
     const ctx = canvas.getContext('2d');
     const gridSize = 60; //20 // Size of each grid cell in pixels
     const width = 12;  //36 // Number of columns
-    const height = 10; //30 // Number of rows
+    const height = 9; //30 // Number of rows
 
     const buildings = [];
     const conveyorBelts = [];
@@ -159,7 +185,7 @@
     let help_active = false;
 
     const money_elem = document.getElementById('money');
-    let money = 60000
+    let money = 20000
 
     let autobuy_buildings = [];
     let autosell_buildings = [];
@@ -194,10 +220,6 @@
       ctx.fillStyle = building.color;
       ctx.fillRect(building.x * gridSize, building.y * gridSize, gridSize, gridSize);
     }
-
-    // Always draw the text label
-    ctx.fillStyle = 'white';
-    ctx.fillText(`${building.type} (${building.inventory})`, building.x * gridSize + 2, building.y * gridSize + 20);
   });
 }
 
@@ -253,6 +275,10 @@ function drawMovingItems() {
       }
 
       money_elem.innerHTML = "Money: " + money.toString();
+      money_elem.style.color = 'white';           // Set the text color to white
+      money_elem.style.fontWeight = 'bold';       // Make the text bold
+      money_elem.style.fontSize = '24px';         // Increase the font size
+      money_elem.style.fontFamily = 'Arial, sans-serif'; // Optional: Change the font family if desired
 
       autobuy_buildings.forEach(building => {
         if (money > building["recipe"]["price"]) {
