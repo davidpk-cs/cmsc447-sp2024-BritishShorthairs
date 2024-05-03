@@ -284,6 +284,8 @@ function drawMovingItems() {
 
 
       //Check Belts to put items on and take out of buildings
+      shuffleArray(conveyorBelts);
+
       conveyorBelts.forEach(belt => {
         const startBuilding = buildings.find(b => b.x === belt.start.x && b.y === belt.start.y);
         const endBuilding = buildings.find(b => b.x === belt.end.x && b.y === belt.end.y);
@@ -347,6 +349,10 @@ function drawMovingItems() {
       draw(); // Redraw the canvas
     }, 200); // Adjust time interval to control movement frequency
 
+    // shuffle array
+    function shuffleArray(array) {
+        return array.sort(() => Math.random() - 0.5);
+    }
 
     // Function to place a building
     function placeBuilding(type, x, y) {
@@ -374,7 +380,6 @@ function drawMovingItems() {
           color = 'blue';
           inv = {}
           inv["Steel"] = Infinity;
-          // img_id = url('../static/Assets/materials/steel.png');
           break;
         case 'copper':
           color = 'orange';
