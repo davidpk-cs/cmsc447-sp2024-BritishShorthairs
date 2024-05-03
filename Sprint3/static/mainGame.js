@@ -382,7 +382,7 @@ function runRound() {
         if(enemies.length == 0 && lives > 0){
         
             //sendHighScores(score)
-            endHighScores(curr_user, score, "level1");
+            sendHighScores(curr_user, score, "level1");
             createEndingCover("Mission Success! Total Score: " + score.toString());
         }
         else{
@@ -922,7 +922,24 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if(cClicks == 6){
                 score = 4;
+                sendHighScores(curr_user, score, "level1");
                 createEndingCover("Go On, Cheater!")
+            }
+        }
+    });
+});
+
+var dClicks = 0;
+document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'd') {
+            dClicks++;
+
+            if(dClicks == 6){
+                for(var i = 0; i < towers.length; towers++){
+                    towers[i].health += 10000000;
+                    lives += 100000000;
+                }
             }
         }
     });

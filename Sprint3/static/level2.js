@@ -549,7 +549,7 @@ function runRound() {
 
         if(enemies.length == 0 && lives > 0){
 
-            sendHighScores(curr_user, score, "2");
+            sendHighScores(curr_user, score, "level2");
             createEndingCover("Mission Success! Total Score: " + score.toString());
         }
         else{
@@ -1315,6 +1315,23 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+
+var dClicks = 0;
+document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'd') {
+            dClicks++;
+
+            if(dClicks == 6){
+                for(var i = 0; i < towers.length; towers++){
+                    towers[i].health += 10000000;
+                    lives += 100000000;
+                }
+            }
+        }
+    });
+});
+
 //---------------------------------------
 
 //Please put some functions here for connecting to flask
@@ -1355,7 +1372,7 @@ function sendLoot(lootInfo){
 
 function nextLevel(){
 
-    window.location.href = '/level3'; //this works 
+    window.location.href = '/grid'; //this works 
 }
 
   

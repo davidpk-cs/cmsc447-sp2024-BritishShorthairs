@@ -18,6 +18,8 @@ var score = 0; //number of points
 const coverName = "coverDiv";
 const endingCoverName = "endingDiv";
 
+var enemyHealthOffset = 1;
+
 
 //------------
 const framesPerSecond = 60; //program tested on high refresh rate screens it works fine
@@ -573,6 +575,8 @@ function sendEnemyWave(){
             else if(roll = 5){enemyToPush.boss2()};
         }
 
+        enemyToPush.health *= enemyHealthOffset;
+
         enemies.push(enemyToPush);
     }
 
@@ -1060,7 +1064,7 @@ function determineQuarter(value1, value2) {
 }
 
 function hardMode(){
-
+    enemyHealthOffset *= 2;
 }
 
 function generateTower(){
@@ -1094,6 +1098,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 score = 4;
                 sendHighScores(curr_user, score, "level3");
                 createEndingCover("Go On, Cheater!")
+            }
+        }
+    });
+});
+
+var dClicks = 0;
+document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'd') {
+            dClicks++;
+
+            if(dClicks == 6){
+                for(var i = 0; i < towers.length; towers++){
+                    towers[i].health += 10000000;
+                    lives += 100000000;
+                }
             }
         }
     });
