@@ -109,6 +109,10 @@ function getCookie(name) {
 
 function setup(){
 
+     var numGunneryShip = getCookie("Ship_Inventory_Gunnery_Ship");
+     var numSniperShip = getCookie("Ship_Inventory_Sniper_Ship");
+     var numCannonShip = getCookie("Ship_Inventory_Cannon_Ship");
+     var numLaserShip = getCookie("Ship_Inventory_Laser_Ship");
 
     for(var i = 0; i < numGunneryShip; i++){
         towerOptions.push([1, 1, 2, 4, 1, 0]);
