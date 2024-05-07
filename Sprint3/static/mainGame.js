@@ -60,6 +60,15 @@ enemySizeOdds = 25;
 
 var curr_user = " ";
 
+function mainGetUser(){
+    //should get the name of the user 
+    var nameField = document.getElementById("createName");
+    var name = nameField.value;
+    curr_user = name;
+    localStorage.setItem('curr_user', name); //saves into local storage and should be retreivable in other .js files
+    console.log("curr_user: " + curr_user);
+}
+
 function generateEconomy(){
 
     var currentSkew = randomInt(1, 10);
@@ -951,18 +960,11 @@ document.addEventListener('DOMContentLoaded', function() {
 //Please put some functions here for connecting to flask
 //One should take a high score and pass it into flask to be put in the database for level 1
 //
-
-function mainGetUser(){
-    //should get the name of the user 
-    var nameField = document.getElementById("createName");
-    var name = nameField.value;
-    curr_user = name;
-    localStorage.setItem('curr_user', name); //saves into local storage and should be retreivable in other .js files
-}
 function sendHighScores(username,score,level = "level1"){
     //this takes in a  username and a score and posts updates the score to the 
     //specified username (works kind of like add and delete)
     console.log("sendHighScores called");
+    console.log("username" + curr_user + " and score" + score);
     fetch('/updateScore', {
         method: 'POST',
         headers: {
