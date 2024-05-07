@@ -491,6 +491,7 @@ function runRound() {
             createEndingCover("Mission Success! Total Score: " + score.toString());
         }
         else{
+            sendHighScores(curr_user, score, "level3");
             createEndingCover("Nice Try! Better Luck Next Time!", false);
         }
 

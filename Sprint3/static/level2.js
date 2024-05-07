@@ -553,6 +553,7 @@ function runRound() {
             createEndingCover("Mission Success! Total Score: " + score.toString());
         }
         else{
+            sendHighScores(curr_user, score, "level2");
             createEndingCover("Nice Try! Better Luck Next Time!", false);
         }
 
@@ -1341,6 +1342,8 @@ document.addEventListener('DOMContentLoaded', function() {
 function sendHighScores(username,score,level = "level2"){
     //this takes in a  username and a score and posts updates the score to the 
     //specified username (works kind of like add and delete)
+    console.log("sendHighScores2 called");
+    console.log("username: " + username + " score: " + score);
     fetch('/updateScore', {
         method: 'POST',
         headers: {

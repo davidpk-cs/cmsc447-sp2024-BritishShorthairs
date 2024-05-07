@@ -208,7 +208,6 @@ def updateScore():
         cursor.execute("UPDATE scoreTable SET level2 = ? WHERE name = ?", (newScore, username))
     elif level == 'level3':
         cursor.execute("UPDATE scoreTable SET level3 = ? WHERE name = ?", (newScore, username))
-    elif level == 'final':
         cursor.execute("SELECT level1, level2, level3 FROM scoreTable WHERE name = ?", (username,))
         scores = cursor.fetchone()
         if scores:
